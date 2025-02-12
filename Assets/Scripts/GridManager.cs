@@ -3,8 +3,8 @@ using UnityEngine;
 
 public static class GridManager
 {
-    private const float CellSize = 1.2f;
-    private static InWorldGridManager _inWorldGridManager => Object.FindFirstObjectByType<InWorldGridManager>();
+    private const float CellSize = 0.5f;
+    private static InWorldGridManager InWorldGridManager => Object.FindFirstObjectByType<InWorldGridManager>();
     
     public enum Direction
     {
@@ -36,44 +36,38 @@ public static class GridManager
         var grid = new Dictionary<Vector2Int, GridCell>();
         var width = dimensions.x;
         var height = dimensions.y;
-        Vector2 origin = startPos - new Vector2((width / 2f) * CellSize, (height / 2f) * CellSize);
-        
-        for (int x = 0; x < width; x++)
+    
+        for (int y = 0; y < height; y++)
         {
-            for (int y = 0; y < height; y++)
+            for (int x = 0; x < width; x++)
             {
-                Vector2 position = origin + new Vector2(x * CellSize, y * CellSize);
-                var newCell = Object.Instantiate(gridCell, position, Quaternion.identity, _inWorldGridManager.transform);
+                Vector2 position = startPos + new Vector2(x * CellSize, -y * CellSize);
+                var newCell = Object.Instantiate(gridCell, position, Quaternion.identity, InWorldGridManager.transform);
+                newCell.gridPosition = new Vector2Int(x, y);
                 grid[new Vector2Int(x, y)] = newCell;
             }
         }
 
-        for (int x = 0; x < width; x++)
+        foreach (var cell in grid.Values)
         {
-            for (int y = 0; y < height; y++)
-            {
-                CacheNeighbors(new Vector2Int(x,y), dimensions, grid);
-            }
+            CacheNeighbors(cell, grid);
         }
 
         return grid;
     }
 
-    private static void CacheNeighbors(Vector2Int pos, Vector2Int dimensions, Dictionary<Vector2Int, GridCell> grid)
+    public static void CacheNeighbors(GridCell cell, Dictionary<Vector2Int, GridCell> grid)
     {
-        GridCell cell = grid[pos];
         cell.Neighbors = new Dictionary<Direction, GridCell>();
         
         foreach (Direction dir in System.Enum.GetValues(typeof(Direction)))
         {
             Vector2Int offset = DirectionOffsets[dir];
-            int nx = pos.x + offset.x;
-            int ny = pos.y + offset.y;
+            int nx = cell.gridPosition.x + offset.x;
+            int ny = cell.gridPosition.y + offset.y;
 
-            if (nx >= 0 && nx < dimensions.x && ny >= 0 && ny < dimensions.y)
-            {
-                cell.Neighbors[dir] = grid[new Vector2Int(nx,ny)];
-            }
+            if (grid.TryGetValue(new Vector2Int(nx, ny), out var neighbourCell))
+                cell.Neighbors[dir] = neighbourCell;
         }
     }
     
@@ -81,33 +75,31 @@ public static class GridManager
     {
         GridCell closestCell = null;
         float closestDistance = float.MaxValue;
-        float minSnapDistance = 10f;
 
-        foreach (var cell in _inWorldGridManager.grid.Values)
+        foreach (var cell in InWorldGridManager.Grid.Values)
         {
             if(!includeOccupied && cell.heldObject != null) continue;
             
             float distance = Vector2.Distance(worldPosition, cell.transform.position);
             
             if (distance > closestDistance) continue;
-            if(distance > minSnapDistance) continue;
-            
             closestDistance = distance;
             closestCell = cell;
         }
 
         return closestCell;
     }
-
-
+    
     public static void Dispose()
     {
-        var grid = _inWorldGridManager.grid;
+        var grid = InWorldGridManager.Grid;
         grid ??= new Dictionary<Vector2Int, GridCell>();
-        foreach (var gridValue in grid.Values)
+        while (InWorldGridManager.transform.childCount > 0)
         {
-            if (gridValue != null)
-                Object.DestroyImmediate(gridValue.gameObject);
+            foreach(Transform child in InWorldGridManager.transform)
+            {
+                Object.DestroyImmediate(child.gameObject);
+            }
         }
         grid.Clear();
     }

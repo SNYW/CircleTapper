@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
@@ -7,10 +8,26 @@ public class InWorldGridManager : MonoBehaviour
 {
     public Vector2Int dimensions;
     public GridCell gridCell;
-    public Dictionary<Vector2Int, GridCell> grid;
-    public void Init()
+    public Dictionary<Vector2Int, GridCell> Grid;
+
+    private void Awake()
     {
-        grid = GridManager.Init(Vector2.zero, dimensions, gridCell);
+        Grid = new Dictionary<Vector2Int, GridCell>();
+        
+        foreach (var cell in GetComponentsInChildren<GridCell>())
+        {
+            Grid.Add(cell.gridPosition, cell);
+        }
+
+        foreach (var cell in Grid.Values)
+        {
+            GridManager.CacheNeighbors(cell, Grid);
+        }
+    }
+
+    public void InitGrid()
+    {
+        Grid = GridManager.Init(Vector2.zero, dimensions, gridCell);
     }
 }
 
@@ -24,7 +41,7 @@ public class GridManagerEditor : Editor
         InWorldGridManager gridManager = (InWorldGridManager)target;
         if (GUILayout.Button("Generate Grid"))
         {
-            gridManager.Init();
+            gridManager.InitGrid();
         }
         if (GUILayout.Button("Clear Grid"))
         {

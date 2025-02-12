@@ -13,7 +13,6 @@ public class GameManager : MonoBehaviour
 
     private void OnDisable()
     {
-        GridManager.Dispose();
         PurchaseManager.Dispose();
     }
 }

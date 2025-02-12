@@ -1,19 +1,28 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Square : BoardObject
 {
     public float clickSpeed;
 
-    private void Awake()
-    {
-        GridManager.GetClosestCell(transform.position).SetChildObject(this);
-    }
-
     private void Start()
     {
+        GridManager.GetClosestCell(transform.position).SetChildObject(this);
         StartCoroutine(ClickNeighbours());
+    }
+
+    public override void OnBeginDrag(PointerEventData eventData)
+    {
+        StopAllCoroutines();
+        base.OnBeginDrag(eventData);
+    }
+
+    public override void OnEndDrag(PointerEventData eventData)
+    {
+        StartCoroutine(ClickNeighbours());
+        base.OnEndDrag(eventData);
     }
 
     private IEnumerator ClickNeighbours()

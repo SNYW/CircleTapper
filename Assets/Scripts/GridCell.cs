@@ -4,15 +4,22 @@ using UnityEngine;
 public class GridCell : MonoBehaviour
 {
     public Vector2Int gridPosition;
-    public Dictionary<GridManager.Direction, GridCell> Neighbors = new();
-
+    public Dictionary<GridManager.Direction, GridCell> Neighbors;
     public BoardObject heldObject = null;
+    private SpriteRenderer spriteRenderer;
 
+    private Color startColor;
     public GridCell(Vector2Int position)
     {
         gridPosition = position;
     }
-    
+
+    private void Awake()
+    {
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        startColor = spriteRenderer.color;
+    }
+
     public void SetChildObject(BoardObject boardObject)
     {
         heldObject = boardObject;
