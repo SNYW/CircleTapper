@@ -27,7 +27,7 @@ public class InWorldGridManager : MonoBehaviour
 
     public void InitGrid()
     {
-        Grid = GridManager.Init(Vector2.zero, dimensions, gridCell);
+        Grid = GridManager.Init(transform.position, dimensions, gridCell);
     }
 }
 

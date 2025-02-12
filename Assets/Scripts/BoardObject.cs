@@ -20,6 +20,7 @@ public abstract class BoardObject : MonoBehaviour, IBeginDragHandler, IEndDragHa
         if (cell.heldObject != null && LastParentCell != null)
         {
             LastParentCell.SetChildObject(cell.heldObject);
+            cell.heldObject = null;
         }
         
         cell.SetChildObject(this);
@@ -28,7 +29,7 @@ public abstract class BoardObject : MonoBehaviour, IBeginDragHandler, IEndDragHa
 
     public void OnDrag(PointerEventData eventData)
     {
-        var campos = GridManager.GetClosestCell(Camera.main.ScreenToWorldPoint(eventData.position));
+        var campos = GridManager.GetClosestCell(Camera.main.ScreenToWorldPoint(eventData.position),true);
         transform.position = campos.transform.position;
     }
 }

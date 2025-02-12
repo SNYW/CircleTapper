@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -9,7 +8,8 @@ public class Square : BoardObject
 
     private void Start()
     {
-        GridManager.GetClosestCell(transform.position).SetChildObject(this);
+        if(ParentCell == null)
+            GridManager.GetClosestCell(transform.position).SetChildObject(this);
         StartCoroutine(ClickNeighbours());
     }
 

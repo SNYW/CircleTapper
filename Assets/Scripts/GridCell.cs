@@ -20,6 +20,11 @@ public class GridCell : MonoBehaviour
         startColor = spriteRenderer.color;
     }
 
+    /*private void Update()
+    {
+        spriteRenderer.color = heldObject == null ? startColor : Color.red;
+    }*/
+
     public void SetChildObject(BoardObject boardObject)
     {
         heldObject = boardObject;
