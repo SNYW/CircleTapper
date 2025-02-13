@@ -6,7 +6,8 @@ public static class SystemEventManager
        public enum GameEvent
        {
               CircleComplete,
-              CurrencySpent
+              CurrencySpent,
+              BoardObjectMoved
        }
        private static Dictionary<GameEvent, Action<object>> _eventListeners;
 

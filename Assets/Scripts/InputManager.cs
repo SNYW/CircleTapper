@@ -8,32 +8,33 @@ public class InputManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.touchCount > 0)
+        if (Input.touchCount <= 0) return;
+        
+        Touch touch = Input.touches[0];
+        Vector2 touchPosition = touch.position;
+        if (Camera.main == null) return;
+        
+        var worldPosition = Camera.main.ScreenToWorldPoint(touchPosition);
+
+        switch (touch.phase)
         {
-            Touch touch = Input.touches[0];
-            Vector2 touchPosition = touch.position;
+            case TouchPhase.Began:
+                HandleTouchBegan(worldPosition);
+                break;
 
-            switch (touch.phase)
-            {
-                case TouchPhase.Began:
-                    HandleTouchBegan(touchPosition);
-                    break;
+            case TouchPhase.Moved:
+                HandleTouchMoved(worldPosition);
+                break;
 
-                case TouchPhase.Moved:
-                    HandleTouchMoved(touchPosition);
-                    break;
-
-                case TouchPhase.Ended:
-                case TouchPhase.Canceled:
-                    HandleTouchEnded(touchPosition);
-                    break;
-            }
+            case TouchPhase.Ended:
+            case TouchPhase.Canceled:
+                HandleTouchEnded(worldPosition);
+                break;
         }
     }
 
-    private void HandleTouchBegan(Vector2 touchPosition)
+    private void HandleTouchBegan(Vector2 worldPosition)
     {
-        Vector3 worldPosition = Camera.main.ScreenToWorldPoint(new Vector3(touchPosition.x, touchPosition.y, 0));
         RaycastHit2D hit = Physics2D.Raycast(worldPosition, Vector2.zero);
 
         if (hit.collider == null) return;
@@ -43,21 +44,19 @@ public class InputManager : MonoBehaviour
         _draggedObject = boardObject;
     }
 
-    private void HandleTouchMoved(Vector2 touchPosition)
+    private void HandleTouchMoved(Vector2 worldPosition)
     {
         if (_draggedObject == null) return;
-
-        _draggedObject.BeginDrag();
-        Vector3 worldPosition = Camera.main.ScreenToWorldPoint(new Vector3(touchPosition.x, touchPosition.y, 0));
-        var campos = GridManager.GetClosestCell(worldPosition,true);
-        _draggedObject.transform.position = campos.transform.position;
+        
+        _draggedObject.BeginDrag(worldPosition);
+        _draggedObject.OnDrag(worldPosition);
     }
 
-    private void HandleTouchEnded(Vector2 touchPosition)
+    private void HandleTouchEnded(Vector2 worldPosition)
     {
         if (_draggedObject != null)
         {
-            _draggedObject.EndDrag(touchPosition);
+            _draggedObject.EndDrag(worldPosition);
         }
         _draggedObject = null; 
     }

@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public abstract class BoardObject : MonoBehaviour
 {
@@ -7,25 +6,31 @@ public abstract class BoardObject : MonoBehaviour
     public GridCell LastParentCell;
 
     private bool _isDragging = false;
-    
-    public virtual void BeginDrag()
+    private Vector2 _startPosition;
+
+    public virtual void BeginDrag(Vector2 touchPosition)
     {
         if (_isDragging) return;
-        
-        LastParentCell = ParentCell;
-        ParentCell.heldObject = null;
-        ParentCell = null;
+
+        _startPosition = touchPosition;
+        if(ParentCell == null)
+            GridManager.GetClosestCell(transform.position).SetChildObject(this);
+        ParentCell.RemoveChildObject();
         _isDragging = true;
     }
 
-    public virtual void EndDrag(Vector2 eventData)
+    public virtual void OnDrag(Vector2 worldPosition)
     {
-        var cell = GridManager.GetClosestCell(Camera.main.ScreenToWorldPoint(eventData), true);
+        transform.position = worldPosition;
+    }
 
-        if (cell.heldObject != null && LastParentCell != null)
+    public virtual void EndDrag(Vector2 touchPosition)
+    {
+        var cell = GridManager.GetClosestCell(touchPosition, true);
+
+        if (cell.heldObject != null && cell.heldObject != this)
         {
-            LastParentCell.SetChildObject(cell.heldObject);
-            cell.heldObject = null;
+            cell = GridManager.GetClosestCell(touchPosition);
         }
         
         cell.SetChildObject(this);
@@ -35,6 +40,5 @@ public abstract class BoardObject : MonoBehaviour
 
     public virtual void OnTap()
     {
-        
     }
 }

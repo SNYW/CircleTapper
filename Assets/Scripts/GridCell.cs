@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,8 +9,12 @@ public class GridCell : MonoBehaviour
     public BoardObject heldObject = null;
     public SpriteRenderer debugSprite;
     public GameObject debugParent;
-
     public LineRenderer debugLine;
+
+    private void Awake()
+    {
+        debugLine.enabled = false;
+    }
 
     private void Update()
     {
@@ -32,8 +37,17 @@ public class GridCell : MonoBehaviour
 
     public void SetChildObject(BoardObject boardObject)
     {
+        RemoveChildObject();
         heldObject = boardObject;
         heldObject.ParentCell = this;
         heldObject.transform.position = transform.position;
+    }
+
+    public void RemoveChildObject()
+    {
+        if (heldObject == null) return;
+        
+        heldObject.ParentCell = null;
+        heldObject = null;
     }
 }

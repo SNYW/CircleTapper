@@ -25,8 +25,23 @@ public class InWorldGridManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        SystemEventManager.Subscribe(SystemEventManager.GameEvent.BoardObjectMoved, OnBoardObjectMoved);
+    }
+
+    private void OnBoardObjectMoved(object obj)
+    {
+        
+    }
+
     public void InitGrid()
     {
         Grid = GridManager.Init(transform.position, dimensions, gridCell);
+    }
+
+    private void OnDisable()
+    {
+        SystemEventManager.Unsubscribe(SystemEventManager.GameEvent.BoardObjectMoved, OnBoardObjectMoved);
     }
 }

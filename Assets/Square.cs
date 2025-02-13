@@ -15,10 +15,10 @@ public class Square : BoardObject
         StartCoroutine(ClickNeighbours());
     }
 
-    public override void BeginDrag()
+    public override void BeginDrag(Vector2 startPos)
     {
         StopAllCoroutines();
-        base.BeginDrag();
+        base.BeginDrag(startPos);
     }
 
     public override void EndDrag(Vector2 eventData)
