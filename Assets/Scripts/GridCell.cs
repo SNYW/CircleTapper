@@ -6,24 +6,29 @@ public class GridCell : MonoBehaviour
     public Vector2Int gridPosition;
     public Dictionary<GridManager.Direction, GridCell> Neighbors;
     public BoardObject heldObject = null;
-    private SpriteRenderer spriteRenderer;
+    public SpriteRenderer debugSprite;
+    public GameObject debugParent;
 
-    private Color startColor;
-    public GridCell(Vector2Int position)
+    public LineRenderer debugLine;
+
+    private void Update()
     {
-        gridPosition = position;
+        debugParent.SetActive(GameManager.DEBUGMODE);
+        debugSprite.color = (heldObject != null && GameManager.DEBUGMODE) ? Color.red : Color.clear;
+
+        if (GameManager.DEBUGMODE && heldObject != null)
+        {
+            if (heldObject.transform.position == transform.position) return;
+            
+            debugLine.enabled = true;
+            debugLine.SetPosition(0, transform.position);
+            debugLine.SetPosition(1, heldObject.transform.position);
+        }
+        else
+        {
+            debugLine.enabled = false;
+        }
     }
-
-    private void Awake()
-    {
-        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-        startColor = spriteRenderer.color;
-    }
-
-    /*private void Update()
-    {
-        spriteRenderer.color = heldObject == null ? startColor : Color.red;
-    }*/
 
     public void SetChildObject(BoardObject boardObject)
     {

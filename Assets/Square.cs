@@ -1,4 +1,5 @@
 using System.Collections;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -22,6 +23,7 @@ public class Square : BoardObject
 
     public override void EndDrag(Vector2 eventData)
     {
+        StopAllCoroutines();
         StartCoroutine(ClickNeighbours());
         base.EndDrag(eventData);
     }
@@ -42,6 +44,10 @@ public class Square : BoardObject
                 }
             }
             clickParticles.Play();
+            transform.DOScale(1.2f, 0.1f)
+                .SetEase(Ease.OutQuad)
+                .OnComplete(() => transform.DOScale(1f, 0.1f)
+                    .SetEase(Ease.InQuad));
         }
     }
 }

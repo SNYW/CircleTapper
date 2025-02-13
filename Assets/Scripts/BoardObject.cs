@@ -5,12 +5,17 @@ public abstract class BoardObject : MonoBehaviour
 {
     public GridCell ParentCell;
     public GridCell LastParentCell;
+
+    private bool _isDragging = false;
     
     public virtual void BeginDrag()
     {
+        if (_isDragging) return;
+        
         LastParentCell = ParentCell;
         ParentCell.heldObject = null;
         ParentCell = null;
+        _isDragging = true;
     }
 
     public virtual void EndDrag(Vector2 eventData)
@@ -25,6 +30,7 @@ public abstract class BoardObject : MonoBehaviour
         
         cell.SetChildObject(this);
         LastParentCell = null;
+        _isDragging = false;
     }
 
     public virtual void OnTap()

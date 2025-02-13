@@ -41,13 +41,13 @@ public class InputManager : MonoBehaviour
         
         boardObject.OnTap();
         _draggedObject = boardObject;
-        Debug.Log($"tapped {boardObject.name}");
     }
 
     private void HandleTouchMoved(Vector2 touchPosition)
     {
         if (_draggedObject == null) return;
-        
+
+        _draggedObject.BeginDrag();
         Vector3 worldPosition = Camera.main.ScreenToWorldPoint(new Vector3(touchPosition.x, touchPosition.y, 0));
         var campos = GridManager.GetClosestCell(worldPosition,true);
         _draggedObject.transform.position = campos.transform.position;
