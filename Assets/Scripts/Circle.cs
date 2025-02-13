@@ -7,6 +7,7 @@ public class Circle : BoardObject
 {
     public TMP_Text numberDisplay;
     public int startValue;
+    public int maxValue;
     public int currentValue;
     public SpriteRenderer spriteRenderer;
 
@@ -22,7 +23,6 @@ public class Circle : BoardObject
         _currentStartValue = startValue;
         numberDisplay.SetText(currentValue.ToString());
 
-        // Initialize MaterialPropertyBlock
         _propertyBlock = new MaterialPropertyBlock();
         spriteRenderer.GetPropertyBlock(_propertyBlock);
         
@@ -58,7 +58,7 @@ public class Circle : BoardObject
     private void Complete()
     {
         SystemEventManager.Send(CircleComplete, _currentStartValue);
-        _currentStartValue = Mathf.Clamp(_currentStartValue * 2, 0, 10);
+        _currentStartValue = Mathf.Clamp(_currentStartValue * 2, 0, maxValue);
         currentValue = _currentStartValue;
 
         _propertyBlock.SetFloat(SegmentCount, _currentStartValue);
@@ -68,7 +68,7 @@ public class Circle : BoardObject
 
     private void LerpRemovedSegments(float newValue)
     {
-        spriteRenderer.GetPropertyBlock(_propertyBlock); // Get latest values
+        spriteRenderer.GetPropertyBlock(_propertyBlock);
         
         if (_propertyBlock.HasProperty(RemovedSegments))
         {
@@ -77,7 +77,7 @@ public class Circle : BoardObject
             DOTween.To(() => currentRemovedSegments, value =>
             {
                 _propertyBlock.SetFloat(RemovedSegments, value);
-                spriteRenderer.SetPropertyBlock(_propertyBlock); // Apply updated value
+                spriteRenderer.SetPropertyBlock(_propertyBlock);
             }, newValue, 0.5f);
         }
         else

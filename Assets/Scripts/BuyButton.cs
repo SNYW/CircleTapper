@@ -29,7 +29,7 @@ public class BuyButton : MonoBehaviour
       if (!PurchaseManager.TryPurchaseItem(_currentCost)) return;
       
       GridManager.GetClosestCell(Vector2.zero).SetChildObject(Instantiate(objectToBuy));
-      _currentCost *= 5;
+      _currentCost *= 2;
       costText.text = _currentCost.ToString();
    }
 }

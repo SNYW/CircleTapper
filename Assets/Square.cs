@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 public class Square : BoardObject
 {
     public float clickSpeed;
+    public ParticleSystem clickParticles;
 
     private void Start()
     {
@@ -40,6 +41,7 @@ public class Square : BoardObject
                     circle.OnMouseDown();
                 }
             }
+            clickParticles.Play();
         }
     }
 }

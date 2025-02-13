@@ -225,7 +225,8 @@ MonoBehaviour:
   ParentCell: {fileID: 0}
   LastParentCell: {fileID: 0}
   numberDisplay: {fileID: 8875670700584503362}
-  startValue: 5
+  startValue: 2
+  maxValue: 10
   currentValue: 0
   spriteRenderer: {fileID: 1495102670577064642}
 --- !u!58 &168634529876207075
@@ -275,6 +276,7 @@ GameObject:
   - component: {fileID: 3479065498157249047}
   - component: {fileID: 8462597659497661619}
   - component: {fileID: 8875670700584503362}
+  - component: {fileID: 18472400697311341}
   m_Layer: 5
   m_Name: Number
   m_TagString: Untagged
@@ -400,6 +402,18 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!225 &18472400697311341
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3846043085347570546}
+  m_Enabled: 1
+  m_Alpha: 0.52
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &6589037720630442523
 GameObject:
   m_ObjectHideFlags: 0
@@ -431,8 +445,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 3479065498157249047}
   - {fileID: 3663785051857027990}
+  - {fileID: 3479065498157249047}
   m_Father: {fileID: 6356487785742600093}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
