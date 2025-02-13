@@ -30,22 +30,3 @@ public class InWorldGridManager : MonoBehaviour
         Grid = GridManager.Init(transform.position, dimensions, gridCell);
     }
 }
-
-[CustomEditor(typeof(InWorldGridManager))]
-public class GridManagerEditor : Editor
-{
-    public override void OnInspectorGUI()
-    {
-        DrawDefaultInspector();
-
-        InWorldGridManager gridManager = (InWorldGridManager)target;
-        if (GUILayout.Button("Generate Grid"))
-        {
-            gridManager.InitGrid();
-        }
-        if (GUILayout.Button("Clear Grid"))
-        {
-            GridManager.Dispose();
-        }
-    }
-}
