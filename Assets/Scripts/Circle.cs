@@ -35,7 +35,7 @@ public class Circle : BoardObject
             GridManager.GetClosestCell(transform.position).SetChildObject(this);
     }
 
-    public void OnMouseDown()
+    public override void OnTap()
     {
         currentValue--;
         var isComplete = currentValue <= 0;

@@ -14,16 +14,16 @@ public class Square : BoardObject
         StartCoroutine(ClickNeighbours());
     }
 
-    public override void OnBeginDrag(PointerEventData eventData)
+    public override void BeginDrag()
     {
         StopAllCoroutines();
-        base.OnBeginDrag(eventData);
+        base.BeginDrag();
     }
 
-    public override void OnEndDrag(PointerEventData eventData)
+    public override void EndDrag(Vector2 eventData)
     {
         StartCoroutine(ClickNeighbours());
-        base.OnEndDrag(eventData);
+        base.EndDrag(eventData);
     }
 
     private IEnumerator ClickNeighbours()
@@ -38,7 +38,7 @@ public class Square : BoardObject
             {
                 if (neighbor.Value?.heldObject is Circle circle)
                 {
-                    circle.OnMouseDown();
+                    circle.OnTap();
                 }
             }
             clickParticles.Play();

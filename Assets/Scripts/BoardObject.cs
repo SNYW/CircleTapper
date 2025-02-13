@@ -1,21 +1,21 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public abstract class BoardObject : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler
+public abstract class BoardObject : MonoBehaviour
 {
     public GridCell ParentCell;
     public GridCell LastParentCell;
     
-    public virtual void OnBeginDrag(PointerEventData eventData)
+    public virtual void BeginDrag()
     {
         LastParentCell = ParentCell;
         ParentCell.heldObject = null;
         ParentCell = null;
     }
 
-    public virtual void OnEndDrag(PointerEventData eventData)
+    public virtual void EndDrag(Vector2 eventData)
     {
-        var cell = GridManager.GetClosestCell(Camera.main.ScreenToWorldPoint(eventData.position), true);
+        var cell = GridManager.GetClosestCell(Camera.main.ScreenToWorldPoint(eventData), true);
 
         if (cell.heldObject != null && LastParentCell != null)
         {
@@ -27,9 +27,8 @@ public abstract class BoardObject : MonoBehaviour, IBeginDragHandler, IEndDragHa
         LastParentCell = null;
     }
 
-    public void OnDrag(PointerEventData eventData)
+    public virtual void OnTap()
     {
-        var campos = GridManager.GetClosestCell(Camera.main.ScreenToWorldPoint(eventData.position),true);
-        transform.position = campos.transform.position;
+        
     }
 }
