@@ -229,6 +229,8 @@ MonoBehaviour:
   maxValue: 10
   currentValue: 0
   spriteRenderer: {fileID: 1495102670577064642}
+  particle: {fileID: 8466067838388665140, guid: 17706f22e730f436ba767c4c75ff8dbf, type: 3}
+  spawnCooldown: 0.1
 --- !u!58 &168634529876207075
 CircleCollider2D:
   m_ObjectHideFlags: 0

@@ -5,10 +5,10 @@ public static class PurchaseManager
     public static void Init()
     {
         _currentCurrency = 0;
-        SystemEventManager.Subscribe(SystemEventManager.GameEvent.CircleComplete, OnCircleComplete);
+        SystemEventManager.Subscribe(SystemEventManager.GameEvent.CurrencyAdded, OnCurrencyAdded);
     }
 
-    private static void OnCircleComplete(object obj)
+    private static void OnCurrencyAdded(object obj)
     {
         if (obj is int value)
         {
@@ -33,7 +33,7 @@ public static class PurchaseManager
     public static void Dispose()
     {
         _currentCurrency = 0;
-        SystemEventManager.Unsubscribe(SystemEventManager.GameEvent.CircleComplete, OnCircleComplete);
+        SystemEventManager.Unsubscribe(SystemEventManager.GameEvent.CurrencyAdded, OnCurrencyAdded);
     }
 
     public static long GetCurrentCurrency()

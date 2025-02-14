@@ -16,6 +16,7 @@ public class CurrencyCounter : MonoBehaviour
         UpdateCurrencyText(PurchaseManager.GetCurrentCurrency());
         Subscribe(GameEvent.CircleComplete, OnCircleComplete);
         Subscribe(GameEvent.CurrencySpent, OnCircleComplete);
+        Subscribe(GameEvent.CurrencyAdded, OnCircleComplete);
     }
 
     private void OnCircleComplete(object obj)
@@ -36,6 +37,7 @@ public class CurrencyCounter : MonoBehaviour
     {
         Unsubscribe(GameEvent.CircleComplete, OnCircleComplete);
         Unsubscribe(GameEvent.CurrencySpent, OnCircleComplete);
+        Unsubscribe(GameEvent.CurrencyAdded, OnCircleComplete);
     }
 
     private void UpdateCurrencyText(long c)

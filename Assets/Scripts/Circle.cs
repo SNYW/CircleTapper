@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using DG.Tweening;
@@ -10,6 +11,11 @@ public class Circle : BoardObject
     public int maxValue;
     public int currentValue;
     public SpriteRenderer spriteRenderer;
+
+    [Header("Particle Spawn")] 
+    public CurrencyParticle particle;
+    public float spawnCooldown;
+    private int _particlesToSpawn;
 
     private int _currentStartValue;
     private MaterialPropertyBlock _propertyBlock;
@@ -33,6 +39,22 @@ public class Circle : BoardObject
 
         if (ParentCell == null)
             GridManager.GetClosestCell(transform.position).SetChildObject(this);
+
+        StartCoroutine(SpawnCurrency());
+    }
+
+    private IEnumerator SpawnCurrency()
+    {
+        while (gameObject.activeSelf)
+        {
+            yield return new WaitForSeconds(spawnCooldown);
+
+            if (_particlesToSpawn <= 0) continue;
+
+            var randPos = transform.position + new Vector3(Random.Range(-0.1f,0.1f), Random.Range(-0.1f,0.1f), 0);
+            Instantiate(particle, randPos, Quaternion.identity);
+            _particlesToSpawn--;
+        }
     }
 
     public override void OnTap()
@@ -57,7 +79,7 @@ public class Circle : BoardObject
 
     private void Complete()
     {
-        SystemEventManager.Send(CircleComplete, _currentStartValue);
+        _particlesToSpawn += _currentStartValue;
         _currentStartValue = Mathf.Clamp(_currentStartValue * 2, 0, maxValue);
         currentValue = _currentStartValue;
 
