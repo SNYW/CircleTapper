@@ -57,7 +57,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -192,12 +192,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2891a69ff393649b3a752f4cc23525ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chainLevel: 1
   ParentCell: {fileID: 0}
   LastParentCell: {fileID: 0}
   onMergeSpawn: {fileID: 886542511069833392, guid: 6105929f3c44446758d7045b23688d6d, type: 3}
   clickSpeed: 5
   clickParticles: {fileID: 1273797279753163438}
+  spriteRenderer: {fileID: 8153827198470543614}
 --- !u!61 &4723867541589226415
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -435,7 +435,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: dd037a41644a94e559bca301ec7bac90, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
