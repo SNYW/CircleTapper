@@ -159,7 +159,7 @@ PrefabInstance:
     - target: {fileID: 1723542381975022146, guid: f0f90a9da8cd6499e9fc67649235afc7, type: 3}
       propertyPath: onMergeSpawn
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 3081271756573555117, guid: f49dc652946894e0297283d3351c9df0, type: 3}
     - target: {fileID: 2573079426784860011, guid: f0f90a9da8cd6499e9fc67649235afc7, type: 3}
       propertyPath: m_Name
       value: SquareLV3

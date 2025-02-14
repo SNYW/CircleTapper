@@ -22,7 +22,7 @@ public class BuyButton : MonoBehaviour
 
    private void OnBoardChanged(object obj)
    {
-      _currentCost = 20 * FindObjectsByType<BoardObject>(FindObjectsSortMode.None).Length;
+      _currentCost = cost * FindObjectsByType<BoardObject>(FindObjectsSortMode.None).Length;
    }
 
    private void Update()
