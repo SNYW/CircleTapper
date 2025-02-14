@@ -59,7 +59,7 @@ public abstract class BoardObject : MonoBehaviour
         if (onMergeSpawn == null) return;
         if (targetObj.gameObject.name != gameObject.name) return;
         
-        var newItem = Instantiate(onMergeSpawn, transform.position, quaternion.identity);
+        var newItem = Instantiate(onMergeSpawn, targetObj.transform.position, quaternion.identity);
         GridManager.GetClosestCell(transform.position, true).SetChildObject(newItem);
         Destroy(targetObj.gameObject);
         Destroy(gameObject);
