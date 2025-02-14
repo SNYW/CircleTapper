@@ -61,10 +61,10 @@ Material:
     - _Radius: 0.43
     - _RemovedSegments: 0.5
     - _Rotation: 180
-    - _SegmentCount: 10
+    - _SegmentCount: 12
     - _SegmentSpacing: 0.04
     m_Colors:
     - _OutlineColour: {r: 1, g: 1, b: 1, a: 1}
-    - _ShadowColour: {r: 0.18867922, g: 0.18867922, b: 0.18867922, a: 0.59607846}
+    - _ShadowColour: {r: 0.1509434, g: 0.1502314, b: 0.1502314, a: 0.5882353}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
