@@ -23,6 +23,7 @@ public class BuyButton : MonoBehaviour
    private void OnBoardChanged(object obj)
    {
       _currentCost = cost * FindObjectsByType<BoardObject>(FindObjectsSortMode.None).Length;
+      costText.text = _currentCost.ToString();
    }
 
    private void Update()
