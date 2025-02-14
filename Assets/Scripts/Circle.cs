@@ -1,8 +1,9 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
 using DG.Tweening;
-using static SystemEventManager.GameEvent;
+using Random = UnityEngine.Random;
 
 public class Circle : BoardObject
 {
@@ -18,6 +19,7 @@ public class Circle : BoardObject
     private int _particlesToSpawn;
 
     private int _currentStartValue;
+    private bool _canTap = true;
     private MaterialPropertyBlock _propertyBlock;
 
     private static readonly int RemovedSegments = Shader.PropertyToID("_RemovedSegments");
@@ -59,37 +61,64 @@ public class Circle : BoardObject
 
     public override void OnTap()
     {
-        currentValue--;
-        var isComplete = currentValue <= 0;
-        if (isComplete)
-        {
-            Complete();
-        }
+        if (!_canTap) return;
 
-        numberDisplay.SetText(currentValue.ToString());
-
-        float newValue = (float)(_currentStartValue - currentValue) / _currentStartValue;
-        LerpRemovedSegments(newValue);
+        _canTap = false;
         
-        transform.DOScale(isComplete ? 0.65f : 0.52f, 0.1f)
-            .SetEase(Ease.OutQuad)
-            .OnComplete(() => transform.DOScale(0.5f, 0.1f)
-                .SetEase(Ease.InQuad));
+        try
+        {
+            currentValue--;
+            var isComplete = currentValue <= 0;
+
+            float newValue = (float)(_currentStartValue - currentValue) / _currentStartValue;
+            LerpRemovedSegments(newValue);
+        
+            transform.DOScale(isComplete ? 0.65f : 0.52f, 0.1f)
+                .SetEase(Ease.OutQuad)
+                .OnComplete(
+                    () =>
+                    {
+                        transform.DOScale(0.5f, 0.1f)
+                            .SetEase(Ease.InQuad).SetTarget(gameObject);
+
+                        _canTap = !isComplete;
+                    })
+                .SetTarget(gameObject);
+        }
+        catch (Exception e)
+        {
+            //Fuck Exceptions
+        }
+        
+        numberDisplay.SetText(Mathf.Clamp(currentValue, 0,maxValue).ToString());
     }
 
     private void Complete()
     {
+        _canTap = false;
         _particlesToSpawn += _currentStartValue;
         _currentStartValue = Mathf.Clamp(_currentStartValue * 2, 0, maxValue);
         currentValue = _currentStartValue;
 
-        _propertyBlock.SetFloat(SegmentCount, _currentStartValue);
-        spriteRenderer.SetPropertyBlock(_propertyBlock);
-        LerpRemovedSegments(0f);
+        try
+        {
+            _propertyBlock.SetFloat(SegmentCount, _currentStartValue);
+            spriteRenderer.SetPropertyBlock(_propertyBlock);
+            LerpRemovedSegments(0f);
+        }
+        catch (Exception e)
+        {
+            //Ignored, can happen on merge
+        }
+        
+        numberDisplay.SetText(Mathf.Clamp(currentValue, 0,maxValue).ToString());
     }
 
     private void LerpRemovedSegments(float newValue)
     {
+        _canTap = false;
+        if (spriteRenderer == null) return;
+        
         spriteRenderer.GetPropertyBlock(_propertyBlock);
         
         if (_propertyBlock.HasProperty(RemovedSegments))
@@ -100,7 +129,15 @@ public class Circle : BoardObject
             {
                 _propertyBlock.SetFloat(RemovedSegments, value);
                 spriteRenderer.SetPropertyBlock(_propertyBlock);
-            }, newValue, 0.5f);
+            }, newValue, 0.5f)
+                .SetTarget(gameObject)
+                .OnComplete(() =>
+                {
+                    if (Mathf.Approximately(newValue, 1))
+                        Complete();
+
+                    _canTap = true;
+                });
         }
         else
         {

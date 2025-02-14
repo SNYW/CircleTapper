@@ -8,7 +8,8 @@ public static class SystemEventManager
               CircleComplete,
               CurrencyAdded,
               CurrencySpent,
-              BoardObjectMoved
+              BoardObjectMoved,
+              BoardChanged,
        }
        private static Dictionary<GameEvent, Action<object>> _eventListeners;
 

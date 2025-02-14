@@ -1,7 +1,6 @@
 using System.Collections;
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public class Square : BoardObject
 {
@@ -47,7 +46,9 @@ public class Square : BoardObject
             transform.DOScale(1.2f, 0.1f)
                 .SetEase(Ease.OutQuad)
                 .OnComplete(() => transform.DOScale(1f, 0.1f)
-                    .SetEase(Ease.InQuad));
+                    .SetEase(Ease.InQuad)
+                    .SetTarget(gameObject))
+                .SetTarget(gameObject);
         }
     }
 }

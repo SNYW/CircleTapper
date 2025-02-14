@@ -132,7 +132,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4c821be1e534110be2907b379aa28ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  anchorName: TotalCounter
+  anchorName: TotalCounterImage
   moveSpeed: 5
   arcHeight: 2
   animateTransform: {fileID: 318734409034256035}
