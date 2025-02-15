@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,10 +18,10 @@ public class BuyButton : MonoBehaviour
       _currentCost = cost;
       costText.text = cost.ToString();
       _button = GetComponent<Button>();
-      SystemEventManager.Subscribe(SystemEventManager.GameEvent.BoardChanged, OnBoardChanged);
    }
 
-   private void OnBoardChanged(object obj)
+
+   private void LateUpdate()
    {
       _currentCost = cost * FindObjectsByType<BoardObject>(FindObjectsSortMode.None).Length;
       costText.text = _currentCost.ToString();
@@ -34,9 +35,11 @@ public class BuyButton : MonoBehaviour
    public void OnMouseDown()
    {
       if (!PurchaseManager.TryPurchaseItem(_currentCost)) return;
-      
-      GridManager.GetClosestCell(Vector2.zero).SetChildObject(Instantiate(objectToBuy));
+
+      var newObj = Instantiate(objectToBuy);
+      GridManager.GetClosestCell(Vector2.zero).SetChildObject(newObj);
       _currentCost = cost * FindObjectsByType<BoardObject>(FindObjectsSortMode.None).Length;
       costText.text = _currentCost.ToString();
+      SystemEventManager.Send(SystemEventManager.GameEvent.BoardChanged, newObj);
    }
 }
