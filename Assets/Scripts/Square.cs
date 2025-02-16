@@ -38,7 +38,6 @@ public class Square : BoardObject
     public override void BeginDrag(Vector2 startPos)
     {
         StopAllCoroutines();
-        SaveManager.RemoveSaveData(ParentCell.gridPosition);
         base.BeginDrag(startPos);
     }
 
@@ -46,7 +45,6 @@ public class Square : BoardObject
     {
         StopAllCoroutines();
         StartCoroutine(ClickNeighbours());
-        SaveManager.SaveBoardObject(ToSaveData());
         base.EndDrag(eventData);
     }
 
@@ -86,7 +84,6 @@ public class Square : BoardObject
                 _remainingCooldown = clickSpeed;
                 LerpRemovedSegments(1);
             }
-            SaveManager.SaveBoardObject(ToSaveData());
         }
     }
     
@@ -115,11 +112,12 @@ public class Square : BoardObject
     
     public override BoardObjectSaveData ToSaveData()
     {
-        return new SquareSaveData()
+        return new SquareSaveData
         {
             remainingCooldown = _remainingCooldown,
             level = chainLevel,
-            position = ParentCell.gridPosition
+            xPosition = ParentCell.gridPosition.x,
+            yPosition = ParentCell.gridPosition.y
         };
     }
 
@@ -128,7 +126,7 @@ public class Square : BoardObject
         if(saveData is not SquareSaveData data) return;
 
         _remainingCooldown = data.remainingCooldown;
-        GridManager.GetClosestCell(data.position).SetChildObject(this);
+        GridManager.GetClosestCell(new Vector2(data.xPosition, data.yPosition)).SetChildObject(this);
         LerpRemovedSegments((float)_remainingCooldown/clickSpeed);
     }
 }

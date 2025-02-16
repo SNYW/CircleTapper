@@ -1,7 +1,7 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using Persistence;
 using UnityEngine;
 
 
@@ -20,14 +20,13 @@ public class GameManager : MonoBehaviour
         DOTween.Init();
         SystemEventManager.Init();
         PurchaseManager.Init();
-        SaveManager.Init(this);
-
+        
         StartCoroutine(GivePassiveIncome());
     }
 
     private void Start()
     {
-        GridManager.GetClosestCell(Vector2.zero).SetChildObject(Instantiate(defaultStartingObject));
+        SaveManager.Instance.Init(this);
     }
 
     private IEnumerator GivePassiveIncome()
@@ -48,6 +47,14 @@ public class GameManager : MonoBehaviour
     private void OnDisable()
     {
         PurchaseManager.Dispose();
-        SaveManager.SaveBoard();
+    }
+
+    public void ResetOnLoad()
+    {
+        var objects = FindObjectsByType<BoardObject>(FindObjectsSortMode.None);
+        foreach (var boardObject in objects)
+        {
+            Destroy(boardObject.gameObject);
+        }
     }
 }

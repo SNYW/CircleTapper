@@ -1,3 +1,5 @@
+using Persistence;
+
 public static class PurchaseManager
 {
     private static long _currentCurrency;
@@ -6,6 +8,12 @@ public static class PurchaseManager
     {
         _currentCurrency = 0;
         SystemEventManager.Subscribe(SystemEventManager.GameEvent.CurrencyAdded, OnCurrencyAdded);
+    }
+
+    public static void OnGameLoad(GameData data)
+    {
+        _currentCurrency = data.currentPoints;
+        SystemEventManager.Send(SystemEventManager.GameEvent.CurrencyAdded, data.currentPoints);
     }
 
     private static void OnCurrencyAdded(object obj)

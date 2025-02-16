@@ -90,6 +90,21 @@ public static class GridManager
         return closestCell;
     }
     
+    public static GridCell GetGridCell(Vector2Int gridPosition, bool includeOccupied = false)
+    {
+        foreach (var cell in InWorldGridManager.Grid.Values)
+        {
+            if(!includeOccupied && cell.heldObject != null) continue;
+
+            if (cell.gridPosition == gridPosition)
+            {
+                return cell;
+            }
+        }
+
+        return null;
+    }
+    
     public static void Dispose()
     {
         var grid = InWorldGridManager.Grid;

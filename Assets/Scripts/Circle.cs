@@ -91,17 +91,6 @@ public class Circle : BoardObject
         }
         
         numberDisplay.SetText(Mathf.Clamp(currentValue, 0,maxValue).ToString());
-        SaveManager.SaveBoardObject(ToSaveData());
-    }
-
-    public override void OnDrag(Vector2 worldPosition)
-    {
-        if (ParentCell != null)
-        {
-            SaveManager.RemoveSaveData(ParentCell.gridPosition);
-        }
-        
-        base.OnDrag(worldPosition);
     }
 
     private void Complete()
@@ -158,12 +147,13 @@ public class Circle : BoardObject
 
     public override BoardObjectSaveData ToSaveData()
     {
-        return new CircleSaveData()
+        return new CircleSaveData
         {
-            curentValue = currentValue,
+            currentValue = currentValue,
             level = chainLevel,
             particlesToSpawn = _particlesToSpawn,
-            position = ParentCell.gridPosition
+            xPosition = ParentCell.gridPosition.x,
+            yPosition = ParentCell.gridPosition.y
         };
     }
 
@@ -171,9 +161,9 @@ public class Circle : BoardObject
     {
         if(saveData is not CircleSaveData data) return;
 
-        currentValue = data.curentValue;
+        currentValue = data.currentValue;
         _particlesToSpawn = data.particlesToSpawn;
-        GridManager.GetClosestCell(data.position).SetChildObject(this);
+        GridManager.GetClosestCell(new Vector2(data.xPosition, data.yPosition)).SetChildObject(this);
         float newValue = (float)(_currentStartValue - currentValue) / _currentStartValue;
         LerpRemovedSegments(newValue);
     }

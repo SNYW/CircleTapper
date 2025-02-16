@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Persistence;
 using UnityEngine;
 
 public class GridCell : MonoBehaviour
@@ -41,12 +42,15 @@ public class GridCell : MonoBehaviour
         heldObject = boardObject;
         heldObject.ParentCell = this;
         heldObject.transform.position = transform.position;
+        
+        SaveManager.Instance.AddObject(gridPosition, heldObject.ToSaveData());
     }
 
     public void RemoveChildObject()
     {
         if (heldObject == null) return;
-        
+
+        SaveManager.Instance.RemoveObject(gridPosition);
         heldObject.ParentCell = null;
         heldObject = null;
     }
