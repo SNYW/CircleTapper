@@ -195,9 +195,11 @@ MonoBehaviour:
   ParentCell: {fileID: 0}
   LastParentCell: {fileID: 0}
   onMergeSpawn: {fileID: 3081271756573555117, guid: 48d518f7800ed4aec854ff15c8ae0bca, type: 3}
-  clickSpeed: 10
-  clickParticles: {fileID: 1273797279753163438}
+  clickSpeed: 5
+  clickParticles:
+  - {fileID: 1273797279753163438}
   spriteRenderer: {fileID: 8153827198470543614}
+  tapTargets: 00000000
 --- !u!61 &4723867541589226415
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -703,6 +705,14 @@ PrefabInstance:
       value: TapEffect
       objectReference: {fileID: 0}
     - target: {fileID: 3392995359296269407, guid: 10460de4d782e41aba5466be95d4b852, type: 3}
+      propertyPath: ShapeModule.m_Scale.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3392995359296269407, guid: 10460de4d782e41aba5466be95d4b852, type: 3}
+      propertyPath: ShapeModule.m_Scale.y
+      value: 1.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 3392995359296269407, guid: 10460de4d782e41aba5466be95d4b852, type: 3}
       propertyPath: InitialModule.startSize.scalar
       value: 0.03
       objectReference: {fileID: 0}
@@ -732,7 +742,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4304265763944753306, guid: 10460de4d782e41aba5466be95d4b852, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.235
       objectReference: {fileID: 0}
     - target: {fileID: 4304265763944753306, guid: 10460de4d782e41aba5466be95d4b852, type: 3}
       propertyPath: m_LocalPosition.z

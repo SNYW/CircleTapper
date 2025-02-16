@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 
@@ -9,12 +10,17 @@ public class GameManager : MonoBehaviour
     public static bool DEBUGMODE = false;
 
     public BoardObject defaultStartingObject;
+
+    public List<Circle> circleLevels;
+    public List<Square> squareLevels;
+    
     private void Awake()
     {
         DontDestroyOnLoad(transform.parent.gameObject);
         DOTween.Init();
         SystemEventManager.Init();
         PurchaseManager.Init();
+        SaveManager.Init(this);
 
         StartCoroutine(GivePassiveIncome());
     }
@@ -42,5 +48,6 @@ public class GameManager : MonoBehaviour
     private void OnDisable()
     {
         PurchaseManager.Dispose();
+        SaveManager.SaveBoard();
     }
 }

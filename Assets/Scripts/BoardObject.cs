@@ -2,8 +2,9 @@ using DG.Tweening;
 using Unity.Mathematics;
 using UnityEngine;
 
-public abstract class BoardObject : MonoBehaviour
+public abstract class BoardObject : MonoBehaviour, ISaveable
 {
+    public int chainLevel;
     public GridCell ParentCell;
     public GridCell LastParentCell;
     public BoardObject onMergeSpawn;
@@ -70,5 +71,15 @@ public abstract class BoardObject : MonoBehaviour
         StopAllCoroutines();
         DOTween.KillAll(gameObject);
         SystemEventManager.Send(SystemEventManager.GameEvent.BoardChanged, this);
+    }
+
+    public virtual BoardObjectSaveData ToSaveData()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public virtual void FromSaveData(BoardObjectSaveData saveData)
+    {
+        throw new System.NotImplementedException();
     }
 }

@@ -128,7 +128,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6741962297256183087, guid: 040ed69c7b182450aa8b0f441fdbbecb, type: 3}
       propertyPath: chainLevel
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6741962297256183087, guid: 040ed69c7b182450aa8b0f441fdbbecb, type: 3}
       propertyPath: startValue

@@ -1,11 +1,12 @@
 using System.Collections;
+using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 
 public class Square : BoardObject
 {
     public int clickSpeed;
-    public ParticleSystem clickParticles;
+    public List<ParticleSystem> clickParticles;
     public SpriteRenderer spriteRenderer;
 
     private MaterialPropertyBlock _propertyBlock;
@@ -13,6 +14,8 @@ public class Square : BoardObject
     private static readonly int SegmentCount = Shader.PropertyToID("_SegmentCount");
 
     private int _remainingCooldown;
+
+    public List<GridManager.Direction> tapTargets;
 
     private void Start()
     {
@@ -35,6 +38,7 @@ public class Square : BoardObject
     public override void BeginDrag(Vector2 startPos)
     {
         StopAllCoroutines();
+        SaveManager.RemoveSaveData(ParentCell.gridPosition);
         base.BeginDrag(startPos);
     }
 
@@ -42,6 +46,7 @@ public class Square : BoardObject
     {
         StopAllCoroutines();
         StartCoroutine(ClickNeighbours());
+        SaveManager.SaveBoardObject(ToSaveData());
         base.EndDrag(eventData);
     }
 
@@ -58,14 +63,19 @@ public class Square : BoardObject
             {
                 if(ParentCell == null) continue;
             
-                foreach (var neighbor in ParentCell.Neighbors)
+                foreach (var direction in tapTargets)
                 {
-                    if (neighbor.Value?.heldObject is Circle circle)
+                    if (ParentCell.Neighbors[direction].heldObject is Circle circle)
                     {
                         circle.OnTap();
                     }
                 }
-                clickParticles.Play();
+
+                foreach (var clickParticle in clickParticles)
+                {
+                    clickParticle.Play();
+                }
+                
                 transform.DOScale(1.2f, 0.1f)
                     .SetEase(Ease.OutQuad)
                     .OnComplete(() => transform.DOScale(1f, 0.1f)
@@ -76,6 +86,7 @@ public class Square : BoardObject
                 _remainingCooldown = clickSpeed;
                 LerpRemovedSegments(1);
             }
+            SaveManager.SaveBoardObject(ToSaveData());
         }
     }
     
@@ -100,5 +111,24 @@ public class Square : BoardObject
         {
             Debug.LogWarning("MaterialPropertyBlock does not have a '_RemovedSegments' property.");
         }
+    }
+    
+    public override BoardObjectSaveData ToSaveData()
+    {
+        return new SquareSaveData()
+        {
+            remainingCooldown = _remainingCooldown,
+            level = chainLevel,
+            position = ParentCell.gridPosition
+        };
+    }
+
+    public override void FromSaveData(BoardObjectSaveData saveData)
+    {
+        if(saveData is not SquareSaveData data) return;
+
+        _remainingCooldown = data.remainingCooldown;
+        GridManager.GetClosestCell(data.position).SetChildObject(this);
+        LerpRemovedSegments((float)_remainingCooldown/clickSpeed);
     }
 }

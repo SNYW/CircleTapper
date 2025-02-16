@@ -29,11 +29,26 @@ public class BuyButton : MonoBehaviour
 
    private void Update()
    {
+      if (GameManager.DEBUGMODE)
+      {
+         _button.interactable = true;
+         return;
+      }
       _button.interactable = PurchaseManager.CanPurchase(_currentCost);
    }
 
    public void OnMouseDown()
    {
+      if (GameManager.DEBUGMODE)
+      {
+         var newBoardObject = Instantiate(objectToBuy);
+         GridManager.GetClosestCell(Vector2.zero).SetChildObject(newBoardObject);
+         _currentCost = cost * FindObjectsByType<BoardObject>(FindObjectsSortMode.None).Length;
+         costText.text = _currentCost.ToString();
+         SystemEventManager.Send(SystemEventManager.GameEvent.BoardChanged, newBoardObject);
+         return;
+      }
+      
       if (!PurchaseManager.TryPurchaseItem(_currentCost)) return;
 
       var newObj = Instantiate(objectToBuy);
