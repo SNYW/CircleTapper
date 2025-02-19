@@ -133,28 +133,5 @@ namespace Persistence
         }
     }
 
-    [CustomEditor(typeof(SaveManager))]
-    public class SaveManagerEditor : Editor
-    {
-        public override void OnInspectorGUI()
-        {
-            SaveManager saveManager = (SaveManager)target;
-            DrawDefaultInspector();
-
-            if (GUILayout.Button("Save"))
-            {
-                saveManager.SaveGame();
-            }
-
-            if (GUILayout.Button("Load"))
-            {
-                saveManager.LoadGame(true);
-            }
-
-            if (GUILayout.Button("Delete"))
-            {
-                saveManager.DeleteSave();
-            }
-        }
-    }
+    
 }
