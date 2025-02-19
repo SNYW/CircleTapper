@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -8,23 +9,19 @@ public interface ISaveable
     public void FromSaveData(BoardObjectSaveData saveData);
 }
 
-[Serializable]
-public abstract class BoardObjectSaveData
+public enum BoardObjectType
 {
+    Circle,
+    Square
+}
+
+[Serializable]
+public class BoardObjectSaveData
+{
+    public string type;
     public int level;
     public int xPosition;
     public int yPosition;
-}
-
-[Serializable]
-public class CircleSaveData : BoardObjectSaveData
-{
-    public int currentValue;
-    public int particlesToSpawn;
-}
-
-[Serializable]
-public class SquareSaveData : BoardObjectSaveData
-{
-    public int remainingCooldown;
+    public int value;
+    public int carryoverValue;
 }

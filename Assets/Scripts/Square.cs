@@ -14,16 +14,23 @@ public class Square : BoardObject
     private static readonly int SegmentCount = Shader.PropertyToID("_SegmentCount");
 
     private int _remainingCooldown;
+    private float LerpValue => (float)_remainingCooldown / clickSpeed;
 
     public List<GridManager.Direction> tapTargets;
 
-    private void Start()
+    public override void Init()
     {
+        Init(clickSpeed);
+    }
+
+    public void Init(int remainingCooldown)
+    {
+        _remainingCooldown = remainingCooldown;
         _propertyBlock = new MaterialPropertyBlock();
         spriteRenderer.GetPropertyBlock(_propertyBlock);
         
         _propertyBlock.SetFloat(SegmentCount, clickSpeed);
-        _propertyBlock.SetFloat(RemovedSegments, 0f);
+        _propertyBlock.SetFloat(RemovedSegments, LerpValue);
         
         spriteRenderer.SetPropertyBlock(_propertyBlock);
         
@@ -31,8 +38,7 @@ public class Square : BoardObject
             GridManager.GetClosestCell(transform.position).SetChildObject(this);
         StartCoroutine(ClickNeighbours());
 
-        _remainingCooldown = clickSpeed;
-        LerpRemovedSegments(1);
+        LerpRemovedSegments(LerpValue);
     }
 
     public override void BeginDrag(Vector2 startPos)
@@ -112,10 +118,12 @@ public class Square : BoardObject
     
     public override BoardObjectSaveData ToSaveData()
     {
-        return new SquareSaveData
+        return new BoardObjectSaveData
         {
-            remainingCooldown = _remainingCooldown,
+            type = BoardObjectType.Square.ToString(),
+            value = _remainingCooldown,
             level = chainLevel,
+            carryoverValue = _remainingCooldown,
             xPosition = ParentCell.gridPosition.x,
             yPosition = ParentCell.gridPosition.y
         };
@@ -123,10 +131,11 @@ public class Square : BoardObject
 
     public override void FromSaveData(BoardObjectSaveData saveData)
     {
-        if(saveData is not SquareSaveData data) return;
-
-        _remainingCooldown = data.remainingCooldown;
-        GridManager.GetClosestCell(new Vector2(data.xPosition, data.yPosition)).SetChildObject(this);
-        LerpRemovedSegments((float)_remainingCooldown/clickSpeed);
+        DOTween.KillAll(gameObject);
+        StopAllCoroutines();
+        
+        _remainingCooldown = saveData.value;
+        GridManager.GetGridCell(new Vector2Int(saveData.xPosition, saveData.yPosition)).SetChildObject(this);
+        Init(saveData.value);
     }
 }

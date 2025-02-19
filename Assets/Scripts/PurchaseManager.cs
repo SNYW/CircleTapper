@@ -6,13 +6,12 @@ public static class PurchaseManager
 
     public static void Init()
     {
-        _currentCurrency = 0;
         SystemEventManager.Subscribe(SystemEventManager.GameEvent.CurrencyAdded, OnCurrencyAdded);
     }
 
     public static void OnGameLoad(GameData data)
     {
-        _currentCurrency = data.currentPoints;
+        _currentCurrency = long.Parse(data.currentPoints);
         SystemEventManager.Send(SystemEventManager.GameEvent.CurrencyAdded, data.currentPoints);
     }
 
@@ -22,6 +21,11 @@ public static class PurchaseManager
         {
             _currentCurrency += value;
         }
+    }
+
+    public static void ResetCurrency()
+    {
+        _currentCurrency = 0;
     }
 
     public static bool CanPurchase(int cost)
@@ -40,7 +44,6 @@ public static class PurchaseManager
 
     public static void Dispose()
     {
-        _currentCurrency = 0;
         SystemEventManager.Unsubscribe(SystemEventManager.GameEvent.CurrencyAdded, OnCurrencyAdded);
     }
 

@@ -1,4 +1,5 @@
 using DG.Tweening;
+using Persistence;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -6,24 +7,24 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
 {
     public int chainLevel;
     public GridCell ParentCell;
-    public GridCell LastParentCell;
     public BoardObject onMergeSpawn;
 
     private bool _isDragging = false;
-    private Vector2 _startPosition;
 
     private void OnEnable()
     {
         SystemEventManager.Send(SystemEventManager.GameEvent.BoardChanged, this);
     }
 
+    public virtual void Init()
+    {
+        
+    }
+
     public virtual void BeginDrag(Vector2 touchPosition)
     {
         if (_isDragging) return;
 
-        _startPosition = touchPosition;
-        if(ParentCell == null)
-            GridManager.GetClosestCell(transform.position).SetChildObject(this);
         ParentCell.RemoveChildObject();
         _isDragging = true;
     }
@@ -47,7 +48,6 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
         }
         
         cell.SetChildObject(this);
-        LastParentCell = null;
         _isDragging = false;
     }
 
@@ -61,7 +61,9 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
         if (targetObj.gameObject.name != gameObject.name) return;
         
         var newItem = Instantiate(onMergeSpawn, targetObj.transform.position, quaternion.identity);
-        GridManager.GetClosestCell(transform.position, true).SetChildObject(newItem);
+        SaveManager.Instance.RemoveObject(targetObj.ParentCell.gridPosition);
+        targetObj.ParentCell.SetChildObject(newItem);
+        newItem.Init();
         Destroy(targetObj.gameObject);
         Destroy(gameObject);
     }

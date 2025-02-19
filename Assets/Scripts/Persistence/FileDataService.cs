@@ -34,8 +34,6 @@ namespace Persistence
             
             string jsonData = _serializer.Serialize<GameData, string>(data);
             File.WriteAllText(fileLocation, jsonData);
-            
-            Debug.Log($"[JsonDataService] Saved at {fileLocation}");
         }
 
         public GameData Load(string name)
@@ -48,7 +46,8 @@ namespace Persistence
             }
 
             string jsonData = File.ReadAllText(fileLocation);
-            return _serializer.Deserialize<GameData, string>(jsonData);
+            var gameData = _serializer.Deserialize<GameData, string>(jsonData);
+            return gameData;
         }
 
         public void Delete(string name)

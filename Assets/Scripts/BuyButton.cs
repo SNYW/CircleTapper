@@ -43,6 +43,7 @@ public class BuyButton : MonoBehaviour
       {
          var newBoardObject = Instantiate(objectToBuy);
          GridManager.GetClosestCell(Vector2.zero).SetChildObject(newBoardObject);
+         newBoardObject.Init();
          _currentCost = cost * FindObjectsByType<BoardObject>(FindObjectsSortMode.None).Length;
          costText.text = _currentCost.ToString();
          SystemEventManager.Send(SystemEventManager.GameEvent.BoardChanged, newBoardObject);
@@ -53,6 +54,7 @@ public class BuyButton : MonoBehaviour
 
       var newObj = Instantiate(objectToBuy);
       GridManager.GetClosestCell(Vector2.zero).SetChildObject(newObj);
+      newObj.Init();
       _currentCost = cost * FindObjectsByType<BoardObject>(FindObjectsSortMode.None).Length;
       costText.text = _currentCost.ToString();
       SystemEventManager.Send(SystemEventManager.GameEvent.BoardChanged, newObj);

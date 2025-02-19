@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,14 +10,14 @@ namespace Persistence
     public class SaveManager : MonoBehaviour
     {
         public static SaveManager Instance;
-
         [SerializeField] public GameData gameData;
-
         private IDataService _dataService;
         private const string SaveFileName = "CTSave";
 
         private Dictionary<Vector2Int, BoardObjectSaveData> _activeSaveData;
         private GameManager _gameManager;
+
+        private bool _isLoaded = false;
 
         private void Awake()
         {
@@ -31,14 +32,18 @@ namespace Persistence
         {
             _gameManager = gameManager;
             _gameManager.ResetOnLoad();
-            _dataService = new BinaryDataService(new BinarySerializer());
+            _dataService = new FileDataService(new JsonSerializer());
             LoadGame(true);
             SystemEventManager.Subscribe(SystemEventManager.GameEvent.CurrencyAdded, OnSaveChanged);
             SystemEventManager.Subscribe(SystemEventManager.GameEvent.CurrencySpent, OnSaveChanged);
-            
+            _isLoaded = true;
         }
-        
-        public void SaveGame() => _dataService.Save(SaveFileName, gameData);
+
+        public void SaveGame()
+        {
+            if(_isLoaded)
+                _dataService.Save(SaveFileName, gameData);
+        } 
 
         public void LoadGame(bool spawnObjects = false)
         {
@@ -46,12 +51,11 @@ namespace Persistence
             gameData = _dataService.Load(SaveFileName);
 
             _activeSaveData = new Dictionary<Vector2Int, BoardObjectSaveData>();
-
-            if (gameData.currentPoints == 0)
+            PurchaseManager.OnGameLoad(gameData);
+            
+            if (long.Parse(gameData.currentPoints) == 0)
             {
                 OnSaveChanged(null);
-                
-                GridManager.GetClosestCell(Vector2.zero).SetChildObject(Instantiate(_gameManager.defaultStartingObject));
                 Debug.Log("No Save Data Found, Resetting");
                 return;
             }
@@ -62,26 +66,30 @@ namespace Persistence
 
                 if (!spawnObjects) continue;
 
-                var boardPos = new Vector2Int(boardObject.xPosition, boardObject.yPosition);
-                switch (boardObject)
+                var type = Enum.Parse<BoardObjectType>(boardObject.type);
+                switch (type)
                 {
-                    case CircleSaveData circleSaveData:
-                        GridManager.GetGridCell(boardPos).SetChildObject(Instantiate(_gameManager.circleLevels[circleSaveData.level]));
+                    case  BoardObjectType.Circle:
+                        Instantiate(_gameManager.circleLevels[boardObject.level]).FromSaveData(boardObject);
                         break;
-                    case SquareSaveData squareSaveData:
-                        GridManager.GetGridCell(boardPos).SetChildObject(Instantiate(_gameManager.circleLevels[squareSaveData.level]));
+                    case  BoardObjectType.Square:
+                        Instantiate(_gameManager.squareLevels[boardObject.level]).FromSaveData(boardObject);
                         break;
                 }
             }
-            
-            PurchaseManager.OnGameLoad(gameData);
         }
 
-        public void DeleteSave() => _dataService.Delete(SaveFileName);
+        public void DeleteSave()
+        {
+            _dataService.Delete(SaveFileName);
+            _gameManager.ResetOnLoad();
+            _activeSaveData.Clear();
+            PurchaseManager.ResetCurrency();
+            SaveGame();
+        }
 
         public void AddObject(Vector2Int position, BoardObjectSaveData data)
         {
-        
             if(!_activeSaveData.TryAdd(position, data))
             {
                 _activeSaveData[position] = data;
@@ -102,7 +110,7 @@ namespace Persistence
 
         private void OnSaveChanged(object o)
         {
-            gameData.currentPoints = PurchaseManager.GetCurrentCurrency();
+            gameData.currentPoints = PurchaseManager.GetCurrentCurrency().ToString();
             gameData.boardObjects = _activeSaveData.Values.ToList();
             SaveGame();
         }
@@ -111,6 +119,16 @@ namespace Persistence
         {
             SystemEventManager.Unsubscribe(SystemEventManager.GameEvent.CurrencyAdded, OnSaveChanged);
             SystemEventManager.Unsubscribe(SystemEventManager.GameEvent.CurrencySpent, OnSaveChanged);
+        }
+
+        private void OnApplicationPause(bool pauseStatus)
+        {
+            SaveGame();
+        }
+
+        private void OnApplicationQuit()
+        {
+            SaveGame();
         }
     }
 
