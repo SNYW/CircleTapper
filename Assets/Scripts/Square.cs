@@ -64,34 +64,32 @@ public class Square : BoardObject
             _remainingCooldown--;
             LerpRemovedSegments((float)_remainingCooldown/clickSpeed);
             SaveObjectState();
-            
-            if (_remainingCooldown <= 0)
-            {
-                if(ParentCell == null) continue;
-            
-                foreach (var direction in tapTargets)
-                {
-                    if (ParentCell.Neighbors[direction].heldObject is Circle circle)
-                    {
-                        circle.OnTap();
-                    }
-                }
 
-                foreach (var clickParticle in clickParticles)
+            if (_remainingCooldown > 0) continue;
+            if(ParentCell == null) continue;
+            
+            foreach (var direction in tapTargets)
+            {
+                if (ParentCell.Neighbors[direction].heldObject is Circle circle)
                 {
-                    clickParticle.Play();
+                    circle.OnTap();
                 }
-                
-                transform.DOScale(1.2f, 0.1f)
-                    .SetEase(Ease.OutQuad)
-                    .OnComplete(() => transform.DOScale(1f, 0.1f)
-                        .SetEase(Ease.InQuad)
-                        .SetTarget(gameObject))
-                    .SetTarget(gameObject);
-                
-                _remainingCooldown = clickSpeed;
-                LerpRemovedSegments(1);
             }
+
+            foreach (var clickParticle in clickParticles)
+            {
+                clickParticle.Play();
+            }
+                
+            transform.DOScale(1.2f, 0.1f)
+                .SetEase(Ease.OutQuad)
+                .OnComplete(() => transform.DOScale(1f, 0.1f)
+                    .SetEase(Ease.InQuad)
+                    .SetTarget(gameObject))
+                .SetTarget(gameObject);
+                
+            _remainingCooldown = clickSpeed;
+            LerpRemovedSegments(1);
         }
     }
     
