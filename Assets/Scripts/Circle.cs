@@ -55,6 +55,8 @@ public class Circle : BoardObject
             var randPos = transform.position + new Vector3(Random.Range(-0.1f, 0.1f), Random.Range(-0.1f, 0.1f), 0);
             Instantiate(particle, randPos, Quaternion.identity);
             _particlesToSpawn--;
+            if(ParentCell!= null)
+                SaveManager.Instance.AddObject(ParentCell.gridPosition, ToSaveData());
         }
     }
 
@@ -131,7 +133,7 @@ public class Circle : BoardObject
         DOTween.KillAll(gameObject);
         StopAllCoroutines();
 
-        _particlesToSpawn = saveData.carryoverValue;
+        _particlesToSpawn = 0;
         GridManager.GetGridCell(new Vector2Int(saveData.xPosition, saveData.yPosition)).SetChildObject(this);
         Init(saveData.value);
         StartCoroutine(SpawnCurrency());

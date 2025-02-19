@@ -43,6 +43,7 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
             if (cell.heldObject.GetType() == GetType())
             {
                 OnMerge(cell.heldObject);
+                return;
             }
             cell = GridManager.GetClosestCell(touchPosition);
         }
