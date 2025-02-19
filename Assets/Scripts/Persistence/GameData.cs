@@ -6,7 +6,7 @@ namespace Persistence
     [Serializable]
     public class GameData
     {
-        public string currentPoints;
+        public long currentPoints;
         public List<BoardObjectSaveData> boardObjects = new();
     }
 }

@@ -52,7 +52,7 @@ namespace Persistence
             _activeSaveData = new Dictionary<Vector2Int, BoardObjectSaveData>();
             PurchaseManager.OnGameLoad(gameData);
             
-            if (long.Parse(gameData.currentPoints) == 0)
+            if (gameData.currentPoints == 0)
             {
                 OnSaveChanged(null);
                 Debug.Log("No Save Data Found, Resetting");
@@ -109,7 +109,9 @@ namespace Persistence
 
         private void OnSaveChanged(object o)
         {
-            gameData.currentPoints = PurchaseManager.GetCurrentCurrency().ToString();
+            if (!_isLoaded) return;
+            
+            gameData.currentPoints = PurchaseManager.GetCurrentCurrency();
             gameData.boardObjects = _activeSaveData.Values.ToList();
             SaveGame();
         }

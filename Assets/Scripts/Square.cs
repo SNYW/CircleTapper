@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using Persistence;
 using UnityEngine;
 
 public class Square : BoardObject
@@ -62,7 +63,8 @@ public class Square : BoardObject
 
             _remainingCooldown--;
             LerpRemovedSegments((float)_remainingCooldown/clickSpeed);
-
+            SaveObjectState();
+            
             if (_remainingCooldown <= 0)
             {
                 if(ParentCell == null) continue;
@@ -137,5 +139,11 @@ public class Square : BoardObject
         _remainingCooldown = saveData.value;
         GridManager.GetGridCell(new Vector2Int(saveData.xPosition, saveData.yPosition)).SetChildObject(this);
         Init(saveData.value);
+    }
+    
+    protected override void SaveObjectState()
+    {
+        if(ParentCell != null)
+            SaveManager.Instance.AddObject(ParentCell.gridPosition, ToSaveData());
     }
 }

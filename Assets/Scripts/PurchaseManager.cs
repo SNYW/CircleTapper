@@ -11,7 +11,7 @@ public static class PurchaseManager
 
     public static void OnGameLoad(GameData data)
     {
-        _currentCurrency = long.Parse(data.currentPoints);
+        _currentCurrency = data.currentPoints;
         SystemEventManager.Send(SystemEventManager.GameEvent.CurrencyAdded, data.currentPoints);
     }
 

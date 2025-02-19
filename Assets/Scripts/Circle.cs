@@ -56,7 +56,7 @@ public class Circle : BoardObject
             Instantiate(particle, randPos, Quaternion.identity);
             _particlesToSpawn--;
             if(ParentCell!= null)
-                SaveManager.Instance.AddObject(ParentCell.gridPosition, ToSaveData());
+               SaveObjectState();
         }
     }
 
@@ -84,6 +84,7 @@ public class Circle : BoardObject
         {
             //Fuck Exceptions
         }
+        SaveObjectState();
     }
 
     private void Complete()
@@ -137,6 +138,12 @@ public class Circle : BoardObject
         GridManager.GetGridCell(new Vector2Int(saveData.xPosition, saveData.yPosition)).SetChildObject(this);
         Init(saveData.value);
         StartCoroutine(SpawnCurrency());
-        SaveManager.Instance.AddObject(ParentCell.gridPosition, ToSaveData());
+        SaveObjectState();
+    }
+
+    protected override void SaveObjectState()
+    {
+        if(ParentCell != null)
+            SaveManager.Instance.AddObject(ParentCell.gridPosition, ToSaveData());
     }
 }

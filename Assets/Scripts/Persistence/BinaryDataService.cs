@@ -42,7 +42,7 @@ namespace Persistence
             
             if (!File.Exists(fileLocation))
             {
-                return new GameData{ currentPoints = "0" };
+                return new GameData{ currentPoints = 0};
             }
 
             byte[] binaryData = File.ReadAllBytes(fileLocation);

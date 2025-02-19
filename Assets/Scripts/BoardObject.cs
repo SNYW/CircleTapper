@@ -85,4 +85,9 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
     {
         throw new System.NotImplementedException();
     }
+
+    protected virtual void SaveObjectState()
+    {
+        throw new System.NotImplementedException();
+    }
 }
