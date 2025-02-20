@@ -70,7 +70,8 @@ public class Square : BoardObject
             
             foreach (var direction in tapTargets)
             {
-                if (ParentCell.Neighbors[direction].heldObject is Circle circle)
+                if (!ParentCell.Neighbors.TryGetValue(direction, out var neighbor)) continue;
+                if (neighbor.heldObject is Circle circle)
                 {
                     circle.OnTap();
                 }

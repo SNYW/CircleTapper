@@ -47,17 +47,18 @@ namespace Persistence
         public void LoadGame(bool spawnObjects = false)
         {
             gameData = new GameData();
-            gameData = _dataService.Load(SaveFileName);
-
             _activeSaveData = new Dictionary<Vector2Int, BoardObjectSaveData>();
-            PurchaseManager.OnGameLoad(gameData);
             
-            if (gameData.currentPoints == 0)
+            try
             {
-                OnSaveChanged(null);
-                Debug.Log("No Save Data Found, Resetting");
+                gameData = _dataService.Load(SaveFileName);
+            }
+            catch (Exception e)
+            {
+                ResetSave();
                 return;
             }
+            PurchaseManager.OnGameLoad(gameData);
             
             foreach (var boardObject in gameData.boardObjects)
             {
@@ -81,10 +82,22 @@ namespace Persistence
         public void DeleteSave()
         {
             _dataService.Delete(SaveFileName);
+            ResetSave();
+        }
+
+        public void ResetSave()
+        {
             _gameManager.ResetOnLoad();
             _activeSaveData.Clear();
+            gameData = new GameData
+            {
+                currentPoints = 0,
+                boardObjects = new List<BoardObjectSaveData>()
+            };
             PurchaseManager.ResetCurrency();
-            SaveGame();
+            var newobj = Instantiate(_gameManager.defaultStartingObject);
+            GridManager.GetClosestCell(Vector2Int.zero).SetChildObject(newobj);
+            newobj.Init();
         }
 
         public void AddObject(Vector2Int position, BoardObjectSaveData data)
@@ -132,6 +145,4 @@ namespace Persistence
             SaveGame();
         }
     }
-
-    
 }

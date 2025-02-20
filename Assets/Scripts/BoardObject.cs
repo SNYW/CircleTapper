@@ -42,8 +42,11 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
         {
             if (cell.heldObject.GetType() == GetType())
             {
-                OnMerge(cell.heldObject);
-                return;
+                if (onMergeSpawn != null && cell.heldObject.gameObject.name == gameObject.name)
+                {
+                    OnMerge(cell.heldObject);
+                    return;
+                }
             }
             cell = GridManager.GetClosestCell(touchPosition);
         }
@@ -58,9 +61,6 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
 
     public virtual void OnMerge(BoardObject targetObj)
     {
-        if (onMergeSpawn == null) return;
-        if (targetObj.gameObject.name != gameObject.name) return;
-        
         var newItem = Instantiate(onMergeSpawn, targetObj.transform.position, quaternion.identity);
         SaveManager.Instance.RemoveObject(targetObj.ParentCell.gridPosition);
         targetObj.ParentCell.SetChildObject(newItem);
