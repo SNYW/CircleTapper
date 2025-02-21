@@ -103,7 +103,7 @@ public class Circle : BoardObject
             {
                 _propertyBlock.SetFloat(RemovedSegments, value);
                 spriteRenderer.SetPropertyBlock(_propertyBlock);
-            }, newValue, 0.2f)
+            }, newValue, 0.1f)
             .SetTarget(gameObject)
             .OnComplete(() =>
             {
