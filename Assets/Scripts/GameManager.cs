@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using Persistence;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 
 public class GameManager : MonoBehaviour
@@ -20,12 +21,15 @@ public class GameManager : MonoBehaviour
         DOTween.Init();
         SystemEventManager.Init();
         PurchaseManager.Init();
+        SoundManager.Init();
         
-        StartCoroutine(GivePassiveIncome());
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoad;
     }
 
-    private void Start()
+    private void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
     {
+        if (scene.buildIndex != 1) return;
+        StartCoroutine(GivePassiveIncome());
         SaveManager.Instance.Init(this);
     }
 
