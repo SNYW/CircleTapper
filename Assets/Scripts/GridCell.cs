@@ -40,7 +40,7 @@ public class GridCell : MonoBehaviour
     {
         RemoveChildObject();
         heldObject = boardObject;
-        heldObject.ParentCell = this;
+        heldObject.parentCell = this;
         heldObject.transform.position = transform.position;
         
         SaveManager.Instance.AddObject(gridPosition, heldObject.ToSaveData());
@@ -51,7 +51,7 @@ public class GridCell : MonoBehaviour
         if (heldObject == null) return;
 
         SaveManager.Instance.RemoveObject(gridPosition);
-        heldObject.ParentCell = null;
+        heldObject.parentCell = null;
         heldObject = null;
     }
 }

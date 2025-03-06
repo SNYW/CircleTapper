@@ -35,7 +35,7 @@ public class Square : BoardObject
         
         spriteRenderer.SetPropertyBlock(_propertyBlock);
         
-        if(ParentCell == null)
+        if(parentCell == null)
             GridManager.GetClosestCell(transform.position).SetChildObject(this);
         StartCoroutine(ClickNeighbours());
 
@@ -66,11 +66,11 @@ public class Square : BoardObject
             SaveObjectState();
 
             if (_remainingCooldown > 0) continue;
-            if(ParentCell == null) continue;
+            if(parentCell == null) continue;
             
             foreach (var direction in tapTargets)
             {
-                if (!ParentCell.Neighbors.TryGetValue(direction, out var neighbor)) continue;
+                if (!parentCell.Neighbors.TryGetValue(direction, out var neighbor)) continue;
                 if (neighbor.heldObject is Circle circle)
                 {
                     circle.OnTap();
@@ -125,8 +125,8 @@ public class Square : BoardObject
             value = _remainingCooldown,
             level = chainLevel,
             carryoverValue = _remainingCooldown,
-            xPosition = ParentCell.gridPosition.x,
-            yPosition = ParentCell.gridPosition.y
+            xPosition = parentCell.gridPosition.x,
+            yPosition = parentCell.gridPosition.y
         };
     }
 
@@ -142,7 +142,7 @@ public class Square : BoardObject
     
     protected override void SaveObjectState()
     {
-        if(ParentCell != null)
-            SaveManager.Instance.AddObject(ParentCell.gridPosition, ToSaveData());
+        if(parentCell != null)
+            SaveManager.Instance.AddObject(parentCell.gridPosition, ToSaveData());
     }
 }

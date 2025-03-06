@@ -55,7 +55,7 @@ public class Circle : BoardObject
             var randPos = transform.position + new Vector3(Random.Range(-0.1f, 0.1f), Random.Range(-0.1f, 0.1f), 0);
             Instantiate(particle, randPos, Quaternion.identity);
             _particlesToSpawn--;
-            if(ParentCell!= null)
+            if(parentCell!= null)
                SaveObjectState();
         }
     }
@@ -123,8 +123,8 @@ public class Circle : BoardObject
             value = currentValue,
             level = chainLevel,
             carryoverValue = _particlesToSpawn,
-            xPosition = ParentCell.gridPosition.x,
-            yPosition = ParentCell.gridPosition.y
+            xPosition = parentCell.gridPosition.x,
+            yPosition = parentCell.gridPosition.y
         };
     }
 
@@ -143,7 +143,7 @@ public class Circle : BoardObject
 
     protected override void SaveObjectState()
     {
-        if(ParentCell != null)
-            SaveManager.Instance.AddObject(ParentCell.gridPosition, ToSaveData());
+        if(parentCell != null)
+            SaveManager.Instance.AddObject(parentCell.gridPosition, ToSaveData());
     }
 }

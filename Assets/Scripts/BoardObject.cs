@@ -6,7 +6,7 @@ using UnityEngine;
 public abstract class BoardObject : MonoBehaviour, ISaveable
 {
     public int chainLevel;
-    public GridCell ParentCell;
+    public GridCell parentCell;
     public BoardObject onMergeSpawn;
 
     private bool _isDragging = false;
@@ -25,7 +25,7 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
     {
         if (_isDragging) return;
 
-        ParentCell.RemoveChildObject();
+        parentCell.RemoveChildObject();
         _isDragging = true;
     }
 
@@ -62,8 +62,8 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
     public virtual void OnMerge(BoardObject targetObj)
     {
         var newItem = Instantiate(onMergeSpawn, targetObj.transform.position, quaternion.identity);
-        SaveManager.Instance.RemoveObject(targetObj.ParentCell.gridPosition);
-        targetObj.ParentCell.SetChildObject(newItem);
+        SaveManager.Instance.RemoveObject(targetObj.parentCell.gridPosition);
+        targetObj.parentCell.SetChildObject(newItem);
         newItem.Init();
         Destroy(targetObj.gameObject);
         Destroy(gameObject);

@@ -9,8 +9,7 @@ public static class SystemEventManager
               CurrencyAdded,
               CurrencySpent,
               BoardObjectMoved,
-              BoardChanged,
-              SceneLoaded
+              BoardChanged
        }
        private static Dictionary<GameEvent, Action<object>> _eventListeners;
 
