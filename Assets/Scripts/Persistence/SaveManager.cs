@@ -75,6 +75,9 @@ namespace Persistence
                     case  BoardObjectType.Square:
                         Instantiate(_gameManager.squareLevels[boardObject.level]).FromSaveData(boardObject);
                         break;
+                    case BoardObjectType.Hex:
+                        Instantiate(_gameManager.hexLevels[boardObject.level]).FromSaveData(boardObject);
+                        break;
                 }
             }
         }

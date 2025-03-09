@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
 
     public List<Circle> circleLevels;
     public List<Square> squareLevels;
+    public List<Hex> hexLevels;
     
     private void Awake()
     {

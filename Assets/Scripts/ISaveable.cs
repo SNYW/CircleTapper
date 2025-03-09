@@ -12,7 +12,8 @@ public interface ISaveable
 public enum BoardObjectType
 {
     Circle,
-    Square
+    Square,
+    Hex
 }
 
 [Serializable]
