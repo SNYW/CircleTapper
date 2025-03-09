@@ -82,7 +82,7 @@ public class Circle : BoardObject
         }
         catch (Exception e)
         {
-            //Fuck Exceptions
+            Debug.LogError(e);
         }
         SaveObjectState();
     }

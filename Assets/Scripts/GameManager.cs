@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     public static bool DEBUGMODE = false;
 
     public BoardObject defaultStartingObject;
+    public InWorldGridManager gridManager;
 
     public List<Circle> circleLevels;
     public List<Square> squareLevels;
@@ -30,6 +31,7 @@ public class GameManager : MonoBehaviour
     private void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
     {
         if (scene.buildIndex != 1) return;
+        gridManager.gameObject.SetActive(true);
         StartCoroutine(GivePassiveIncome());
         SaveManager.Instance.Init(this);
     }

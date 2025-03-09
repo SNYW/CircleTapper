@@ -72,7 +72,7 @@ public class Hex : BoardObject
             }
         }
 
-        neighbourValueText.text = _neighbourValue == 0 ? "" : _neighbourValue.ToString();
+        neighbourValueText.text = _neighbourValue.ToString();
     }
 
     public override void BeginDrag(Vector2 startPos)
@@ -101,12 +101,15 @@ public class Hex : BoardObject
 
             if (_remainingCooldown > 0) continue;
             if(parentCell == null) continue;
-
-            _particlesToSpawn += _neighbourValue;
-
-            foreach (var clickParticle in clickParticles)
+            
+            if (_neighbourValue != 0)
             {
-                clickParticle.Play();
+                _particlesToSpawn += _neighbourValue;
+
+                foreach (var clickParticle in clickParticles)
+                {
+                    clickParticle.Play();
+                }
             }
                 
             transform.DOScale(1.2f, 0.1f)

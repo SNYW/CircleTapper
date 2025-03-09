@@ -1,25 +1,22 @@
-using System;
-using System.Collections;
 using UnityEngine;
 
 public class SceneManager : MonoBehaviour
 {
-    private static readonly int Load = Animator.StringToHash("Load");
-    public Animator fadeAnimator;
+    public Animator uiAnimator;
 
     public static SceneManager Instance;
+    private static readonly int Load = Animator.StringToHash("Load");
 
     private void Awake()
     {
         if (Instance != null) Destroy(Instance.gameObject);
-
         Instance = this;
     }
 
     public void LoadScene(int index)
     {
         StopAllCoroutines();
-        fadeAnimator.SetTrigger(Load);
+        uiAnimator.SetTrigger(Load);
         UnityEngine.SceneManagement.SceneManager.LoadScene(index);
     }
 }

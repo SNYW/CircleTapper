@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
 
 [ExecuteInEditMode]
 public class InWorldGridManager : MonoBehaviour
@@ -14,13 +12,14 @@ public class InWorldGridManager : MonoBehaviour
     {
         Grid = new Dictionary<Vector2Int, GridCell>();
         
-        foreach (var cell in GetComponentsInChildren<GridCell>())
+        foreach (var cell in GetComponentsInChildren<GridCell>(true))
         {
             Grid.Add(cell.gridPosition, cell);
         }
 
         foreach (var cell in Grid.Values)
         {
+            cell.gameObject.SetActive(true);
             GridManager.CacheNeighbors(cell, Grid);
         }
     }

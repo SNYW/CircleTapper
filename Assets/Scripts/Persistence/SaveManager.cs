@@ -55,6 +55,7 @@ namespace Persistence
             }
             catch (Exception e)
             {
+                Debug.LogError(e);
                 ResetSave();
                 return;
             }
