@@ -144,7 +144,7 @@ public class Hex : BoardObject
     {
         while (gameObject.activeSelf)
         {
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.01f);
 
             if (_particlesToSpawn <= 0) continue;
 

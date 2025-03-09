@@ -15,7 +15,6 @@ public class Circle : BoardObject
     public float spawnCooldown;
     private int _particlesToSpawn;
 
-    private bool _canTap = true;
     private MaterialPropertyBlock _propertyBlock;
     private float LerpValue => 1-(float)currentValue / startValue;
     private static readonly int RemovedSegments = Shader.PropertyToID("_RemovedSegments");
@@ -62,13 +61,12 @@ public class Circle : BoardObject
 
     public override void OnTap()
     {
-        if (!_canTap) return;
-
-        _canTap = false;
-
+        if(currentValue == 0) return;
+        
         try
         {
-            currentValue--;
+            
+            currentValue = Mathf.Clamp(currentValue-1, 0, startValue);
             var isComplete = currentValue <= 0;
 
             transform.DOScale(isComplete ? 0.65f : 0.52f, 0.1f)
@@ -112,7 +110,6 @@ public class Circle : BoardObject
                 {
                     Complete();
                 }
-                _canTap = true;
             });
     }
 

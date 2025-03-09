@@ -196,7 +196,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chainLevel: 0
   parentCell: {fileID: 0}
-  onMergeSpawn: {fileID: 0}
+  onMergeSpawn: {fileID: 1963523410248093157, guid: 752b10ce58c2249cda238840a773b0c2, type: 3}
   influenceIndicators:
   - {fileID: 4681156148058246195}
   clickSpeed: 6
