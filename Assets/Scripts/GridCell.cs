@@ -44,6 +44,7 @@ public class GridCell : MonoBehaviour
         heldObject.transform.position = transform.position;
         
         SaveManager.Instance.AddObject(gridPosition, heldObject.ToSaveData());
+        SystemEventManager.Send(SystemEventManager.GameEvent.BoardObjectMoved, boardObject);
     }
 
     public void RemoveChildObject()

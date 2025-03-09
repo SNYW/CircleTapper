@@ -199,7 +199,7 @@ MonoBehaviour:
   onMergeSpawn: {fileID: 0}
   influenceIndicators:
   - {fileID: 4681156148058246195}
-  clickSpeed: 12
+  clickSpeed: 6
   clickParticles:
   - {fileID: 1273797279753163438}
   - {fileID: 9024497028199271694}

@@ -92,6 +92,7 @@ public class Circle : BoardObject
         _particlesToSpawn += startValue;
         currentValue = startValue;
         LerpRemovedSegments(0f);
+        SystemEventManager.Send(SystemEventManager.GameEvent.CircleComplete, this);
     }
 
     private void LerpRemovedSegments(float newValue)
