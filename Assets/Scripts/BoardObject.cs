@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using DG.Tweening;
 using Persistence;
 using Unity.Mathematics;
@@ -8,11 +9,13 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
     public int chainLevel;
     public GridCell parentCell;
     public BoardObject onMergeSpawn;
+    public List<GameObject> influenceIndicators;
 
     private bool _isDragging = false;
 
     private void OnEnable()
     {
+        SetIndicators(false);
         SystemEventManager.Send(SystemEventManager.GameEvent.BoardChanged, this);
     }
 
@@ -27,6 +30,8 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
 
         parentCell.RemoveChildObject();
         _isDragging = true;
+        
+        SetIndicators(true);
     }
 
     public virtual void OnDrag(Vector2 worldPosition)
@@ -53,6 +58,8 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
         
         cell.SetChildObject(this);
         _isDragging = false;
+        
+        SetIndicators(false);
     }
 
     public virtual void OnTap()
@@ -74,6 +81,16 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
         StopAllCoroutines();
         DOTween.KillAll(gameObject);
         SystemEventManager.Send(SystemEventManager.GameEvent.BoardChanged, this);
+    }
+
+    private void SetIndicators(bool active)
+    {
+        if (influenceIndicators is not { Count: > 0 }) return;
+        
+        foreach (var indicator in influenceIndicators)
+        {
+            indicator.gameObject.SetActive(active);
+        }
     }
 
     public virtual BoardObjectSaveData ToSaveData()

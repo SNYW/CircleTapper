@@ -26,14 +26,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5418315529200665794}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 0.013, y: 0.02, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.27, y: 0.31, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8401256797226816586}
   m_Father: {fileID: 3166469139836078315}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &7757725458010290320
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -241,7 +241,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3166469139836078315}
   m_Layer: 0
-  m_Name: Triangle
+  m_Name: TriangleLV0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -277,20 +277,32 @@ PrefabInstance:
       value: TapEffect
       objectReference: {fileID: 0}
     - target: {fileID: 3392995359296269407, guid: 10460de4d782e41aba5466be95d4b852, type: 3}
+      propertyPath: looping
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3392995359296269407, guid: 10460de4d782e41aba5466be95d4b852, type: 3}
+      propertyPath: ShapeModule.type
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3392995359296269407, guid: 10460de4d782e41aba5466be95d4b852, type: 3}
       propertyPath: ShapeModule.m_Scale.x
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3392995359296269407, guid: 10460de4d782e41aba5466be95d4b852, type: 3}
       propertyPath: ShapeModule.m_Scale.y
-      value: 0.6
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3392995359296269407, guid: 10460de4d782e41aba5466be95d4b852, type: 3}
+      propertyPath: ShapeModule.radiusThickness
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4304265763944753306, guid: 10460de4d782e41aba5466be95d4b852, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.309
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4304265763944753306, guid: 10460de4d782e41aba5466be95d4b852, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.016
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4304265763944753306, guid: 10460de4d782e41aba5466be95d4b852, type: 3}
       propertyPath: m_LocalPosition.z
