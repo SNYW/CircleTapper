@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Objectives;
 using Persistence;
 using UnityEngine;
@@ -54,6 +53,12 @@ namespace Managers
             var objectiveIndex = _objectives.IndexOf(CurrentObjective);
             CurrentObjective.Dispose();
             CurrentObjective = _objectives[objectiveIndex + 1];
+            SystemEventManager.Send(SystemEventManager.GameEvent.ObjectiveUpdated, CurrentObjective);
+        }
+
+        public static void ResetObjectives()
+        {
+            CurrentObjective = _objectives[0];
             SystemEventManager.Send(SystemEventManager.GameEvent.ObjectiveUpdated, CurrentObjective);
         }
     }

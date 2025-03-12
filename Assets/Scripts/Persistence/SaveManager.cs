@@ -103,6 +103,7 @@ namespace Persistence
                 boardObjects = new List<BoardObjectSaveData>()
             };
             PurchaseManager.ResetCurrency();
+            ObjectiveManager.ResetObjectives();
             var newobj = Instantiate(_gameManager.defaultStartingObject);
             GridManager.GetClosestCell(Vector2Int.zero).SetChildObject(newobj);
             newobj.Init();
