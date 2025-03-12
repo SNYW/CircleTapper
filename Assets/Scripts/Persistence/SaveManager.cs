@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Managers;
 using UnityEditor;
 using UnityEngine;
 
@@ -35,6 +36,7 @@ namespace Persistence
             LoadGame(true);
             SystemEventManager.Subscribe(SystemEventManager.GameEvent.CurrencyAdded, OnSaveChanged);
             SystemEventManager.Subscribe(SystemEventManager.GameEvent.CurrencySpent, OnSaveChanged);
+            SystemEventManager.Subscribe(SystemEventManager.GameEvent.ObjectiveUpdated, OnSaveChanged);
             _isLoaded = true;
         }
 
@@ -60,6 +62,7 @@ namespace Persistence
                 return;
             }
             PurchaseManager.OnGameLoad(gameData);
+            ObjectiveManager.OnGameLoad(gameData);
             
             foreach (var boardObject in gameData.boardObjects)
             {
@@ -96,6 +99,7 @@ namespace Persistence
             gameData = new GameData
             {
                 currentPoints = 0,
+                currentObjective = string.Empty,
                 boardObjects = new List<BoardObjectSaveData>()
             };
             PurchaseManager.ResetCurrency();
@@ -130,6 +134,7 @@ namespace Persistence
             
             gameData.currentPoints = PurchaseManager.GetCurrentCurrency();
             gameData.boardObjects = _activeSaveData.Values.ToList();
+            gameData.currentObjective = ObjectiveManager.CurrentObjective.id;
             SaveGame();
         }
 
@@ -137,6 +142,7 @@ namespace Persistence
         {
             SystemEventManager.Unsubscribe(SystemEventManager.GameEvent.CurrencyAdded, OnSaveChanged);
             SystemEventManager.Unsubscribe(SystemEventManager.GameEvent.CurrencySpent, OnSaveChanged);
+            SystemEventManager.Unsubscribe(SystemEventManager.GameEvent.ObjectiveUpdated, OnSaveChanged);
         }
 
         private void OnApplicationPause(bool pauseStatus)
