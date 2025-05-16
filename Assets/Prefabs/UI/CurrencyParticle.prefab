@@ -97,6 +97,7 @@ GameObject:
   m_Component:
   - component: {fileID: 560345001091772509}
   - component: {fileID: 8466067838388665140}
+  - component: {fileID: 4776544966621621650}
   m_Layer: 0
   m_Name: CurrencyParticle
   m_TagString: Untagged
@@ -136,3 +137,34 @@ MonoBehaviour:
   moveSpeed: 5
   arcHeight: 2
   animateTransform: {fileID: 318734409034256035}
+--- !u!114 &4776544966621621650
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7812482534773432873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a6610d2e704f1648819acc8d7460285, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CollisionTag: 
+  EventReference:
+    Guid:
+      Data1: -532503713
+      Data2: 1237080617
+      Data3: -542622794
+      Data4: -674414542
+    Path: event:/Test
+  Event: 
+  EventPlayTrigger: 2
+  EventStopTrigger: 0
+  AllowFadeout: 1
+  TriggerOnce: 0
+  Preload: 0
+  NonRigidbodyVelocity: 0
+  Params: []
+  OverrideAttenuation: 0
+  OverrideMinDistance: 1
+  OverrideMaxDistance: 20

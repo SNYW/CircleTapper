@@ -36325,6 +36325,7 @@ GameObject:
   - component: {fileID: 1186765411}
   - component: {fileID: 1186765410}
   - component: {fileID: 1186765413}
+  - component: {fileID: 1186765414}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -36339,7 +36340,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1186765409}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!20 &1186765411
 Camera:
   m_ObjectHideFlags: 0
@@ -36450,6 +36451,20 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+--- !u!114 &1186765414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1186765409}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c6556701af9e04380698b89f691b6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nonRigidbodyVelocity: 0
+  attenuationObject: {fileID: 0}
 --- !u!1 &1187717856
 GameObject:
   m_ObjectHideFlags: 0
@@ -63299,6 +63314,7 @@ GameObject:
   - component: {fileID: 1945645146}
   - component: {fileID: 1945645148}
   - component: {fileID: 1945645147}
+  - component: {fileID: 1945645149}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -63363,6 +63379,37 @@ MonoBehaviour:
   hexLevels:
   - {fileID: 6395192640284774339, guid: 3861996e325fb41a4b21186c765d2a06, type: 3}
   - {fileID: 1963523410248093157, guid: 752b10ce58c2249cda238840a773b0c2, type: 3}
+--- !u!114 &1945645149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1945645145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a6610d2e704f1648819acc8d7460285, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CollisionTag: 
+  EventReference:
+    Guid:
+      Data1: 1887488942
+      Data2: 1199027365
+      Data3: 1038298250
+      Data4: -1140576617
+    Path: event:/BGM
+  Event: 
+  EventPlayTrigger: 1
+  EventStopTrigger: 0
+  AllowFadeout: 1
+  TriggerOnce: 0
+  Preload: 0
+  NonRigidbodyVelocity: 0
+  Params: []
+  OverrideAttenuation: 0
+  OverrideMinDistance: 1
+  OverrideMaxDistance: 20
 --- !u!1 &1946024643
 GameObject:
   m_ObjectHideFlags: 0
