@@ -12,6 +12,8 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
     public List<GameObject> influenceIndicators;
 
     private bool _isDragging = false;
+    private float dragDelayTime = 0.1f;
+    private float dragStartTime;
 
     private void OnEnable()
     {
@@ -27,16 +29,17 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
     public virtual void BeginDrag(Vector2 touchPosition)
     {
         if (_isDragging) return;
-
-        parentCell.RemoveChildObject();
+        dragStartTime = Time.time;
         _isDragging = true;
-        
-        SetIndicators(true);
     }
 
     public virtual void OnDrag(Vector2 worldPosition)
     {
+        if (!_isDragging || !(Time.time - dragStartTime >= dragDelayTime)) return;
+        
+        parentCell?.RemoveChildObject();
         transform.position = worldPosition;
+        SetIndicators(true);
     }
 
     public virtual void EndDrag(Vector2 touchPosition)
