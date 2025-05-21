@@ -207,6 +207,13 @@ MonoBehaviour:
   neighbourValueText: {fileID: 8875670700584503362}
   particle: {fileID: 8466067838388665140, guid: 17706f22e730f436ba767c4c75ff8dbf, type: 3}
   tapTargets: 05000000
+  HexCompleteSFX:
+    Guid:
+      Data1: -1592480810
+      Data2: 1317581610
+      Data3: -533124195
+      Data4: 1869714446
+    Path: event:/Complete_Hex
 --- !u!58 &951238484152061567
 CircleCollider2D:
   m_ObjectHideFlags: 0
