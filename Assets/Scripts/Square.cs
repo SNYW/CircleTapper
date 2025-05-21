@@ -19,6 +19,8 @@ public class Square : BoardObject
 
     public List<GridManager.Direction> tapTargets;
 
+    public FMODUnity.EventReference SquareCompleteSFX; //audio 
+
     public override void Init()
     {
         Init(clickSpeed);
@@ -74,7 +76,13 @@ public class Square : BoardObject
                 if (neighbor.heldObject is Circle circle)
                 {
                     circle.OnTap();
+                    FMODUnity.RuntimeManager.PlayOneShotAttached(SquareCompleteSFX, gameObject); //audio
                 }
+                else
+                {
+                    FMODUnity.RuntimeManager.PlayOneShotAttached(SquareCompleteSFX, gameObject); //audio
+                }
+                
             }
 
             foreach (var clickParticle in clickParticles)

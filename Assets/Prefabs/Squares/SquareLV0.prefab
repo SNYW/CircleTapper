@@ -291,6 +291,20 @@ MonoBehaviour:
   - {fileID: 1273797279753163438}
   spriteRenderer: {fileID: 8153827198470543614}
   tapTargets: 00000000
+  SquareCompleteSFX:
+    Guid:
+      Data1: -391062280
+      Data2: 1315266191
+      Data3: -1588083811
+      Data4: 651861112
+    Path: event:/Complete_Square
+  SquareEmptyCompleteSFX:
+    Guid:
+      Data1: 837736494
+      Data2: 1257092902
+      Data3: 92039841
+      Data4: -1319525764
+    Path: event:/Complete_Square_NoCircleTap
 --- !u!61 &4723867541589226415
 BoxCollider2D:
   m_ObjectHideFlags: 0
