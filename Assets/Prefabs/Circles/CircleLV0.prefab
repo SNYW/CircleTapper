@@ -237,7 +237,7 @@ MonoBehaviour:
       Data2: 1176744217
       Data3: 1791872161
       Data4: -1968072420
-    Path: event:/Buy_Circle
+    Path: event:/Complete_Circle
 --- !u!58 &168634529876207075
 CircleCollider2D:
   m_ObjectHideFlags: 0
