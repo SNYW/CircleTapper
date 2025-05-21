@@ -20,6 +20,8 @@ public class Circle : BoardObject
     private static readonly int RemovedSegments = Shader.PropertyToID("_RemovedSegments");
     private static readonly int SegmentCount = Shader.PropertyToID("_SegmentCount");
 
+    public FMODUnity.EventReference CircleCompleteSFX; //audio
+
     public override void Init()
     {
         Init(startValue);
@@ -91,6 +93,7 @@ public class Circle : BoardObject
         currentValue = startValue;
         LerpRemovedSegments(0f);
         SystemEventManager.Send(SystemEventManager.GameEvent.CircleComplete, this);
+        FMODUnity.RuntimeManager.PlayOneShotAttached(CircleCompleteSFX, gameObject); //audio
     }
 
     private void LerpRemovedSegments(float newValue)

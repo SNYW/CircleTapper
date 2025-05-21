@@ -222,16 +222,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d424a8b18b977467587233879666a1a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ParentCell: {fileID: 0}
-  LastParentCell: {fileID: 0}
+  chainLevel: 0
+  parentCell: {fileID: 0}
   onMergeSpawn: {fileID: 886542511069833392, guid: 6105929f3c44446758d7045b23688d6d, type: 3}
-  numberDisplay: {fileID: 8875670700584503362}
+  influenceIndicators: []
   startValue: 3
-  maxValue: 3
   currentValue: 0
   spriteRenderer: {fileID: 1495102670577064642}
   particle: {fileID: 8466067838388665140, guid: 17706f22e730f436ba767c4c75ff8dbf, type: 3}
   spawnCooldown: 0.1
+  CircleCompleteSFX:
+    Guid:
+      Data1: 1702320368
+      Data2: 1176744217
+      Data3: 1791872161
+      Data4: -1968072420
+    Path: event:/Buy_Circle
 --- !u!58 &168634529876207075
 CircleCollider2D:
   m_ObjectHideFlags: 0
