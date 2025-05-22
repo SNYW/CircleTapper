@@ -286,6 +286,13 @@ MonoBehaviour:
   onMergeSpawn: {fileID: 3081271756573555117, guid: 48d518f7800ed4aec854ff15c8ae0bca, type: 3}
   influenceIndicators:
   - {fileID: 515192891871548639}
+  MergeObjectSFX:
+    Guid:
+      Data1: 1152697574
+      Data2: 1091558996
+      Data3: -2057272186
+      Data4: -1409553683
+    Path: event:/Merge_Object
   clickSpeed: 5
   clickParticles:
   - {fileID: 1273797279753163438}
@@ -298,13 +305,6 @@ MonoBehaviour:
       Data3: -1588083811
       Data4: 651861112
     Path: event:/Complete_Square
-  SquareEmptyCompleteSFX:
-    Guid:
-      Data1: 837736494
-      Data2: 1257092902
-      Data3: 92039841
-      Data4: -1319525764
-    Path: event:/Complete_Square_NoCircleTap
 --- !u!61 &4723867541589226415
 BoxCollider2D:
   m_ObjectHideFlags: 0

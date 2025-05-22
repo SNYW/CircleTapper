@@ -414,6 +414,26 @@ PrefabInstance:
       propertyPath: objectToBuy
       value: 
       objectReference: {fileID: 6395192640284774339, guid: 3861996e325fb41a4b21186c765d2a06, type: 3}
+    - target: {fileID: 22047776896385526, guid: 1f28a3143af384b08b98409c8a4abe44, type: 3}
+      propertyPath: BuyButtonSFX.Path
+      value: event:/UI_Button_Buy
+      objectReference: {fileID: 0}
+    - target: {fileID: 22047776896385526, guid: 1f28a3143af384b08b98409c8a4abe44, type: 3}
+      propertyPath: BuyButtonSFX.Guid.Data1
+      value: -275212362
+      objectReference: {fileID: 0}
+    - target: {fileID: 22047776896385526, guid: 1f28a3143af384b08b98409c8a4abe44, type: 3}
+      propertyPath: BuyButtonSFX.Guid.Data2
+      value: 1168841480
+      objectReference: {fileID: 0}
+    - target: {fileID: 22047776896385526, guid: 1f28a3143af384b08b98409c8a4abe44, type: 3}
+      propertyPath: BuyButtonSFX.Guid.Data3
+      value: -1468682342
+      objectReference: {fileID: 0}
+    - target: {fileID: 22047776896385526, guid: 1f28a3143af384b08b98409c8a4abe44, type: 3}
+      propertyPath: BuyButtonSFX.Guid.Data4
+      value: 1329490867
+      objectReference: {fileID: 0}
     - target: {fileID: 407079871432841518, guid: 1f28a3143af384b08b98409c8a4abe44, type: 3}
       propertyPath: m_Sprite
       value: 
@@ -1065,6 +1085,26 @@ PrefabInstance:
       propertyPath: objectToBuy
       value: 
       objectReference: {fileID: 1723542381975022146, guid: f0f90a9da8cd6499e9fc67649235afc7, type: 3}
+    - target: {fileID: 22047776896385526, guid: 1f28a3143af384b08b98409c8a4abe44, type: 3}
+      propertyPath: BuyButtonSFX.Path
+      value: event:/UI_Button_Buy
+      objectReference: {fileID: 0}
+    - target: {fileID: 22047776896385526, guid: 1f28a3143af384b08b98409c8a4abe44, type: 3}
+      propertyPath: BuyButtonSFX.Guid.Data1
+      value: -275212362
+      objectReference: {fileID: 0}
+    - target: {fileID: 22047776896385526, guid: 1f28a3143af384b08b98409c8a4abe44, type: 3}
+      propertyPath: BuyButtonSFX.Guid.Data2
+      value: 1168841480
+      objectReference: {fileID: 0}
+    - target: {fileID: 22047776896385526, guid: 1f28a3143af384b08b98409c8a4abe44, type: 3}
+      propertyPath: BuyButtonSFX.Guid.Data3
+      value: -1468682342
+      objectReference: {fileID: 0}
+    - target: {fileID: 22047776896385526, guid: 1f28a3143af384b08b98409c8a4abe44, type: 3}
+      propertyPath: BuyButtonSFX.Guid.Data4
+      value: 1329490867
+      objectReference: {fileID: 0}
     - target: {fileID: 407079871432841518, guid: 1f28a3143af384b08b98409c8a4abe44, type: 3}
       propertyPath: m_Sprite
       value: 
@@ -1835,7 +1875,7 @@ MonoBehaviour:
       Data2: 1159290560
       Data3: -680860031
       Data4: -952952668
-    Path: event:/UI_DeleteSave
+    Path: event:/UI_Button_DeleteSave
 --- !u!1 &759628667
 GameObject:
   m_ObjectHideFlags: 0
@@ -3706,6 +3746,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 927695896}
     m_Modifications:
+    - target: {fileID: 22047776896385526, guid: 1f28a3143af384b08b98409c8a4abe44, type: 3}
+      propertyPath: BuyButtonSFX.Path
+      value: event:/UI_Button_Buy
+      objectReference: {fileID: 0}
+    - target: {fileID: 22047776896385526, guid: 1f28a3143af384b08b98409c8a4abe44, type: 3}
+      propertyPath: BuyButtonSFX.Guid.Data1
+      value: -275212362
+      objectReference: {fileID: 0}
+    - target: {fileID: 22047776896385526, guid: 1f28a3143af384b08b98409c8a4abe44, type: 3}
+      propertyPath: BuyButtonSFX.Guid.Data2
+      value: 1168841480
+      objectReference: {fileID: 0}
+    - target: {fileID: 22047776896385526, guid: 1f28a3143af384b08b98409c8a4abe44, type: 3}
+      propertyPath: BuyButtonSFX.Guid.Data3
+      value: -1468682342
+      objectReference: {fileID: 0}
+    - target: {fileID: 22047776896385526, guid: 1f28a3143af384b08b98409c8a4abe44, type: 3}
+      propertyPath: BuyButtonSFX.Guid.Data4
+      value: 1329490867
+      objectReference: {fileID: 0}
     - target: {fileID: 3040756307101631795, guid: 1f28a3143af384b08b98409c8a4abe44, type: 3}
       propertyPath: m_Name
       value: Button

@@ -7,6 +7,7 @@ public class SceneManager : MonoBehaviour
     public static SceneManager Instance;
     private static readonly int Load = Animator.StringToHash("Load");
 
+
     private void Awake()
     {
         if (Instance != null) Destroy(Instance.gameObject);
