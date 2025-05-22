@@ -29,6 +29,8 @@ public class Hex : BoardObject
 
     public List<GridManager.Direction> tapTargets;
 
+    public FMODUnity.EventReference HexCompleteSFX; //audio
+
     private void Awake()
     {
         SystemEventManager.Subscribe(SystemEventManager.GameEvent.CircleComplete, OnCircleComplete);
@@ -61,6 +63,7 @@ public class Hex : BoardObject
                 _particlesToSpawn += _storedParticles;
                 _storedParticles = 0;
                 neighbourValueText.text = "0";
+                FMODUnity.RuntimeManager.PlayOneShotAttached(HexCompleteSFX, gameObject); //audio
 
                 foreach (var clickParticle in clickParticles)
                 {
@@ -150,8 +153,8 @@ public class Hex : BoardObject
 
             var randPos = transform.position + new Vector3(Random.Range(-0.1f, 0.1f), Random.Range(-0.1f, 0.1f), 0);
             Instantiate(particle, randPos, Quaternion.identity);
-            _particlesToSpawn--;
-            if(parentCell!= null)
+            _particlesToSpawn--;            
+            if (parentCell!= null)
                 SaveObjectState();
         }
     }

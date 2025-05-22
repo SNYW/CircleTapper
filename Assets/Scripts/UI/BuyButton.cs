@@ -13,8 +13,11 @@ public class BuyButton : MonoBehaviour
 
    private int _currentCost;
    private Button _button;
-   
-   private void Awake()
+
+   public FMODUnity.EventReference BuyButtonSFX; //audio 
+
+
+    private void Awake()
    {
       _currentCost = cost;
       costText.text = cost.ToString();
@@ -60,5 +63,6 @@ public class BuyButton : MonoBehaviour
       _currentCost = cost * FindObjectsByType<BoardObject>(FindObjectsSortMode.None).Length;
       costText.text = _currentCost.ToString();
       SystemEventManager.Send(SystemEventManager.GameEvent.BoardChanged, newObj);
-   }
+      FMODUnity.RuntimeManager.PlayOneShotAttached(BuyButtonSFX, gameObject); //audio
+    }
 }

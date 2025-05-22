@@ -20,6 +20,9 @@ public class Circle : BoardObject
     private static readonly int RemovedSegments = Shader.PropertyToID("_RemovedSegments");
     private static readonly int SegmentCount = Shader.PropertyToID("_SegmentCount");
 
+    public FMODUnity.EventReference CircleCompleteSFX; //audio
+    public FMODUnity.EventReference CircleTapSFX; //audio
+
     public override void Init()
     {
         Init(startValue);
@@ -75,6 +78,7 @@ public class Circle : BoardObject
                 {
                     transform.DOScale(0.5f, 0.1f).SetEase(Ease.InQuad).SetTarget(gameObject);
                     LerpRemovedSegments(LerpValue);
+                    FMODUnity.RuntimeManager.PlayOneShotAttached(CircleTapSFX, gameObject); //audio
                 });
         }
         catch (Exception e)
@@ -90,6 +94,7 @@ public class Circle : BoardObject
         currentValue = startValue;
         LerpRemovedSegments(0f);
         SystemEventManager.Send(SystemEventManager.GameEvent.CircleComplete, this);
+        FMODUnity.RuntimeManager.PlayOneShotAttached(CircleCompleteSFX, gameObject); //audio
     }
 
     private void LerpRemovedSegments(float newValue)

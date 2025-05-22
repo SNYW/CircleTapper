@@ -199,6 +199,13 @@ MonoBehaviour:
   onMergeSpawn: {fileID: 1963523410248093157, guid: 752b10ce58c2249cda238840a773b0c2, type: 3}
   influenceIndicators:
   - {fileID: 4681156148058246195}
+  MergeObjectSFX:
+    Guid:
+      Data1: 1152697574
+      Data2: 1091558996
+      Data3: -2057272186
+      Data4: -1409553683
+    Path: event:/Merge_Object
   clickSpeed: 6
   clickParticles:
   - {fileID: 1273797279753163438}
@@ -207,6 +214,13 @@ MonoBehaviour:
   neighbourValueText: {fileID: 8875670700584503362}
   particle: {fileID: 8466067838388665140, guid: 17706f22e730f436ba767c4c75ff8dbf, type: 3}
   tapTargets: 05000000
+  HexCompleteSFX:
+    Guid:
+      Data1: -1592480810
+      Data2: 1317581610
+      Data3: -533124195
+      Data4: 1869714446
+    Path: event:/Complete_Hex
 --- !u!58 &951238484152061567
 CircleCollider2D:
   m_ObjectHideFlags: 0

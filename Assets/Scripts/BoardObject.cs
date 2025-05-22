@@ -15,6 +15,8 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
     private float dragDelayTime = 0.1f;
     private float dragStartTime;
 
+    public FMODUnity.EventReference MergeObjectSFX; //audio 
+
     private void OnEnable()
     {
         SetIndicators(false);
@@ -79,6 +81,7 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
         newItem.Init();
         Destroy(targetObj.gameObject);
         Destroy(gameObject);
+        FMODUnity.RuntimeManager.PlayOneShotAttached(MergeObjectSFX, gameObject); //audio
     }
 
     private void OnDestroy()
