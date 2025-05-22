@@ -65,7 +65,6 @@ public class Circle : BoardObject
         
         try
         {
-            
             currentValue = Mathf.Clamp(currentValue-1, 0, startValue);
             var isComplete = currentValue <= 0;
 
@@ -128,20 +127,25 @@ public class Circle : BoardObject
 
     public override void FromSaveData(BoardObjectSaveData saveData)
     {
-
         DOTween.KillAll(gameObject);
         StopAllCoroutines();
 
         _particlesToSpawn = 0;
-        GridManager.GetGridCell(new Vector2Int(saveData.xPosition, saveData.yPosition)).SetChildObject(this);
+        var gridCell = GridManager.GetGridCell(new Vector2Int(saveData.xPosition, saveData.yPosition));
+
+        if (gridCell == null)
+        {
+            Debug.LogError($"Tried to spawn an item on a populated position {saveData.xPosition},{saveData.yPosition}");
+            return;
+        }
+        
+        gridCell.SetChildObject(this);
         Init(saveData.value);
-        StartCoroutine(SpawnCurrency());
         SaveObjectState();
     }
 
     protected override void SaveObjectState()
     {
-        if(parentCell != null)
-            SaveManager.Instance.AddObject(parentCell.gridPosition, ToSaveData());
+        if(parentCell != null) SaveManager.Instance.AddObject(parentCell.gridPosition, ToSaveData());
     }
 }

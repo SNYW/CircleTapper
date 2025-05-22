@@ -51,10 +51,11 @@ public class BuyButton : MonoBehaviour
          return;
       }
       
-      if (!PurchaseManager.TryPurchaseItem(_currentCost)) return;
+      var newCell = GridManager.GetClosestCell(Vector2.zero);
+      if (newCell == null || !PurchaseManager.TryPurchaseItem(_currentCost)) return;
 
       var newObj = Instantiate(objectToBuy);
-      GridManager.GetClosestCell(Vector2.zero).SetChildObject(newObj);
+      newCell.SetChildObject(newObj);
       newObj.Init();
       _currentCost = cost * FindObjectsByType<BoardObject>(FindObjectsSortMode.None).Length;
       costText.text = _currentCost.ToString();

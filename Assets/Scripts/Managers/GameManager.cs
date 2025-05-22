@@ -11,6 +11,7 @@ namespace Managers
     {
         public static bool DEBUGMODE = false;
 
+        public int passiveBonus;
         public BoardObject defaultStartingObject;
         public InWorldGridManager gridManager;
 
@@ -44,7 +45,7 @@ namespace Managers
             {
                 yield return new WaitForSeconds(1);
                 var boardItems = FindObjectsByType<BoardObject>(FindObjectsSortMode.None);
-                SystemEventManager.Send(SystemEventManager.GameEvent.CurrencyAdded, boardItems.Length);
+                SystemEventManager.Send(SystemEventManager.GameEvent.CurrencyAdded, boardItems.Length+passiveBonus);
             }
         }
 

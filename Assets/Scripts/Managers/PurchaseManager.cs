@@ -1,4 +1,5 @@
 using Persistence;
+using UnityEngine;
 
 public static class PurchaseManager
 {
@@ -30,7 +31,7 @@ public static class PurchaseManager
 
     public static bool CanPurchase(int cost)
     {
-        return cost <= _currentCurrency;
+        return cost <= _currentCurrency && GridManager.GetClosestCell(Vector2.zero) != null;
     }
 
     public static bool TryPurchaseItem(int cost)
