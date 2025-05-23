@@ -38,8 +38,12 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
     public virtual void OnDrag(Vector2 worldPosition)
     {
         if (!_isDragging || !(Time.time - dragStartTime >= dragDelayTime)) return;
+
+        if (parentCell != null)
+        {
+            parentCell?.RemoveChildObject();
+        }
         
-        parentCell?.RemoveChildObject();
         transform.position = worldPosition;
         SetIndicators(true);
     }

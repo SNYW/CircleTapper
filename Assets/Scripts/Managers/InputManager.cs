@@ -42,6 +42,7 @@ public class InputManager : MonoBehaviour
         
         boardObject.OnTap();
         _draggedObject = boardObject;
+        SystemEventManager.Send(SystemEventManager.GameEvent.ObjectDragged, _draggedObject);
     }
 
     private void HandleTouchMoved(Vector2 worldPosition)
@@ -56,6 +57,7 @@ public class InputManager : MonoBehaviour
     {
         if (_draggedObject != null)
         {
+            SystemEventManager.Send(SystemEventManager.GameEvent.ObjectDropped, _draggedObject);
             _draggedObject.EndDrag(worldPosition);
         }
         _draggedObject = null; 
