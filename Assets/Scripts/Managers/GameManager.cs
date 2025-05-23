@@ -9,7 +9,7 @@ namespace Managers
 {
     public class GameManager : MonoBehaviour
     {
-        public static bool DEBUGMODE = true;
+        public static bool DEBUGMODE = false;
 
         public int passiveBonus;
         public BoardObject defaultStartingObject;
