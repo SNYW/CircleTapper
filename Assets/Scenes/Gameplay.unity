@@ -3542,11 +3542,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   deleteObjectSFX:
     Guid:
-      Data1: 1152697574
-      Data2: 1091558996
-      Data3: -2057272186
-      Data4: -1409553683
-    Path: event:/Merge_Object
+      Data1: -1348493373
+      Data2: 1293786319
+      Data3: -644037221
+      Data4: -86215656
+    Path: event:/UI_Neg
 --- !u!1 &1601288333
 GameObject:
   m_ObjectHideFlags: 0
