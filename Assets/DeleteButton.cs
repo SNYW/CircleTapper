@@ -19,6 +19,7 @@ public class DeleteButton : MonoBehaviour
 
     private void OnObjectDropped(object obj)
     {
+        _cg.DOFade(0, 0.3f);
         if (obj is not BoardObject bo) return;
 
         Vector2 objectScreenPos = Camera.main.WorldToScreenPoint(bo.transform.position);
@@ -29,8 +30,6 @@ public class DeleteButton : MonoBehaviour
         if (!(dist < 100f)) return;
         
         StartCoroutine(DeleteItem(bo));
-
-        _cg.DOFade(0, 0.3f);
     }
 
     private IEnumerator DeleteItem(BoardObject bo)

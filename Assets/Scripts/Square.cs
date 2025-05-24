@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using DG.Tweening;
 using Persistence;
 using UnityEngine;
@@ -152,5 +153,15 @@ public class Square : BoardObject
     {
         if(parentCell != null)
             SaveManager.Instance.AddObject(parentCell.gridPosition, ToSaveData());
+    }
+    
+    public override string GetValue()
+    {
+        return _remainingCooldown.ToString();
+    }
+
+    public override string GetMaterialValue()
+    {
+        return _propertyBlock.GetFloat(RemovedSegments).ToString(CultureInfo.InvariantCulture);
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using DG.Tweening;
 using Persistence;
@@ -11,11 +12,6 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
     public BoardObject onMergeSpawn;
     public List<GameObject> influenceIndicators;
 
-    private bool _isDragging = false;
-    private bool _dragActive = false;
-    private Vector2 dragStartPos;
-    private float dragStartThreshold = 0.2f; // distance in world units before drag starts
-
     public FMODUnity.EventReference MergeObjectSFX;
 
     private void OnEnable()
@@ -28,36 +24,20 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
 
     public virtual void BeginDrag(Vector2 touchPosition)
     {
-        if (_isDragging) return;
-        dragStartPos = touchPosition;
-        _isDragging = true;
-        _dragActive = false;
     }
 
     public virtual void OnDrag(Vector2 worldPosition)
     {
-        if (!_isDragging) return;
+         if (parentCell != null) parentCell?.RemoveChildObject();
 
-        if (!_dragActive)
-        {
-            float distance = Vector2.Distance(dragStartPos, worldPosition);
-            if (distance < dragStartThreshold) return;
-            _dragActive = true;
-
-            if (parentCell != null)
-                parentCell?.RemoveChildObject();
-
-            SetIndicators(true);
-        }
+         SetIndicators(true);
 
         transform.position = worldPosition;
     }
 
     public virtual void EndDrag(Vector2 touchPosition)
     {
-        if (!_isDragging || !_dragActive) return;
-
-        var cell = GridManager.GetClosestCell(touchPosition, true);
+        var cell = GridManager.GetClosestCell(touchPosition, false);
 
         if (cell.heldObject != null && cell.heldObject != this)
         {
@@ -71,11 +51,8 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
             }
             cell = GridManager.GetClosestCell(touchPosition);
         }
-
+        
         cell.SetChildObject(this);
-        _isDragging = false;
-        _dragActive = false;
-
         SetIndicators(false);
     }
 
@@ -120,4 +97,12 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
     {
         throw new System.NotImplementedException();
     }
+
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+    }
+
+    public abstract string GetValue(); 
+    public abstract string GetMaterialValue();
 }

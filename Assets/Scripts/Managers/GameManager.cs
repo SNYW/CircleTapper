@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
@@ -52,6 +53,11 @@ namespace Managers
         public void ToggleDebug()
         {
             DEBUGMODE = !DEBUGMODE;
+        }
+
+        private void Update()
+        {
+            if(Input.GetKeyDown(KeyCode.Space)) ToggleDebug();
         }
 
         private void OnDisable()

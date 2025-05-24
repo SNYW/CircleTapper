@@ -1,28 +1,33 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 public class InputManager : MonoBehaviour
 {
     private BoardObject _draggedObject;
+    private bool _isDragging;
+    private Vector2 _startTouchPosition;
+    private float _startTouchTime;
+
+    private const float DragThreshold = 0.2f;
+    private const float TapTimeThreshold = 0.2f;
 
     private void Update()
     {
         if (Input.touchCount <= 0) return;
-        
+
         Touch touch = Input.touches[0];
-        Vector2 touchPosition = touch.position;
         if (Camera.main == null) return;
-        
-        var worldPosition = Camera.main.ScreenToWorldPoint(touchPosition);
+        Vector2 worldPosition = Camera.main.ScreenToWorldPoint(touch.position);
 
         switch (touch.phase)
         {
             case TouchPhase.Began:
-                HandleTouchBegan(worldPosition);
+                _startTouchPosition = worldPosition;
+                _startTouchTime = Time.time;
+                TrySetDraggedObject(worldPosition);
                 break;
 
             case TouchPhase.Moved:
+            case TouchPhase.Stationary:
                 HandleTouchMoved(worldPosition);
                 break;
 
@@ -33,33 +38,50 @@ public class InputManager : MonoBehaviour
         }
     }
 
-    private void HandleTouchBegan(Vector2 worldPosition)
+    private void TrySetDraggedObject(Vector2 worldPosition)
     {
         RaycastHit2D hit = Physics2D.Raycast(worldPosition, Vector2.zero);
-
         if (hit.collider == null) return;
-        if (!hit.collider.TryGetComponent<BoardObject>(out var boardObject)) return;
-        
-        boardObject.OnTap();
-        _draggedObject = boardObject;
-        SystemEventManager.Send(SystemEventManager.GameEvent.ObjectDragged, _draggedObject);
+        if (!hit.collider.TryGetComponent(out _draggedObject)) return;
     }
 
     private void HandleTouchMoved(Vector2 worldPosition)
     {
         if (_draggedObject == null) return;
-        
-        _draggedObject.BeginDrag(worldPosition);
-        _draggedObject.OnDrag(worldPosition);
+
+        float distance = Vector2.Distance(worldPosition, _startTouchPosition);
+        if (!_isDragging && distance >= DragThreshold)
+        {
+            _draggedObject.BeginDrag(_startTouchPosition);
+            _isDragging = true;
+            SystemEventManager.Send(SystemEventManager.GameEvent.ObjectDragged, _draggedObject);
+        }
+
+        if (_isDragging)
+        {
+            _draggedObject.OnDrag(worldPosition);
+        }
     }
 
     private void HandleTouchEnded(Vector2 worldPosition)
     {
+        float duration = Time.time - _startTouchTime;
+        float distance = Vector2.Distance(worldPosition, _startTouchPosition);
+
         if (_draggedObject != null)
         {
-            SystemEventManager.Send(SystemEventManager.GameEvent.ObjectDropped, _draggedObject);
-            _draggedObject.EndDrag(worldPosition);
+            if (_isDragging)
+            {
+                _draggedObject.EndDrag(worldPosition);
+                SystemEventManager.Send(SystemEventManager.GameEvent.ObjectDropped, _draggedObject);
+            }
+            else if (distance < DragThreshold && duration < TapTimeThreshold)
+            {
+                _draggedObject.OnTap();
+            }
         }
-        _draggedObject = null; 
+
+        _draggedObject = null;
+        _isDragging = false;
     }
 }

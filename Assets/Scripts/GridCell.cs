@@ -12,10 +12,12 @@ public class GridCell : MonoBehaviour
     public SpriteRenderer debugSprite;
     public GameObject debugParent;
     public LineRenderer debugLine;
+    private GridCellDebugger debugger;
 
     private void Awake()
     {
         debugLine.enabled = false;
+        debugger = GetComponentInChildren<GridCellDebugger>();
     }
 
     private void Update()
@@ -25,15 +27,18 @@ public class GridCell : MonoBehaviour
 
         if (GameManager.DEBUGMODE && heldObject != null)
         {
+            debugger.bo = heldObject;
             if (heldObject.transform.position == transform.position) return;
             
             debugLine.enabled = true;
             debugLine.SetPosition(0, transform.position);
             debugLine.SetPosition(1, heldObject.transform.position);
+         
         }
         else
         {
             debugLine.enabled = false;
+            debugger.bo = null;
         }
     }
 

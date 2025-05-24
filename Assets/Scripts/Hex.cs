@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using DG.Tweening;
 using Persistence;
 using TMPro;
@@ -187,5 +188,15 @@ public class Hex : BoardObject
     {
         if(parentCell != null)
             SaveManager.Instance.AddObject(parentCell.gridPosition, ToSaveData());
+    }
+    
+    public override string GetValue()
+    {
+        return _remainingCooldown.ToString();
+    }
+
+    public override string GetMaterialValue()
+    {
+        return _propertyBlock.GetFloat(RemovedSegments).ToString(CultureInfo.InvariantCulture);
     }
 }
