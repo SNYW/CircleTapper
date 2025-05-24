@@ -12,10 +12,11 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
     public List<GameObject> influenceIndicators;
 
     private bool _isDragging = false;
-    private float dragDelayTime = 0.1f;
-    private float dragStartTime;
+    private bool _dragActive = false;
+    private Vector2 dragStartPos;
+    private float dragStartThreshold = 0.2f; // distance in world units before drag starts
 
-    public FMODUnity.EventReference MergeObjectSFX; //audio 
+    public FMODUnity.EventReference MergeObjectSFX;
 
     private void OnEnable()
     {
@@ -23,35 +24,39 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
         SystemEventManager.Send(SystemEventManager.GameEvent.BoardChanged, this);
     }
 
-    public virtual void Init()
-    {
-        
-    }
+    public virtual void Init() { }
 
     public virtual void BeginDrag(Vector2 touchPosition)
     {
         if (_isDragging) return;
-        dragStartTime = Time.time;
+        dragStartPos = touchPosition;
         _isDragging = true;
+        _dragActive = false;
     }
 
     public virtual void OnDrag(Vector2 worldPosition)
     {
-        if (!_isDragging || !(Time.time - dragStartTime >= dragDelayTime)) return;
+        if (!_isDragging) return;
 
-        if (parentCell != null)
+        if (!_dragActive)
         {
-            parentCell?.RemoveChildObject();
+            float distance = Vector2.Distance(dragStartPos, worldPosition);
+            if (distance < dragStartThreshold) return;
+            _dragActive = true;
+
+            if (parentCell != null)
+                parentCell?.RemoveChildObject();
+
+            SetIndicators(true);
         }
-        
+
         transform.position = worldPosition;
-        SetIndicators(true);
     }
 
     public virtual void EndDrag(Vector2 touchPosition)
     {
-        if (!_isDragging || !(Time.time - dragStartTime >= dragDelayTime)) return;
-        
+        if (!_isDragging || !_dragActive) return;
+
         var cell = GridManager.GetClosestCell(touchPosition, true);
 
         if (cell.heldObject != null && cell.heldObject != this)
@@ -66,16 +71,15 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
             }
             cell = GridManager.GetClosestCell(touchPosition);
         }
-        
+
         cell.SetChildObject(this);
         _isDragging = false;
-        
+        _dragActive = false;
+
         SetIndicators(false);
     }
 
-    public virtual void OnTap()
-    {
-    }
+    public virtual void OnTap() { }
 
     public virtual void OnMerge(BoardObject targetObj)
     {
@@ -85,7 +89,7 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
         newItem.Init();
         Destroy(targetObj.gameObject);
         Destroy(gameObject);
-        FMODUnity.RuntimeManager.PlayOneShotAttached(MergeObjectSFX, gameObject); //audio
+        FMODUnity.RuntimeManager.PlayOneShotAttached(MergeObjectSFX, gameObject);
     }
 
     private void OnDestroy()
@@ -98,11 +102,8 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
     private void SetIndicators(bool active)
     {
         if (influenceIndicators is not { Count: > 0 }) return;
-        
         foreach (var indicator in influenceIndicators)
-        {
             indicator.gameObject.SetActive(active);
-        }
     }
 
     public virtual BoardObjectSaveData ToSaveData()
