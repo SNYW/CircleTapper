@@ -86,6 +86,12 @@ namespace Persistence
             }
         }
 
+        public GameData GetSaveDataForUtils()
+        {
+            _dataService ??= new FileDataService(new JsonSerializer());
+            return _dataService.Load(SaveFileName);
+        }
+
         public void DeleteSave()
         {
             _dataService.Delete(SaveFileName);

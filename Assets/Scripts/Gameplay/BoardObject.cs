@@ -24,14 +24,12 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
 
     public virtual void BeginDrag(Vector2 touchPosition)
     {
+        parentCell?.RemoveChildObject();
     }
 
     public virtual void OnDrag(Vector2 worldPosition)
     {
-         if (parentCell != null) parentCell?.RemoveChildObject();
-
-         SetIndicators(true);
-
+        SetIndicators(true);
         transform.position = worldPosition;
     }
 
