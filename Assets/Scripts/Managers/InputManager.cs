@@ -75,8 +75,6 @@ public class InputManager : MonoBehaviour
             {
                 if (!FindAnyObjectByType<DeleteButton>().TryDeleteObject(_draggedObject))
                     _draggedObject.EndDrag(worldPosition);
-                
-                SystemEventManager.Send(SystemEventManager.GameEvent.ObjectDropped, _draggedObject);
             }
             else if (distance < DragThreshold && duration < TapTimeThreshold)
             {
@@ -84,6 +82,7 @@ public class InputManager : MonoBehaviour
             }
         }
 
+        SystemEventManager.Send(SystemEventManager.GameEvent.ObjectDropped, _draggedObject);
         _draggedObject = null;
         _isDragging = false;
     }

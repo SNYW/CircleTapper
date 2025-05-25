@@ -110,9 +110,13 @@ namespace Persistence
             };
             PurchaseManager.ResetCurrency();
             ObjectiveManager.ResetObjectives();
-            var newobj = Instantiate(_gameManager.defaultStartingObject);
-            GridManager.GetClosestCell(Vector2Int.zero).SetChildObject(newobj);
-            newobj.Init();
+            
+            var freeCell = GridManager.GetClosestCell(Vector2Int.zero);
+            if (freeCell == null) return;
+            
+            var newObj = Instantiate(_gameManager.defaultStartingObject);
+            freeCell.SetChildObject(newObj);
+            newObj.Init();
         }
 
         public void AddObject(Vector2Int position, BoardObjectSaveData data)

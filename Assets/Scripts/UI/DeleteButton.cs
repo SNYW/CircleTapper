@@ -40,6 +40,7 @@ public class DeleteButton : MonoBehaviour
 
     private void OnObjectDropped(object obj)
     {
+        DOTween.KillAll(_cg);
         _cg.DOFade(0, 0.3f);
     }
 
