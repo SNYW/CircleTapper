@@ -22,6 +22,11 @@ namespace Managers
     
         private void Awake()
         {
+            
+#if !UNITY_EDITOR
+            Application.targetFrameRate = 60;
+#endif
+            
             DontDestroyOnLoad(transform.parent.gameObject);
             DOTween.Init();
             SystemEventManager.Init();
