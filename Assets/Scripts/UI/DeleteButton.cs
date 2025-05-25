@@ -17,39 +17,18 @@ public class DeleteButton : MonoBehaviour
         SystemEventManager.Subscribe(SystemEventManager.GameEvent.ObjectDragged, OnObjectDragged);
         SystemEventManager.Subscribe(SystemEventManager.GameEvent.ObjectDropped, OnObjectDropped);
     }
-
-    private void OnObjectDropped(object obj)
+    
+    public bool CanDelete(BoardObject bo)
     {
-        _cg.DOFade(0, 0.3f);
-        if (obj is not BoardObject bo) return;
-
         Vector2 objectScreenPos = Camera.main.WorldToScreenPoint(bo.transform.position);
         RectTransform buttonRect = GetComponent<RectTransform>();
         Vector2 buttonScreenPos = RectTransformUtility.WorldToScreenPoint(null, buttonRect.position);
         float dist = Vector2.Distance(objectScreenPos, buttonScreenPos);
-
-        if (!(dist < 100f)) return;
-        
-        DeleteItem(bo);
-    }
-
-    private void DeleteItem(BoardObject bo)
-    {
-        var pos = bo.parentCell?.gridPosition;
-        var effectPos = bo.transform.position;
-        
-        if (pos.HasValue)
-        {
-            GridManager.GetGridCell(pos.Value, true).RemoveChildObject();
-        }
-        Destroy(bo.gameObject);
-        FMODUnity.RuntimeManager.PlayOneShotAttached(deleteObjectSFX, gameObject);
-        EffectsManager.Instance.SpawnEffect(EffectsManager.EffectType.Deletion, effectPos);
+        return dist < 100f;
     }
     
     private void OnObjectDragged(object obj)
     {
-        if (obj is not BoardObject bo) return;
         _cg.DOFade(1, 0.3f);
     }
 
@@ -57,5 +36,24 @@ public class DeleteButton : MonoBehaviour
     {
         SystemEventManager.Unsubscribe(SystemEventManager.GameEvent.ObjectDragged, OnObjectDragged);
         SystemEventManager.Unsubscribe(SystemEventManager.GameEvent.ObjectDropped, OnObjectDropped);
+    }
+
+    private void OnObjectDropped(object obj)
+    {
+        _cg.DOFade(0, 0.3f);
+    }
+
+    public bool TryDeleteObject(BoardObject boardObject)
+    {
+        var canDelete = CanDelete(boardObject);
+
+        if (!canDelete) return canDelete;
+        
+        var effectPos = boardObject.transform.position;
+        Destroy(boardObject.gameObject);
+        FMODUnity.RuntimeManager.PlayOneShotAttached(deleteObjectSFX, gameObject);
+        EffectsManager.Instance.SpawnEffect(EffectsManager.EffectType.Deletion, effectPos);
+        
+        return canDelete;
     }
 }

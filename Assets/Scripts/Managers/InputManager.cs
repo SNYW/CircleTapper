@@ -1,3 +1,4 @@
+using Persistence;
 using UnityEngine;
 
 public class InputManager : MonoBehaviour
@@ -72,8 +73,10 @@ public class InputManager : MonoBehaviour
         {
             if (_isDragging)
             {
+                if (!FindAnyObjectByType<DeleteButton>().TryDeleteObject(_draggedObject))
+                    _draggedObject.EndDrag(worldPosition);
+                
                 SystemEventManager.Send(SystemEventManager.GameEvent.ObjectDropped, _draggedObject);
-                _draggedObject.EndDrag(worldPosition);
             }
             else if (distance < DragThreshold && duration < TapTimeThreshold)
             {
