@@ -63,6 +63,7 @@ public class BuyButton : MonoBehaviour
       _currentCost = cost * FindObjectsByType<BoardObject>(FindObjectsSortMode.None).Length;
       costText.text = _currentCost.ToString();
       SystemEventManager.Send(SystemEventManager.GameEvent.BoardChanged, newObj);
+      EffectsManager.Instance.SpawnEffect(EffectsManager.EffectType.Spawn, newObj.transform.position);
       FMODUnity.RuntimeManager.PlayOneShotAttached(BuyButtonSFX, gameObject); //audio
     }
 }

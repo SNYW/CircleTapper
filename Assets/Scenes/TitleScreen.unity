@@ -109063,6 +109063,7 @@ GameObject:
   - component: {fileID: 1945645148}
   - component: {fileID: 1945645147}
   - component: {fileID: 1945645149}
+  - component: {fileID: 1945645150}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -109159,6 +109160,21 @@ MonoBehaviour:
   OverrideAttenuation: 0
   OverrideMinDistance: 1
   OverrideMaxDistance: 20
+--- !u!114 &1945645150
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1945645145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2883a6bfaa94433ac30fdea7ca8a5a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  effectMappings:
+  - type: 0
+    prefab: {fileID: 2924537618870226153, guid: 492dab21627b449c096155b64e325e40, type: 3}
 --- !u!1 &1950754084
 GameObject:
   m_ObjectHideFlags: 0
