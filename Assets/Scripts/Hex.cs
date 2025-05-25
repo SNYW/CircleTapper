@@ -1,12 +1,9 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
-using DG.Tweening;
 using Persistence;
 using TMPro;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public class Hex : BoardObject
 {
@@ -18,19 +15,23 @@ public class Hex : BoardObject
     private MaterialPropertyBlock _propertyBlock;
     private static readonly int RemovedSegments = Shader.PropertyToID("_RemovedSegments");
     private static readonly int SegmentCount = Shader.PropertyToID("_SegmentCount");
-    
-    [Header("Particle Spawn")] 
+
+    [Header("Particle Spawn")]
     public CurrencyParticle particle;
 
     private int _particlesToSpawn;
     private int _storedParticles;
-
     private int _remainingCooldown;
-    private float LerpValue => (float)_remainingCooldown / clickSpeed;
+
+    private float currentRemovedSegments;
+    private float targetRemovedSegments;
+    private float lerpSpeed = 10f;
 
     public List<GridManager.Direction> tapTargets;
+    public FMODUnity.EventReference HexCompleteSFX;
 
-    public FMODUnity.EventReference HexCompleteSFX; //audio
+    private Vector3 targetScale = Vector3.one;
+    private float scaleSpeed = 10f;
 
     private void Awake()
     {
@@ -39,48 +40,36 @@ public class Hex : BoardObject
 
     private void OnCircleComplete(object obj)
     {
-        if (obj is not Circle c) return;
-        if (parentCell == null) return;
+        if (obj is not Circle c || parentCell == null) return;
 
         foreach (var dir in tapTargets)
         {
             if (!parentCell.Neighbors.TryGetValue(dir, out var cell)) continue;
-
             if (cell != c.parentCell) continue;
-            
+
             _storedParticles += c.startValue;
-            
-        
             neighbourValueText.text = _storedParticles.ToString();
+
             _remainingCooldown--;
-            LerpRemovedSegments(LerpValue);
+            targetRemovedSegments = (float)_remainingCooldown / clickSpeed;
             SaveObjectState();
 
-            if (_remainingCooldown > 0) return;
-            if(parentCell == null) return;
-            
-            if (_storedParticles != 0)
+            if (_remainingCooldown > 0 || parentCell == null) return;
+
+            if (_storedParticles > 0)
             {
                 _particlesToSpawn += _storedParticles;
                 _storedParticles = 0;
                 neighbourValueText.text = "0";
-                FMODUnity.RuntimeManager.PlayOneShotAttached(HexCompleteSFX, gameObject); //audio
+                FMODUnity.RuntimeManager.PlayOneShotAttached(HexCompleteSFX, gameObject);
 
                 foreach (var clickParticle in clickParticles)
-                {
                     clickParticle.Play();
-                }
             }
-                
-            transform.DOScale(1.2f, 0.1f)
-                .SetEase(Ease.OutQuad)
-                .OnComplete(() => transform.DOScale(1f, 0.1f)
-                    .SetEase(Ease.InQuad)
-                    .SetTarget(gameObject))
-                .SetTarget(gameObject);
-                
+
+            targetScale = Vector3.one * 1.2f;
             _remainingCooldown = clickSpeed;
-            LerpRemovedSegments(1);
+            targetRemovedSegments = 1f;
         }
     }
 
@@ -94,18 +83,18 @@ public class Hex : BoardObject
         _remainingCooldown = remainingCooldown;
         _propertyBlock = new MaterialPropertyBlock();
         spriteRenderer.GetPropertyBlock(_propertyBlock);
-        
+
         _propertyBlock.SetFloat(SegmentCount, clickSpeed);
-        _propertyBlock.SetFloat(RemovedSegments, LerpValue);
-        
+        currentRemovedSegments = (float)_remainingCooldown / clickSpeed;
+        targetRemovedSegments = currentRemovedSegments;
+        _propertyBlock.SetFloat(RemovedSegments, currentRemovedSegments);
         spriteRenderer.SetPropertyBlock(_propertyBlock);
-        
-        if(parentCell == null)
+
+        if (parentCell == null)
             GridManager.GetClosestCell(transform.position).SetChildObject(this);
+
         StartCoroutine(SpawnCurrency());
         neighbourValueText.text = _storedParticles.ToString();
-
-        LerpRemovedSegments(LerpValue);
     }
 
     public override void BeginDrag(Vector2 startPos)
@@ -120,30 +109,27 @@ public class Hex : BoardObject
         StartCoroutine(SpawnCurrency());
         base.EndDrag(eventData);
     }
-    
-    private void LerpRemovedSegments(float newValue)
-    {
-        if (spriteRenderer == null) return;
-        
-        spriteRenderer.GetPropertyBlock(_propertyBlock);
-        
-        if (_propertyBlock.HasProperty(RemovedSegments))
-        {
-            float currentRemovedSegments = _propertyBlock.GetFloat(RemovedSegments);
 
-            DOTween.To(() => currentRemovedSegments, value =>
-                {
-                    _propertyBlock.SetFloat(RemovedSegments, value);
-                    spriteRenderer.SetPropertyBlock(_propertyBlock);
-                }, newValue, 0.2f)
-                .SetTarget(gameObject);
-        }
-        else
+    private void Update()
+    {
+        // Shader value lerp
+        if (!Mathf.Approximately(currentRemovedSegments, targetRemovedSegments))
         {
-            Debug.LogWarning("MaterialPropertyBlock does not have a '_RemovedSegments' property.");
+            currentRemovedSegments = Mathf.MoveTowards(currentRemovedSegments, targetRemovedSegments, Time.deltaTime * lerpSpeed);
+            _propertyBlock.SetFloat(RemovedSegments, currentRemovedSegments);
+            spriteRenderer.SetPropertyBlock(_propertyBlock);
+        }
+
+        // Scale animation
+        if (transform.localScale != targetScale)
+        {
+            transform.localScale = Vector3.MoveTowards(transform.localScale, targetScale, scaleSpeed * Time.deltaTime);
+
+            if (transform.localScale == targetScale && targetScale != Vector3.one)
+                targetScale = Vector3.one;
         }
     }
-    
+
     private IEnumerator SpawnCurrency()
     {
         while (gameObject.activeSelf)
@@ -154,12 +140,12 @@ public class Hex : BoardObject
 
             var randPos = transform.position + new Vector3(Random.Range(-0.1f, 0.1f), Random.Range(-0.1f, 0.1f), 0);
             Instantiate(particle, randPos, Quaternion.identity);
-            _particlesToSpawn--;            
-            if (parentCell!= null)
+            _particlesToSpawn--;
+            if (parentCell != null)
                 SaveObjectState();
         }
     }
-    
+
     public override BoardObjectSaveData ToSaveData()
     {
         return new BoardObjectSaveData
@@ -175,28 +161,21 @@ public class Hex : BoardObject
 
     public override void FromSaveData(BoardObjectSaveData saveData)
     {
-        DOTween.KillAll(gameObject);
         StopAllCoroutines();
-        
         _remainingCooldown = saveData.value;
         _storedParticles = saveData.carryoverValue;
         GridManager.GetGridCell(new Vector2Int(saveData.xPosition, saveData.yPosition)).SetChildObject(this);
         Init(saveData.value);
-    }
-    
-    protected override void SaveObjectState()
-    {
-        if(parentCell != null)
-            SaveManager.Instance.AddObject(parentCell.gridPosition, ToSaveData());
-    }
-    
-    public override string GetValue()
-    {
-        return _remainingCooldown.ToString();
+        SaveObjectState();
     }
 
-    public override string GetMaterialValue()
+    protected override void SaveObjectState()
     {
-        return _propertyBlock.GetFloat(RemovedSegments).ToString(CultureInfo.InvariantCulture);
+        if (parentCell != null)
+            SaveManager.Instance.AddObject(parentCell.gridPosition, ToSaveData());
     }
+
+    public override string GetValue() => _remainingCooldown.ToString();
+
+    public override string GetMaterialValue() => _propertyBlock.GetFloat(RemovedSegments).ToString(CultureInfo.InvariantCulture);
 }
