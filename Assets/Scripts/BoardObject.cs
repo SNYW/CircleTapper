@@ -37,7 +37,7 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
 
     public virtual void EndDrag(Vector2 touchPosition)
     {
-        var cell = GridManager.GetClosestCell(touchPosition, false);
+        var cell = GridManager.GetClosestCell(touchPosition, true);
 
         if (cell.heldObject != null && cell.heldObject != this)
         {
