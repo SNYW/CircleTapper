@@ -1,5 +1,6 @@
 using System.Collections;
 using DG.Tweening;
+using Managers;
 using Persistence;
 using UnityEngine;
 
@@ -29,20 +30,21 @@ public class DeleteButton : MonoBehaviour
 
         if (!(dist < 100f)) return;
         
-        StartCoroutine(DeleteItem(bo));
+        DeleteItem(bo);
     }
 
-    private IEnumerator DeleteItem(BoardObject bo)
+    private void DeleteItem(BoardObject bo)
     {
-        yield return new WaitForEndOfFrame();
-        
         var pos = bo.parentCell?.gridPosition;
-        Destroy(bo.gameObject);
+        var effectPos = bo.transform.position;
+        
         if (pos.HasValue)
         {
-            SaveManager.Instance.RemoveObject(pos.Value);
+            GridManager.GetGridCell(pos.Value, true).RemoveChildObject();
         }
+        Destroy(bo.gameObject);
         FMODUnity.RuntimeManager.PlayOneShotAttached(deleteObjectSFX, gameObject);
+        EffectsManager.Instance.SpawnEffect(EffectsManager.EffectType.Deletion, effectPos);
     }
     
     private void OnObjectDragged(object obj)

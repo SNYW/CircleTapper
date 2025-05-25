@@ -10,7 +10,8 @@ namespace Managers
 
         public enum EffectType
         {
-            Spawn
+            Spawn,
+            Deletion
         }
 
         [System.Serializable]

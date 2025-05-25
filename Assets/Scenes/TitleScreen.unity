@@ -109175,6 +109175,8 @@ MonoBehaviour:
   effectMappings:
   - type: 0
     prefab: {fileID: 2924537618870226153, guid: 492dab21627b449c096155b64e325e40, type: 3}
+  - type: 1
+    prefab: {fileID: 2924537618870226153, guid: 205ecc590957249ada41455a35197563, type: 3}
 --- !u!1 &1950754084
 GameObject:
   m_ObjectHideFlags: 0
