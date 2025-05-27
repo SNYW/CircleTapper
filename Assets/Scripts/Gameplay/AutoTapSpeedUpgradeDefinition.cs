@@ -9,9 +9,11 @@ namespace Gameplay
         public float speedPerLevel;
 
         public override void OnLevelUp()
-        {   
-            UpgradeManager.LevelUpUpgrade(this);
-            PurchaseManager.TryPurchaseUpgrade(this);
+        {
+            if (PurchaseManager.TryPurchaseUpgrade(this))
+            {
+                UpgradeManager.LevelUpUpgrade(this);
+            }
         }
 
         public override bool CanPurchase()

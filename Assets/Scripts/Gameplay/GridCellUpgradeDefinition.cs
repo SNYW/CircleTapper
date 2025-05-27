@@ -16,9 +16,10 @@ namespace Managers
 
             if (cellToUnlock == null) return;
 
+            if (!PurchaseManager.TryPurchaseUpgrade(this)) return;
+           
             SaveManager.Instance.UnlockCell(cellToUnlock);
             UpgradeManager.LevelUpUpgrade(this);
-            PurchaseManager.TryPurchaseUpgrade(this);
             EffectsManager.Instance.SpawnEffect(EffectsManager.EffectType.Spawn, cellToUnlock.transform.position);
         }
 

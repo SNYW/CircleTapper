@@ -34,6 +34,8 @@ namespace UI
 
         public void OnButtonDown()
         {
+            if (!PurchaseManager.CanPurchaseUpgrade(definition.GetPurchasePrice())) return;
+            
             definition.OnLevelUp();
             costText.text = definition.GetPurchasePrice().ToString();
             SystemEventManager.Send(SystemEventManager.GameEvent.UpgradePointSpent, PurchaseManager.GetCurrentUpgradePoints());

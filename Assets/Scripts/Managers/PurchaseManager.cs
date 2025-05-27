@@ -65,10 +65,13 @@ namespace Managers
             return true;
         }
         
-        public static void TryPurchaseUpgrade(UpgradeDefinition definition)
+        public static bool TryPurchaseUpgrade(UpgradeDefinition definition)
         {
+            if (_currentUpgradePoints - definition.GetPurchasePrice() < 0) return false;
+            
             _currentUpgradePoints -= definition.GetPurchasePrice();
             SystemEventManager.Send(SystemEventManager.GameEvent.UpgradePointSpent, _currentUpgradePoints);
+            return true;
         }
 
         public static long GetCurrentCurrency()
