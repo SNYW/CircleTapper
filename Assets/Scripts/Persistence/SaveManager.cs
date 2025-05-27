@@ -186,8 +186,12 @@ namespace Persistence
             {
                 existingSaveData.currentLevel = saveData.currentLevel;
             }
+            else
+            {
+                gameData.upgrades.Add(saveData);
+            }
             
-            OnSaveChanged(null);
+            SaveGame();
         }
 
         private void OnSaveChanged(object o)

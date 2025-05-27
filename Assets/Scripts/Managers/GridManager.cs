@@ -77,6 +77,8 @@ public static class GridManager
         GridCell closestCell = null;
         float closestDistance = float.MaxValue;
 
+        if (InWorldGridManager == null || InWorldGridManager.Grid == null) return null;
+
         foreach (var cell in InWorldGridManager.Grid.Values)
         {
             if(!includeOccupied && cell.heldObject != null) continue;
@@ -133,5 +135,10 @@ public static class GridManager
     public static List<BoardObject> GetAllBoardItems()
     {
         return InWorldGridManager.Grid.Where(kvp => kvp.Value.heldObject != null).Select(kvp => kvp.Value.heldObject).ToList();
+    }
+
+    public static int GetCellCount()
+    {
+        return InWorldGridManager.Grid.Count;
     }
 }

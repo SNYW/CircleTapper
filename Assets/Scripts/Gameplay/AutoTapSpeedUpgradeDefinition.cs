@@ -19,7 +19,7 @@ namespace Gameplay
             return !IsMaxed() && PurchaseManager.CanPurchaseUpgrade(GetPurchasePrice());
         }
 
-        private bool IsMaxed()
+        public override bool IsMaxed()
         {
             if (UpgradeManager.TryGetUpgrade(upgradeName, out var upgrade))
             {
@@ -32,6 +32,14 @@ namespace Gameplay
         public override int GetPurchasePrice()
         {
             return 5;
+        }
+
+        public override string GetLevelInfo()
+        {
+            var upgraded = UpgradeManager.TryGetUpgrade(upgradeName, out var upgrade);
+
+            var value = upgraded ? upgrade.currentLevel : 0;
+            return $"{value}/{maxLevel}";
         }
     }
 }

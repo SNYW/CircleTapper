@@ -178,4 +178,9 @@ public class Hex : BoardObject
     public override string GetValue() => _remainingCooldown.ToString();
 
     public override string GetMaterialValue() => _propertyBlock.GetFloat(RemovedSegments).ToString(CultureInfo.InvariantCulture);
+
+    private void OnDisable()
+    {
+        SystemEventManager.Unsubscribe(SystemEventManager.GameEvent.CircleComplete, OnCircleComplete);
+    }
 }

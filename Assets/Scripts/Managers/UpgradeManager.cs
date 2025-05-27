@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Gameplay;
 using Persistence;
 using UnityEngine;
@@ -64,6 +65,7 @@ namespace Managers
                 };
                 
                 upgrades.Add(definition.upgradeName, newUpgrade);
+                SaveManager.Instance.SaveUpgrade(newUpgrade);
             }
         }
 
@@ -81,13 +83,8 @@ namespace Managers
 
         public static void OnGameLoad(GameData gameData)
         {
-            if (gameData.upgrades == null)
-            {
-                gameData.upgrades = new List<UpgradeSaveObject>();
-                SaveManager.Instance.SaveGame();
-                return;
-            }
-            
+            gameData.upgrades ??= new List<UpgradeSaveObject>();
+
             foreach (var upgradeSaveObject in gameData.upgrades)
             {
                 if (!TryGetUpgradeDefinition(upgradeSaveObject.upgradeName, out var def)) continue;
@@ -101,6 +98,11 @@ namespace Managers
         public static void ResetUpgrades()
         {
             upgrades = new Dictionary<string, Upgrade>();
+        }
+
+        public static bool CanPurchaseAnyUpgrades()
+        {
+            return definitions.Any(d => d.Value.CanPurchase());
         }
     }
 }

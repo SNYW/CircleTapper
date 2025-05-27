@@ -11,13 +11,12 @@ namespace UI
         public UpgradeDefinition definition;
         public TMP_Text costText;
         public TMP_Text nameText;
+        public TMP_Text levelText;
         public Button button;
 
         private void Awake()
         {
             nameText.text = definition.upgradeName;
-         
-            OnUpgradePointSpent(null);
         }
 
         private void OnEnable()
@@ -29,7 +28,8 @@ namespace UI
         private void OnUpgradePointSpent(object obj)
         {
             button.interactable = definition.CanPurchase();
-            costText.text = definition.GetPurchasePrice().ToString();
+            costText.text = definition.IsMaxed() ? "MAX" : definition.GetPurchasePrice().ToString();
+            levelText.text = definition.GetLevelInfo();
         }
 
         public void OnButtonDown()

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using Persistence;
 using System;
+using Gameplay;
 
 public class GridVisualizerWithData : EditorWindow
 {
@@ -11,6 +12,8 @@ public class GridVisualizerWithData : EditorWindow
     private int gridHeight = 10;
     private float cellSize = 40f; 
     private Dictionary<Vector2Int, BoardObjectSaveData> occupiedCells = new();
+    private Vector2 upgradeScrollPos;
+    private List<UpgradeSaveObject> upgrades = new();
 
     private void OnEnable()
     {
@@ -31,6 +34,7 @@ public class GridVisualizerWithData : EditorWindow
     private void OnGUI()
     {
         LoadSaveData();
+
         GUILayout.Label("Grid Settings", EditorStyles.boldLabel);
         gridWidth = EditorGUILayout.IntField("Grid Width", gridWidth);
         gridHeight = EditorGUILayout.IntField("Grid Height", gridHeight);
@@ -38,7 +42,24 @@ public class GridVisualizerWithData : EditorWindow
 
         Rect gridRect = GUILayoutUtility.GetRect(gridWidth * cellSize, gridHeight * cellSize, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
         DrawGrid(gridRect);
+
+        GUILayout.Space(20);
+        GUILayout.Label("Upgrades", EditorStyles.boldLabel);
+
+        upgradeScrollPos = GUILayout.BeginScrollView(upgradeScrollPos, GUILayout.Height(150));
+        if (upgrades != null)
+        {
+            foreach (var upgrade in upgrades)
+            {
+                GUILayout.BeginHorizontal("box");
+                GUILayout.Label((string)upgrade.upgradeName, GUILayout.Width(200));
+                GUILayout.Label("Level: " + upgrade.currentLevel);
+                GUILayout.EndHorizontal();
+            }
+        }
+        GUILayout.EndScrollView();
     }
+
 
     private void DrawGrid(Rect area)
     {
@@ -97,6 +118,7 @@ public class GridVisualizerWithData : EditorWindow
             occupiedCells[pos] = obj;
         }
 
+        upgrades = gameData.upgrades;
         Repaint();
     }
 }

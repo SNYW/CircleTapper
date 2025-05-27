@@ -11,5 +11,7 @@ namespace Gameplay
         public abstract void OnLevelUp();
         public abstract bool CanPurchase();
         public abstract int GetPurchasePrice();
+        public abstract string GetLevelInfo();
+        public abstract bool IsMaxed();
     }
 }

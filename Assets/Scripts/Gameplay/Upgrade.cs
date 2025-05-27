@@ -1,7 +1,9 @@
+using System;
 using Managers;
 
 namespace Gameplay
 {
+    [Serializable]
     public class UpgradeSaveObject
     {
         public string upgradeName;

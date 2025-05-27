@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36d26a15d36b4230a75943e8c4d2a2e2, type: 3}
   m_Name: GridUpgradeDefinition
   m_EditorClassIdentifier: 
-  upgradeName: Grid Size ++
-  maxLevel: 0
+  upgradeName: Grid Size
+  maxLevel: 125
   unitAmount: 10
   costPerUnit: 1

@@ -57,6 +57,7 @@ namespace Gameplay
             yield return new WaitForSeconds(initialDelay);
             active = true;
             FadeTo(1);
+            remainingCooldown = GetCooldown();
         }
 
         private void Update()
