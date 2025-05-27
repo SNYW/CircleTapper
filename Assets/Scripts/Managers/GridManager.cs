@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public static class GridManager
@@ -127,5 +128,10 @@ public static class GridManager
             }
         }
         grid.Clear();
+    }
+
+    public static List<BoardObject> GetAllBoardItems()
+    {
+        return InWorldGridManager.Grid.Where(kvp => kvp.Value.heldObject != null).Select(kvp => kvp.Value.heldObject).ToList();
     }
 }

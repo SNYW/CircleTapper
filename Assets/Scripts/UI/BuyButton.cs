@@ -38,7 +38,7 @@ public class BuyButton : MonoBehaviour
          _button.interactable = true;
          return;
       }
-      _button.interactable = PurchaseManager.CanPurchase(_currentCost);
+      _button.interactable = PurchaseManager.CanPurchaseItem(_currentCost);
    }
 
    public void OnMouseDown()

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using Persistence;
 using UnityEngine;
@@ -13,6 +14,7 @@ namespace Managers
         public static bool DEBUGMODE = false;
 
         public int passiveBonus;
+        public int passiveUpgradeBonus;
         public BoardObject defaultStartingObject;
         public InWorldGridManager gridManager;
 
@@ -33,6 +35,7 @@ namespace Managers
             PurchaseManager.Init();
             SoundManager.Init();
             ObjectiveManager.Init();
+            UpgradeManager.Init();
         
             UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoad;
         }
@@ -51,8 +54,9 @@ namespace Managers
             while (gameObject.activeSelf)
             {
                 yield return new WaitForSeconds(1);
-                var boardItems = FindObjectsByType<BoardObject>(FindObjectsSortMode.None);
-                SystemEventManager.Send(SystemEventManager.GameEvent.CurrencyAdded, boardItems.Length+passiveBonus);
+               
+                PurchaseManager.AddCurrency(PurchaseManager.GetPassiveIncomeAmount()+passiveBonus);
+                PurchaseManager.AddUpgradePoints(passiveUpgradeBonus);
             }
         }
 
@@ -64,11 +68,6 @@ namespace Managers
         private void Update()
         {
             if(Input.GetKeyDown(KeyCode.Space)) ToggleDebug();
-        }
-
-        private void OnDisable()
-        {
-            PurchaseManager.Dispose();
         }
 
         public void ResetOnLoad()

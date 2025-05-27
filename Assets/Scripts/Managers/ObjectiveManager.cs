@@ -54,12 +54,7 @@ namespace Managers
             CurrentObjective.Dispose();
             CurrentObjective = _objectives[objectiveIndex + 1];
             SystemEventManager.Send(SystemEventManager.GameEvent.ObjectiveUpdated, CurrentObjective);
-            var cellToUnlock = GridManager.GetClosestCell(Vector2.zero, false, true);
-
-            if (cellToUnlock == null) return;
-            
-            SaveManager.Instance.UnlockCell(cellToUnlock);
-            EffectsManager.Instance.SpawnEffect(EffectsManager.EffectType.Spawn, cellToUnlock.transform.position);
+            PurchaseManager.AddUpgradePoints(1);
         }
 
         public static void ResetObjectives()

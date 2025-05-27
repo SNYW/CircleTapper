@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Gameplay;
 using Managers;
 using UnityEditor;
 using UnityEngine;
@@ -63,8 +64,10 @@ namespace Persistence
             }
             
             if(gameData.unlockedCells.Count == 0) ResetSave();
+            
             PurchaseManager.OnGameLoad(gameData);
             ObjectiveManager.OnGameLoad(gameData);
+            UpgradeManager.OnGameLoad(gameData);
 
             foreach (var cellPos in gameData.unlockedCells)
             {
@@ -113,14 +116,18 @@ namespace Persistence
             gameData = new GameData
             {
                 currentPoints = 0,
+                currentUpgradePoints = 0,
                 currentObjective = string.Empty,
                 boardObjects = new List<BoardObjectSaveData>(),
-                unlockedCells = new List<Vector2Int>()
+                unlockedCells = new List<Vector2Int>(),
+                upgrades = new List<UpgradeSaveObject>()
             };
             
             PurchaseManager.ResetCurrency();
             ObjectiveManager.ResetObjectives();
             GridManager.ResetCells();
+            UpgradeManager.ResetUpgrades();
+            
             var freeCell = GridManager.GetClosestCell(Vector2Int.zero, true,true);
             
             if (freeCell == null) return;
@@ -171,13 +178,27 @@ namespace Persistence
             return gameData.unlockedCells.Contains(gridPosition);
         }
 
+        public void SaveUpgrade(Upgrade upgrade)
+        {
+            var saveData = upgrade.ToSaveObject();
+            var existingSaveData = gameData.upgrades.FirstOrDefault(s => s.upgradeName == saveData.upgradeName);
+            if (existingSaveData != null)
+            {
+                existingSaveData.currentLevel = saveData.currentLevel;
+            }
+            
+            OnSaveChanged(null);
+        }
+
         private void OnSaveChanged(object o)
         {
             if (!_isLoaded) return;
             
             gameData.currentPoints = PurchaseManager.GetCurrentCurrency();
+            gameData.currentUpgradePoints = PurchaseManager.GetCurrentUpgradePoints();
             gameData.boardObjects = _activeSaveData.Values.ToList();
             gameData.currentObjective = ObjectiveManager.CurrentObjective.id;
+            gameData.upgrades = UpgradeManager.GetUpgradeSaveData();
             SaveGame();
         }
 

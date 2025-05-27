@@ -1,55 +1,84 @@
+using System.Linq;
+using Gameplay;
 using Persistence;
 using UnityEngine;
 
-public static class PurchaseManager
+namespace Managers
 {
-    private static long _currentCurrency;
-
-    public static void Init()
+    public static class PurchaseManager
     {
-        SystemEventManager.Subscribe(SystemEventManager.GameEvent.CurrencyAdded, OnCurrencyAdded);
-    }
+        private static long _currentCurrency;
+        private static long _currentUpgradePoints;
 
-    public static void OnGameLoad(GameData data)
-    {
-        _currentCurrency = data.currentPoints;
-        SystemEventManager.Send(SystemEventManager.GameEvent.CurrencyAdded, data.currentPoints);
-    }
+        public static void Init()
+        {
+       
+        }
 
-    private static void OnCurrencyAdded(object obj)
-    {
-        if (obj is int value)
+        public static void AddCurrency(long value)
         {
             _currentCurrency += value;
+            SystemEventManager.Send(SystemEventManager.GameEvent.CurrencyAdded, _currentCurrency);
         }
-    }
+    
+        public static void AddUpgradePoints(long value)
+        {
+            _currentUpgradePoints += value;
+            SystemEventManager.Send(SystemEventManager.GameEvent.UpgradePointAdded, _currentUpgradePoints);
+        }
 
-    public static void ResetCurrency()
-    {
-        _currentCurrency = 0;
-    }
+        public static int GetPassiveIncomeAmount()
+        {
+            return GridManager.GetAllBoardItems().Sum(bo => bo.chainLevel+1);
+        }
 
-    public static bool CanPurchase(int cost)
-    {
-        return cost <= _currentCurrency && GridManager.GetClosestCell(Vector2.zero) != null;
-    }
+        public static void OnGameLoad(GameData data)
+        {
+            _currentCurrency = 0;
+            _currentUpgradePoints = 0;
+            AddCurrency(data.currentPoints);
+            AddUpgradePoints(data.currentUpgradePoints);
+        }
 
-    public static bool TryPurchaseItem(int cost)
-    {
-        if (!CanPurchase(cost)) return false;
+        public static void ResetCurrency()
+        {
+            _currentCurrency = 0;
+            _currentUpgradePoints = 0;
+        }
 
-        _currentCurrency -= cost;
-        SystemEventManager.Send(SystemEventManager.GameEvent.CurrencySpent, cost);
-        return true;
-    }
+        public static bool CanPurchaseItem(int cost)
+        {
+            return cost <= _currentCurrency && GridManager.GetClosestCell(Vector2.zero) != null;
+        }
 
-    public static void Dispose()
-    {
-        SystemEventManager.Unsubscribe(SystemEventManager.GameEvent.CurrencyAdded, OnCurrencyAdded);
-    }
+        public static bool CanPurchaseUpgrade(int cost)
+        {
+            return cost <= _currentUpgradePoints;
+        }
 
-    public static long GetCurrentCurrency()
-    {
-        return _currentCurrency;
+        public static bool TryPurchaseItem(int cost)
+        {
+            if (!CanPurchaseItem(cost)) return false;
+
+            _currentCurrency -= cost;
+            SystemEventManager.Send(SystemEventManager.GameEvent.CurrencySpent, cost);
+            return true;
+        }
+        
+        public static void TryPurchaseUpgrade(UpgradeDefinition definition)
+        {
+            _currentUpgradePoints -= definition.GetPurchasePrice();
+            SystemEventManager.Send(SystemEventManager.GameEvent.UpgradePointSpent, _currentUpgradePoints);
+        }
+
+        public static long GetCurrentCurrency()
+        {
+            return _currentCurrency;
+        }
+
+        public static long GetCurrentUpgradePoints()
+        {
+            return _currentUpgradePoints;
+        }
     }
 }

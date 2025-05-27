@@ -14,6 +14,8 @@ public static class SystemEventManager
               ObjectDragged,
               ObjectDropped,
               GridCellUnlocked,
+              UpgradePointAdded,
+              UpgradePointSpent
        }
        private static Dictionary<GameEvent, Action<object>> _eventListeners;
 
