@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Managers;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -47,6 +48,6 @@ public class CurrencyParticle : MonoBehaviour
 
     private void OnDestroy()
     {
-        SystemEventManager.Send(SystemEventManager.GameEvent.CurrencyAdded, 1);
+        PurchaseManager.AddCurrency(1);
     }
 }

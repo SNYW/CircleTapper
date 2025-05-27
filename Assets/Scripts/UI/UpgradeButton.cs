@@ -22,6 +22,7 @@ namespace UI
 
         private void OnEnable()
         {
+            OnUpgradePointSpent(null);
             SystemEventManager.Subscribe(SystemEventManager.GameEvent.UpgradePointSpent, OnUpgradePointSpent);
         }
 

@@ -28,7 +28,6 @@ namespace Managers
             upgrade = null;
             if (!upgrades.TryGetValue(name, out var retrievedDef))
             {
-                Debug.LogError($"Could not find upgrade with name {name}");
                 return false;
             }
 
