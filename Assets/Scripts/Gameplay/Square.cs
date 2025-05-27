@@ -40,7 +40,7 @@ public class Square : BoardObject
         targetRemovedSegments = currentRemovedSegments;
         _propertyBlock.SetFloat(RemovedSegments, currentRemovedSegments);
         spriteRenderer.SetPropertyBlock(_propertyBlock);
-
+        
         if (parentCell == null)
             GridManager.GetClosestCell(transform.position).SetChildObject(this);
 

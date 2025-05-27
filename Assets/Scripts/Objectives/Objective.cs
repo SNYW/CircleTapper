@@ -50,7 +50,7 @@ namespace Objectives
         {
             return targetType switch
             {
-                TargetType.Points => "Collect Points",
+                TargetType.Points => "Unlock New Cell",
                 _ => throw new ArgumentOutOfRangeException()
             };
         }

@@ -12,7 +12,8 @@ public static class SystemEventManager
               BoardChanged,
               ObjectiveUpdated,
               ObjectDragged,
-              ObjectDropped
+              ObjectDropped,
+              GridCellUnlocked,
        }
        private static Dictionary<GameEvent, Action<object>> _eventListeners;
 

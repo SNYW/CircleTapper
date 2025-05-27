@@ -14,7 +14,7 @@ public class BuyButton : MonoBehaviour
    private int _currentCost;
    private Button _button;
 
-   public FMODUnity.EventReference BuyButtonSFX; //audio 
+   public FMODUnity.EventReference BuyButtonSFX;
 
 
     private void Awake()
@@ -64,6 +64,6 @@ public class BuyButton : MonoBehaviour
       costText.text = _currentCost.ToString();
       SystemEventManager.Send(SystemEventManager.GameEvent.BoardChanged, newObj);
       EffectsManager.Instance.SpawnEffect(EffectsManager.EffectType.Spawn, newObj.transform.position);
-      FMODUnity.RuntimeManager.PlayOneShotAttached(BuyButtonSFX, gameObject); //audio
+      FMODUnity.RuntimeManager.PlayOneShotAttached(BuyButtonSFX, gameObject);
     }
 }

@@ -43,6 +43,7 @@ namespace Managers
             gridManager.gameObject.SetActive(true);
             StartCoroutine(GivePassiveIncome());
             SaveManager.Instance.Init(this);
+            FindAnyObjectByType<CameraZoomController>().OnGameplayStart();
         }
 
         private IEnumerator GivePassiveIncome()

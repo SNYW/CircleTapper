@@ -9,8 +9,8 @@ namespace Managers
     public static class ObjectiveManager
     {
         private static List<Objective> _objectives;
-
         public static Objective CurrentObjective;
+        public static bool AllObjectivesComplete => _objectives[^1] == CurrentObjective;
         public static void Init()
         {
             _objectives = new List<Objective>();
@@ -47,13 +47,19 @@ namespace Managers
         }
         public static void ClaimObjective()
         {
-            if (_objectives[^1] == CurrentObjective) return;
+            if (AllObjectivesComplete) return;
             
             
             var objectiveIndex = _objectives.IndexOf(CurrentObjective);
             CurrentObjective.Dispose();
             CurrentObjective = _objectives[objectiveIndex + 1];
             SystemEventManager.Send(SystemEventManager.GameEvent.ObjectiveUpdated, CurrentObjective);
+            var cellToUnlock = GridManager.GetClosestCell(Vector2.zero, false, true);
+
+            if (cellToUnlock == null) return;
+            
+            SaveManager.Instance.UnlockCell(cellToUnlock);
+            EffectsManager.Instance.SpawnEffect(EffectsManager.EffectType.Spawn, cellToUnlock.transform.position);
         }
 
         public static void ResetObjectives()

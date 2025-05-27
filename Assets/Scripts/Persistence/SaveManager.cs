@@ -61,8 +61,16 @@ namespace Persistence
                 ResetSave();
                 return;
             }
+            
+            if(gameData.unlockedCells.Count == 0) ResetSave();
             PurchaseManager.OnGameLoad(gameData);
             ObjectiveManager.OnGameLoad(gameData);
+
+            foreach (var cellPos in gameData.unlockedCells)
+            {
+                var gameCell = GridManager.GetGridCell(cellPos);
+                gameCell.Unlock(false);
+            }
             
             foreach (var boardObject in gameData.boardObjects)
             {
@@ -106,17 +114,23 @@ namespace Persistence
             {
                 currentPoints = 0,
                 currentObjective = string.Empty,
-                boardObjects = new List<BoardObjectSaveData>()
+                boardObjects = new List<BoardObjectSaveData>(),
+                unlockedCells = new List<Vector2Int>()
             };
+            
             PurchaseManager.ResetCurrency();
             ObjectiveManager.ResetObjectives();
+            GridManager.ResetCells();
+            var freeCell = GridManager.GetClosestCell(Vector2Int.zero, true,true);
             
-            var freeCell = GridManager.GetClosestCell(Vector2Int.zero);
             if (freeCell == null) return;
             
+            UnlockCell(freeCell);
             var newObj = Instantiate(_gameManager.defaultStartingObject);
             freeCell.SetChildObject(newObj);
             newObj.Init();
+            
+            FindAnyObjectByType<CameraZoomController>().OnGameplayStart();
         }
 
         public void AddObject(Vector2Int position, BoardObjectSaveData data)
@@ -137,6 +151,24 @@ namespace Persistence
             }
         
             OnSaveChanged(null);
+        }
+
+        public void UnlockCell(GridCell g, bool playAnimation = false)
+        {
+           if(gameData.unlockedCells.Contains(g.gridPosition))
+               Debug.LogError("Trying to unlock already unlocked gridcell");
+           else
+           {
+               gameData.unlockedCells.Add(g.gridPosition);
+               g.Unlock();
+               SaveGame();
+               SystemEventManager.Send(SystemEventManager.GameEvent.GridCellUnlocked, g);
+           }
+        }
+
+        public bool GetCellLocked(Vector2Int gridPosition)
+        {
+            return gameData.unlockedCells.Contains(gridPosition);
         }
 
         private void OnSaveChanged(object o)

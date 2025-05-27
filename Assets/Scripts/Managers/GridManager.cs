@@ -71,7 +71,7 @@ public static class GridManager
         }
     }
     
-    public static GridCell GetClosestCell(Vector2 worldPosition, bool includeOccupied = false)
+    public static GridCell GetClosestCell(Vector2 worldPosition, bool includeOccupied = false, bool lockedOnly = false)
     {
         GridCell closestCell = null;
         float closestDistance = float.MaxValue;
@@ -79,6 +79,8 @@ public static class GridManager
         foreach (var cell in InWorldGridManager.Grid.Values)
         {
             if(!includeOccupied && cell.heldObject != null) continue;
+            if(lockedOnly && !cell.locked) continue;
+            if(!lockedOnly && cell.locked) continue;
             
             float distance = Vector2.Distance(worldPosition, cell.transform.position);
             
@@ -103,6 +105,14 @@ public static class GridManager
         }
 
         return null;
+    }
+    
+    public static void ResetCells()
+    {
+        foreach (var kvp in InWorldGridManager.Grid)
+        {
+            kvp.Value.Lock();
+        }
     }
     
     public static void Dispose()

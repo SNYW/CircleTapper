@@ -11,6 +11,7 @@ namespace UI
         public TMP_Text objectiveText;
         public Slider progressSlider;
         public Button claimButton;
+        public GameObject allCompletePanel;
 
         private Objective targetObjective;
 
@@ -18,6 +19,7 @@ namespace UI
         {
             SystemEventManager.Subscribe(SystemEventManager.GameEvent.ObjectiveUpdated, OnObjectiveUpdated);
             claimButton.interactable = false;
+            allCompletePanel.SetActive(ObjectiveManager.AllObjectivesComplete);
         }
 
         private void OnObjectiveUpdated(object obj)
@@ -40,6 +42,7 @@ namespace UI
         public void ClaimCurrentObjective()
         {
             if(targetObjective.Claimable) ObjectiveManager.ClaimObjective();
+            allCompletePanel.SetActive(ObjectiveManager.AllObjectivesComplete);
         }
 
         private static string FormatNumber(int number)
