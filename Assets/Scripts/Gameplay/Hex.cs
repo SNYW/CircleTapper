@@ -47,7 +47,7 @@ public class Hex : BoardObject
             if (!parentCell.Neighbors.TryGetValue(dir, out var cell)) continue;
             if (cell != c.parentCell) continue;
 
-            _storedParticles += c.startValue;
+            _storedParticles += c.startValue*2;
             neighbourValueText.text = _storedParticles.ToString();
 
             _remainingCooldown--;
