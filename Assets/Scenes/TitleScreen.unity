@@ -110539,6 +110539,8 @@ MonoBehaviour:
   hexLevels:
   - {fileID: 6395192640284774339, guid: 3861996e325fb41a4b21186c765d2a06, type: 3}
   - {fileID: 1963523410248093157, guid: 752b10ce58c2249cda238840a773b0c2, type: 3}
+  - {fileID: 1963523410248093157, guid: 66898c942a275436fbe8fb5f44b29eaf, type: 3}
+  - {fileID: 1963523410248093157, guid: 66cacc5745b834417b4e03ef232ffd99, type: 3}
 --- !u!114 &1945645149
 MonoBehaviour:
   m_ObjectHideFlags: 0
