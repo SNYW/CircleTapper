@@ -206,7 +206,7 @@ MonoBehaviour:
       Data3: -2057272186
       Data4: -1409553683
     Path: event:/Merge_Object
-  clickSpeed: 6
+  clickSpeed: 3
   clickParticles:
   - {fileID: 1273797279753163438}
   - {fileID: 9024497028199271694}
