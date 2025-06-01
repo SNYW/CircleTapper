@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Gameplay;
 using Managers;
-using UnityEditor;
 using UnityEngine;
 
 namespace Persistence
@@ -18,7 +17,7 @@ namespace Persistence
         private Dictionary<Vector2Int, BoardObjectSaveData> _activeSaveData;
         private GameManager _gameManager;
 
-        private bool _isLoaded = false;
+        private bool _isLoaded;
 
         private void Awake()
         {
@@ -41,13 +40,13 @@ namespace Persistence
             _isLoaded = true;
         }
 
-        public void SaveGame()
+        private void SaveGame()
         {
             if(_isLoaded)
                 _dataService.Save(SaveFileName, gameData);
-        } 
+        }
 
-        public void LoadGame(bool spawnObjects = false)
+        private void LoadGame(bool spawnObjects = false)
         {
             gameData = new GameData();
             _activeSaveData = new Dictionary<Vector2Int, BoardObjectSaveData>();
@@ -109,7 +108,7 @@ namespace Persistence
             ResetSave();
         }
 
-        public void ResetSave()
+        private void ResetSave()
         {
             _gameManager.ResetOnLoad();
             _activeSaveData.Clear();
@@ -163,7 +162,7 @@ namespace Persistence
         public void UnlockCell(GridCell g, bool playAnimation = false)
         {
            if(gameData.unlockedCells.Contains(g.gridPosition))
-               Debug.LogError("Trying to unlock already unlocked gridcell");
+               Debug.LogError("Trying to unlock already unlocked grid cell");
            else
            {
                gameData.unlockedCells.Add(g.gridPosition);
