@@ -21,6 +21,7 @@ namespace Managers
             SaveManager.Instance.UnlockCell(cellToUnlock);
             UpgradeManager.LevelUpUpgrade(this);
             EffectsManager.Instance.SpawnEffect(EffectsManager.EffectType.Spawn, cellToUnlock.transform.position);
+            FMODUnity.RuntimeManager.PlayOneShot("event:/UI_Button_UpgradeGrid"); //audio
         }
 
         public override bool CanPurchase()

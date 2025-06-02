@@ -15,6 +15,8 @@ namespace UI
 
         private Objective targetObjective;
 
+        public FMODUnity.EventReference claimButtonSFX;
+
         private void OnEnable()
         {
             SystemEventManager.Subscribe(SystemEventManager.GameEvent.ObjectiveUpdated, OnObjectiveUpdated);
@@ -43,6 +45,7 @@ namespace UI
         {
             if(targetObjective.Claimable) ObjectiveManager.ClaimObjective();
             allCompletePanel.SetActive(ObjectiveManager.AllObjectivesComplete);
+            FMODUnity.RuntimeManager.PlayOneShotAttached(claimButtonSFX, gameObject); //audio
         }
 
         private static string FormatNumber(int number)

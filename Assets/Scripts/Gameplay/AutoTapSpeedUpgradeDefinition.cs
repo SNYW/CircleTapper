@@ -13,6 +13,7 @@ namespace Gameplay
             if (PurchaseManager.TryPurchaseUpgrade(this))
             {
                 UpgradeManager.LevelUpUpgrade(this);
+                FMODUnity.RuntimeManager.PlayOneShot("event:/UI_Button_UpgradeAutoTap"); //audio
             }
         }
 

@@ -2746,6 +2746,13 @@ MonoBehaviour:
   progressSlider: {fileID: 613657789}
   claimButton: {fileID: 1601288335}
   allCompletePanel: {fileID: 681272634}
+  claimButtonSFX:
+    Guid:
+      Data1: -141619435
+      Data2: 1230407948
+      Data3: 1661889936
+      Data4: 2127899405
+    Path: event:/UI_Button_Claim
 --- !u!1 &595056495
 GameObject:
   m_ObjectHideFlags: 0
@@ -6345,6 +6352,8 @@ GameObject:
   - component: {fileID: 1430816703}
   - component: {fileID: 1430816702}
   - component: {fileID: 1430816704}
+  - component: {fileID: 1430816706}
+  - component: {fileID: 1430816705}
   m_Layer: 5
   m_Name: Upgrade Panel
   m_TagString: Untagged
@@ -6426,6 +6435,68 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pointsText: {fileID: 709026837}
+--- !u!114 &1430816705
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1430816699}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a6610d2e704f1648819acc8d7460285, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CollisionTag: 
+  EventReference:
+    Guid:
+      Data1: -1348493373
+      Data2: 1293786319
+      Data3: -644037221
+      Data4: -86215656
+    Path: event:/UI_Neg
+  Event: 
+  EventPlayTrigger: 12
+  EventStopTrigger: 0
+  AllowFadeout: 1
+  TriggerOnce: 0
+  Preload: 0
+  NonRigidbodyVelocity: 0
+  Params: []
+  OverrideAttenuation: 0
+  OverrideMinDistance: 1
+  OverrideMaxDistance: 20
+--- !u!114 &1430816706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1430816699}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a6610d2e704f1648819acc8d7460285, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CollisionTag: 
+  EventReference:
+    Guid:
+      Data1: 1638984021
+      Data2: 1287992390
+      Data3: -925887309
+      Data4: -1544671054
+    Path: event:/UI_Pos
+  Event: 
+  EventPlayTrigger: 11
+  EventStopTrigger: 0
+  AllowFadeout: 1
+  TriggerOnce: 0
+  Preload: 0
+  NonRigidbodyVelocity: 0
+  Params: []
+  OverrideAttenuation: 0
+  OverrideMinDistance: 1
+  OverrideMaxDistance: 20
 --- !u!1 &1534786462
 GameObject:
   m_ObjectHideFlags: 0
