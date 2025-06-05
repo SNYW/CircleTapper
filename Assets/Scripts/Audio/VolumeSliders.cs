@@ -1,33 +1,33 @@
 using UnityEngine;
 using UnityEngine.UI;
-using FMODUnity;
-using FMOD.Studio;
 
-public class AudioSettingsUI : MonoBehaviour
+namespace Audio
 {
-    private MixManager mixManager;
-
-    public Slider masterSlider;
-    public Slider musicSlider;
-    public Slider sfxSlider;
-
-    private void Start()
+    public class AudioSettingsUI : MonoBehaviour
     {
-        // Look for MixManager in the scene (including DontDestroyOnLoad objects)
-        mixManager = FindObjectOfType<MixManager>();
+        private MixManager _mixManager;
 
-        if (mixManager == null)
+        public Slider masterSlider;
+        public Slider musicSlider;
+        public Slider sfxSlider;
+
+        private void Start()
         {
-            Debug.LogError("MixManager not found in the scene!");
-            return;
+            _mixManager = FindAnyObjectByType<MixManager>();
+
+            if (_mixManager == null)
+            {
+                Debug.LogError("MixManager not found in the scene!");
+                return;
+            }
+
+            masterSlider.value = _mixManager.masterVolume;
+            musicSlider.value = _mixManager.musicVolume;
+            sfxSlider.value = _mixManager.sfxVolume;
+
+            masterSlider.onValueChanged.AddListener(_mixManager.SetMasterVolume);
+            musicSlider.onValueChanged.AddListener(_mixManager.SetMusicVolume);
+            sfxSlider.onValueChanged.AddListener(_mixManager.SetSFXVolume);
         }
-
-        masterSlider.value = mixManager.masterVolume;
-        musicSlider.value = mixManager.musicVolume;
-        sfxSlider.value = mixManager.sfxVolume;
-
-        masterSlider.onValueChanged.AddListener(mixManager.SetMasterVolume);
-        musicSlider.onValueChanged.AddListener(mixManager.SetMusicVolume);
-        sfxSlider.onValueChanged.AddListener(mixManager.SetSFXVolume);
     }
 }

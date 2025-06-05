@@ -1,61 +1,62 @@
-using UnityEngine;
-using FMODUnity;
 using FMOD.Studio;
+using FMODUnity;
+using UnityEngine;
 
-public class MixManager : MonoBehaviour
+namespace Audio
 {
-    public float masterVolume = 1f;
-    public float musicVolume = 1f;
-    public float sfxVolume = 1f;
-
-    private Bus masterBus;
-    private Bus musicBus;
-    private Bus sfxBus;
-
-    private void Awake()
+    public class MixManager : MonoBehaviour
     {
-        DontDestroyOnLoad(gameObject); // In case this isn’t already here
+        public float masterVolume = 1f;
+        public float musicVolume = 1f;
+        public float sfxVolume = 1f;
 
-        masterBus = RuntimeManager.GetBus("bus:/");
-        musicBus = RuntimeManager.GetBus("bus:/Music");
-        sfxBus = RuntimeManager.GetBus("bus:/SFX");
+        private Bus _masterBus;
+        private Bus _musicBus;
+        private Bus _sfxBus;
 
-        LoadVolumeSettings(); // Load saved settings when game starts
-        ApplyVolumes();
-    }
+        private void Awake()
+        {
+            _masterBus = RuntimeManager.GetBus("bus:/");
+            _musicBus = RuntimeManager.GetBus("bus:/Music");
+            _sfxBus = RuntimeManager.GetBus("bus:/SFX");
 
-    public void SetMasterVolume(float value)
-    {
-        masterVolume = value;
-        masterBus.setVolume(value);
-        PlayerPrefs.SetFloat("Volume_Master", value);
-    }
+            LoadVolumeSettings();
+            ApplyVolumes();
+        }
 
-    public void SetMusicVolume(float value)
-    {
-        musicVolume = value;
-        musicBus.setVolume(value);
-        PlayerPrefs.SetFloat("Volume_Music", value);
-    }
+        public void SetMasterVolume(float value)
+        {
+            masterVolume = value;
+            _masterBus.setVolume(value);
+            PlayerPrefs.SetFloat("Volume_Master", value);
+        }
 
-    public void SetSFXVolume(float value)
-    {
-        sfxVolume = value;
-        sfxBus.setVolume(value);
-        PlayerPrefs.SetFloat("Volume_SFX", value);
-    }
+        public void SetMusicVolume(float value)
+        {
+            musicVolume = value;
+            _musicBus.setVolume(value);
+            PlayerPrefs.SetFloat("Volume_Music", value);
+        }
 
-    private void LoadVolumeSettings()
-    {
-        masterVolume = PlayerPrefs.GetFloat("Volume_Master", 1f);
-        musicVolume = PlayerPrefs.GetFloat("Volume_Music", 1f);
-        sfxVolume = PlayerPrefs.GetFloat("Volume_SFX", 1f);
-    }
+        public void SetSFXVolume(float value)
+        {
+            sfxVolume = value;
+            _sfxBus.setVolume(value);
+            PlayerPrefs.SetFloat("Volume_SFX", value);
+        }
 
-    private void ApplyVolumes()
-    {
-        masterBus.setVolume(masterVolume);
-        musicBus.setVolume(musicVolume);
-        sfxBus.setVolume(sfxVolume);
+        private void LoadVolumeSettings()
+        {
+            masterVolume = PlayerPrefs.GetFloat("Volume_Master", 1f);
+            musicVolume = PlayerPrefs.GetFloat("Volume_Music", 1f);
+            sfxVolume = PlayerPrefs.GetFloat("Volume_SFX", 1f);
+        }
+
+        private void ApplyVolumes()
+        {
+            _masterBus.setVolume(masterVolume);
+            _musicBus.setVolume(musicVolume);
+            _sfxBus.setVolume(sfxVolume);
+        }
     }
 }
