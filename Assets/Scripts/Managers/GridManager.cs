@@ -139,6 +139,6 @@ public static class GridManager
 
     public static int GetCellCount()
     {
-        return InWorldGridManager.Grid.Count;
+        return InWorldGridManager?.Grid?.Count ?? 0;
     }
 }

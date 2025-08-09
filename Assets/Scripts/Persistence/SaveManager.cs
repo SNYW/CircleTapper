@@ -36,7 +36,6 @@ namespace Persistence
             LoadGame(true);
             SystemEventManager.Subscribe(SystemEventManager.GameEvent.CurrencyAdded, OnSaveChanged);
             SystemEventManager.Subscribe(SystemEventManager.GameEvent.CurrencySpent, OnSaveChanged);
-            SystemEventManager.Subscribe(SystemEventManager.GameEvent.ObjectiveUpdated, OnSaveChanged);
             _isLoaded = true;
         }
 
@@ -65,8 +64,8 @@ namespace Persistence
             if(gameData.unlockedCells.Count == 0) ResetSave();
             
             PurchaseManager.OnGameLoad(gameData);
-            ObjectiveManager.OnGameLoad(gameData);
             UpgradeManager.OnGameLoad(gameData);
+            ObjectiveManager.OnGameLoad();
 
             foreach (var cellPos in gameData.unlockedCells)
             {
@@ -116,7 +115,7 @@ namespace Persistence
             {
                 currentPoints = 0,
                 currentUpgradePoints = 0,
-                currentObjective = string.Empty,
+                currentObjective = 1,
                 boardObjects = new List<BoardObjectSaveData>(),
                 unlockedCells = new List<Vector2Int>(),
                 upgrades = new List<UpgradeSaveObject>()
@@ -200,7 +199,7 @@ namespace Persistence
             gameData.currentPoints = PurchaseManager.GetCurrentCurrency();
             gameData.currentUpgradePoints = PurchaseManager.GetCurrentUpgradePoints();
             gameData.boardObjects = _activeSaveData.Values.ToList();
-            gameData.currentObjective = ObjectiveManager.CurrentObjective.id;
+            gameData.currentObjective = ObjectiveManager.CurrentObjective;
             gameData.upgrades = UpgradeManager.GetUpgradeSaveData();
             SaveGame();
         }
@@ -209,7 +208,6 @@ namespace Persistence
         {
             SystemEventManager.Unsubscribe(SystemEventManager.GameEvent.CurrencyAdded, OnSaveChanged);
             SystemEventManager.Unsubscribe(SystemEventManager.GameEvent.CurrencySpent, OnSaveChanged);
-            SystemEventManager.Unsubscribe(SystemEventManager.GameEvent.ObjectiveUpdated, OnSaveChanged);
         }
 
         private void OnApplicationPause(bool pauseStatus)

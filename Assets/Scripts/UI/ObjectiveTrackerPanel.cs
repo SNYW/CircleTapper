@@ -1,5 +1,5 @@
+using System;
 using Managers;
-using Objectives;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,39 +13,40 @@ namespace UI
         public Button claimButton;
         public GameObject allCompletePanel;
 
-        private Objective targetObjective;
-
         public FMODUnity.EventReference claimButtonSFX;
 
-        private void OnEnable()
+        public void Init()
         {
-            SystemEventManager.Subscribe(SystemEventManager.GameEvent.ObjectiveUpdated, OnObjectiveUpdated);
+            SystemEventManager.Subscribe(SystemEventManager.GameEvent.CurrencyAdded, OnObjectiveUpdated);
+            SystemEventManager.Subscribe(SystemEventManager.GameEvent.CurrencySpent, OnObjectiveUpdated);
             claimButton.interactable = false;
             allCompletePanel.SetActive(ObjectiveManager.AllObjectivesComplete);
         }
 
         private void OnObjectiveUpdated(object obj)
         {
-            if(obj is not Objective currentObjective) return;
-            if (targetObjective != null) targetObjective.OnProgressed -= OnObjectiveProgressed;
-            
-            targetObjective = currentObjective;
-            targetObjective.OnProgressed += OnObjectiveProgressed;
-            OnObjectiveProgressed(-1);
+            OnObjectiveProgressed();
         }
 
-        private void OnObjectiveProgressed(int obj)
+        private void OnObjectiveProgressed()
         {
-            objectiveText.text = $"{targetObjective.GetDisplayText()}: {FormatNumber(targetObjective.current)}/{FormatNumber(targetObjective.amount)}";
-            progressSlider.value = Mathf.Max(targetObjective.Percentage, 0.04f);
-            claimButton.interactable = targetObjective.Claimable;
+            objectiveText.text = $"Next Upgrade: {FormatNumber(PurchaseManager.GetCurrentCurrency())}/{FormatNumber(ObjectiveManager.GetCurrentObjectiveCost())}";
+            progressSlider.value = Mathf.Max((float)PurchaseManager.GetCurrentCurrency()/ObjectiveManager.GetCurrentObjectiveCost(), 0.04f);
+            claimButton.interactable = ObjectiveManager.CanClaimObjective();
+        }
+
+        private void Update()
+        {
+            allCompletePanel.SetActive(ObjectiveManager.AllObjectivesComplete);
         }
 
         public void ClaimCurrentObjective()
         {
-            if(targetObjective.Claimable) ObjectiveManager.ClaimObjective();
+            if (!ObjectiveManager.CanClaimObjective()) return;
+            
+            ObjectiveManager.ClaimObjective();
             allCompletePanel.SetActive(ObjectiveManager.AllObjectivesComplete);
-            FMODUnity.RuntimeManager.PlayOneShotAttached(claimButtonSFX, gameObject); //audio
+            FMODUnity.RuntimeManager.PlayOneShotAttached(claimButtonSFX, gameObject);
         }
 
         private static string FormatNumber(int number)
@@ -57,11 +58,21 @@ namespace UI
     
             return number.ToString();
         }
-
+        
+        private static string FormatNumber(long number)
+        {
+            if (number >= 1_000_000)
+                return (number % 1_000_000 == 0) ? (number / 1_000_000) + "m" : (number / 1_000_000f).ToString("0.0") + "m";
+            if (number >= 1_000)
+                return (number % 1_000 == 0) ? (number / 1_000) + "k" : (number / 1_000f).ToString("0.0") + "k";
+    
+            return number.ToString();
+        }
 
         private void OnDisable()
         {
-            SystemEventManager.Unsubscribe(SystemEventManager.GameEvent.ObjectiveUpdated, OnObjectiveUpdated);
+            SystemEventManager.Unsubscribe(SystemEventManager.GameEvent.CurrencyAdded, OnObjectiveUpdated);
+            SystemEventManager.Unsubscribe(SystemEventManager.GameEvent.CurrencySpent, OnObjectiveUpdated);
         }
     }
 }

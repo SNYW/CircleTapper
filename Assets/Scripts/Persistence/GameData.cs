@@ -10,7 +10,7 @@ namespace Persistence
     {
         public long currentPoints;
         public long currentUpgradePoints;
-        public string currentObjective;
+        public int currentObjective;
         public List<BoardObjectSaveData> boardObjects = new();
         public List<Vector2Int> unlockedCells;
         public List<UpgradeSaveObject> upgrades;

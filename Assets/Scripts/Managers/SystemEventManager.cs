@@ -10,7 +10,6 @@ public static class SystemEventManager
               CurrencySpent,
               BoardObjectMoved,
               BoardChanged,
-              ObjectiveUpdated,
               ObjectDragged,
               ObjectDropped,
               GridCellUnlocked,

@@ -104,5 +104,10 @@ namespace Managers
         {
             return definitions.Any(d => d.Value.CanPurchase());
         }
+
+        public static bool AllUpgradesComplete()
+        {
+            return definitions.Values.All(upgrade => upgrade.IsMaxed());
+        }
     }
 }

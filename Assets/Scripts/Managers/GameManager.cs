@@ -1,7 +1,5 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using DG.Tweening;
 using Persistence;
 using UnityEngine;
@@ -11,7 +9,7 @@ namespace Managers
 {
     public class GameManager : MonoBehaviour
     {
-        public static bool DEBUGMODE = false;
+        public static bool DEBUGMODE;
 
         public int passiveBonus;
         public int passiveUpgradeBonus;

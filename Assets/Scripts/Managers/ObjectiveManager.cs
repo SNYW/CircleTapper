@@ -1,66 +1,55 @@
 using System;
-using System.Collections.Generic;
-using Objectives;
 using Persistence;
+using UI;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Managers
 {
     public static class ObjectiveManager
     {
-        private static List<Objective> _objectives;
-        public static Objective CurrentObjective;
-        public static bool AllObjectivesComplete => _objectives[^1] == CurrentObjective;
+        public static int CurrentObjective;
+        public static bool AllObjectivesComplete => UpgradeManager.AllUpgradesComplete();
         public static void Init()
         {
-            _objectives = new List<Objective>();
-            TextAsset file = Resources.Load<TextAsset>("Data/Objectives/Objectives");
-            if (file == null)
-            {
-                Debug.LogError("Objectives File not found");
-            }
-
-            var stringObjectives = file.text.Split(Environment.NewLine);
-
-            foreach (var text in stringObjectives)
-            {
-                var split = text.Split(',');
-
-                _objectives.Add(new Objective(split[0], split[1], split[2]));
-            }
+            CurrentObjective = SaveManager.Instance.gameData.currentObjective;
         }
 
-        public static void OnGameLoad(GameData gameData)
+        public static void OnGameLoad()
         {
-            if (string.IsNullOrEmpty(gameData.currentObjective))
-            {
-                CurrentObjective = _objectives[0];
-                Debug.Log($"Current Objective Loaded as: {CurrentObjective.id}");
-                SystemEventManager.Send(SystemEventManager.GameEvent.ObjectiveUpdated, CurrentObjective);
-                return;
-            }
-
-            CurrentObjective = _objectives.Find(o => o.id == gameData.currentObjective);
-            Debug.Log($"Current Objective Loaded as: {CurrentObjective.id}");
-            
-            SystemEventManager.Send(SystemEventManager.GameEvent.ObjectiveUpdated, CurrentObjective);
+            CurrentObjective = Mathf.Min(1, SaveManager.Instance.gameData.currentObjective);
+            Object.FindFirstObjectByType<ObjectiveTrackerPanel>().Init();
         }
+
+        public static bool CanClaimObjective()
+        {
+            return PurchaseManager.GetCurrentCurrency() >= GetCurrentObjectiveCost();
+        }
+        
         public static void ClaimObjective()
         {
-            if (AllObjectivesComplete) return;
+            if (AllObjectivesComplete || !CanClaimObjective() || !PurchaseManager.TryPurchaseItem(GetCurrentObjectiveCost(), false)) return;
             
-            
-            var objectiveIndex = _objectives.IndexOf(CurrentObjective);
-            CurrentObjective.Dispose();
-            CurrentObjective = _objectives[objectiveIndex + 1];
-            SystemEventManager.Send(SystemEventManager.GameEvent.ObjectiveUpdated, CurrentObjective);
+            CurrentObjective++;
             PurchaseManager.AddUpgradePoints(1);
         }
 
         public static void ResetObjectives()
         {
-            CurrentObjective = _objectives[0];
-            SystemEventManager.Send(SystemEventManager.GameEvent.ObjectiveUpdated, CurrentObjective);
+            CurrentObjective = 1;
+            SystemEventManager.Send(SystemEventManager.GameEvent.CurrencyAdded,0);
+        }
+
+        public static int GetCurrentObjectiveCost()
+        {
+            int multiplier = CurrentObjective switch
+            {
+                < 10 => 100,
+                < 50 => 1000,
+                _ => 2000
+            };
+
+            return CurrentObjective * multiplier;
         }
     }
 }

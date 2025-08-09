@@ -46,9 +46,11 @@ namespace Managers
             _currentUpgradePoints = 0;
         }
 
-        public static bool CanPurchaseItem(int cost)
+        public static bool CanPurchaseItem(int cost, bool requireFreeCell = true)
         {
-            return cost <= _currentCurrency && GridManager.GetClosestCell(Vector2.zero) != null;
+            if (requireFreeCell && GridManager.GetClosestCell(Vector2.zero) == null) return false;
+            
+            return cost <= _currentCurrency;
         }
 
         public static bool CanPurchaseUpgrade(int cost)
@@ -56,14 +58,16 @@ namespace Managers
             return cost <= _currentUpgradePoints;
         }
 
-        public static bool TryPurchaseItem(int cost)
+        public static bool TryPurchaseItem(int cost, bool requireFreeCell = true)
         {
-            if (!CanPurchaseItem(cost)) return false;
+            if (!CanPurchaseItem(cost, requireFreeCell)) return false;
 
             _currentCurrency -= cost;
             SystemEventManager.Send(SystemEventManager.GameEvent.CurrencySpent, cost);
             return true;
         }
+        
+        
         
         public static bool TryPurchaseUpgrade(UpgradeDefinition definition)
         {
