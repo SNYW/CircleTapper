@@ -17,7 +17,7 @@ namespace Managers
 
         public static void OnGameLoad()
         {
-            CurrentObjective = Mathf.Min(1, SaveManager.Instance.gameData.currentObjective);
+            CurrentObjective = Mathf.Max(1, SaveManager.Instance.gameData.currentObjective);
             Object.FindFirstObjectByType<ObjectiveTrackerPanel>().Init();
         }
 

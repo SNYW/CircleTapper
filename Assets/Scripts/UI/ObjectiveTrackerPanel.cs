@@ -21,6 +21,7 @@ namespace UI
             SystemEventManager.Subscribe(SystemEventManager.GameEvent.CurrencySpent, OnObjectiveUpdated);
             claimButton.interactable = false;
             allCompletePanel.SetActive(ObjectiveManager.AllObjectivesComplete);
+            OnObjectiveProgressed();
         }
 
         private void OnObjectiveUpdated(object obj)
