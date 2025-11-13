@@ -17,20 +17,13 @@ namespace UI
 
         public void Init()
         {
-            SystemEventManager.Subscribe(SystemEventManager.GameEvent.CurrencyAdded, OnObjectiveUpdated);
-            SystemEventManager.Subscribe(SystemEventManager.GameEvent.CurrencySpent, OnObjectiveUpdated);
             claimButton.interactable = false;
-            allCompletePanel.SetActive(ObjectiveManager.AllObjectivesComplete);
-            OnObjectiveProgressed();
-        }
-
-        private void OnObjectiveUpdated(object obj)
-        {
             OnObjectiveProgressed();
         }
 
         private void OnObjectiveProgressed()
         {
+            allCompletePanel.SetActive(ObjectiveManager.AllObjectivesComplete);
             objectiveText.text = $"Next Upgrade: {FormatNumber(PurchaseManager.GetCurrentCurrency())}/{FormatNumber(ObjectiveManager.GetCurrentObjectiveCost())}";
             progressSlider.value = Mathf.Max((float)PurchaseManager.GetCurrentCurrency()/ObjectiveManager.GetCurrentObjectiveCost(), 0.04f);
             claimButton.interactable = ObjectiveManager.CanClaimObjective();
@@ -38,7 +31,7 @@ namespace UI
 
         private void Update()
         {
-            allCompletePanel.SetActive(ObjectiveManager.AllObjectivesComplete);
+           OnObjectiveProgressed();
         }
 
         public void ClaimCurrentObjective()
@@ -68,12 +61,6 @@ namespace UI
                 return (number % 1_000 == 0) ? (number / 1_000) + "k" : (number / 1_000f).ToString("0.0") + "k";
     
             return number.ToString();
-        }
-
-        private void OnDisable()
-        {
-            SystemEventManager.Unsubscribe(SystemEventManager.GameEvent.CurrencyAdded, OnObjectiveUpdated);
-            SystemEventManager.Unsubscribe(SystemEventManager.GameEvent.CurrencySpent, OnObjectiveUpdated);
         }
     }
 }

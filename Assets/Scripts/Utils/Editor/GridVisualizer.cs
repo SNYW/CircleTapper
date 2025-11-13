@@ -57,6 +57,11 @@ public class GridVisualizerWithData : EditorWindow
                 GUILayout.EndHorizontal();
             }
         }
+        if (GUILayout.Button("Delete Save"))
+        {
+            Debug.Log("Delete Save clicked");
+            new FileDataService(new JsonSerializer()).Delete("CTSave");
+        }
         GUILayout.EndScrollView();
     }
 
@@ -109,16 +114,23 @@ public class GridVisualizerWithData : EditorWindow
 
     private void LoadSaveData()
     {
-        GameData gameData = FindAnyObjectByType<SaveManager>().GetSaveDataForUtils();
-
-        occupiedCells.Clear();
-        foreach (var obj in gameData.boardObjects)
+        try
         {
-            Vector2Int pos = new(obj.xPosition, obj.yPosition);
-            occupiedCells[pos] = obj;
-        }
+            GameData gameData = FindAnyObjectByType<SaveManager>().GetSaveDataForUtils();
 
-        upgrades = gameData.upgrades;
-        Repaint();
+            occupiedCells.Clear();
+            foreach (var obj in gameData.boardObjects)
+            {
+                Vector2Int pos = new(obj.xPosition, obj.yPosition);
+                occupiedCells[pos] = obj;
+            }
+
+            upgrades = gameData.upgrades;
+            Repaint();
+        }
+        catch (Exception e)
+        {
+            // ignored
+        }
     }
 }

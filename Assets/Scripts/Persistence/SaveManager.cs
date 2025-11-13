@@ -93,6 +93,8 @@ namespace Persistence
                         break;
                 }
             }
+            
+            SystemEventManager.Send(SystemEventManager.GameEvent.GameLoaded, _activeSaveData);
         }
 
         public GameData GetSaveDataForUtils()
@@ -136,6 +138,7 @@ namespace Persistence
             newObj.Init();
             
             FindAnyObjectByType<CameraZoomController>().OnGameplayStart();
+            SystemEventManager.Send(SystemEventManager.GameEvent.GameLoaded, _activeSaveData);
         }
 
         public void AddObject(Vector2Int position, BoardObjectSaveData data)
