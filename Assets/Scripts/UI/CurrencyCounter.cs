@@ -12,7 +12,7 @@ public class CurrencyCounter : MonoBehaviour
 
     private long _currentCurrency;
     private long _targetCurrency;
-    private int _boardItemAmount;
+    private long _passiveIncomeAmount;
     
     private void Start()
     {
@@ -27,7 +27,7 @@ public class CurrencyCounter : MonoBehaviour
 
     private void OnBoardChanged(object obj)
     {
-        _boardItemAmount = FindObjectsByType<BoardObject>(FindObjectsSortMode.None).Length;
+        _passiveIncomeAmount = PurchaseManager.GetPassiveIncomeAmount();
     }
 
     private void OnCircleComplete(object obj)
@@ -43,7 +43,7 @@ public class CurrencyCounter : MonoBehaviour
             UpdateCurrencyText(_currentCurrency);
         }
 
-        passiveText.text = $"+{_boardItemAmount}/s";
+        passiveText.text = $"+{_passiveIncomeAmount}/s";
     }
 
     private void OnDisable()
