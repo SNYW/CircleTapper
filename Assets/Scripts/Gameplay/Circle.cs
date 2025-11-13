@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Globalization;
+using Gameplay;
+using Managers;
 using UnityEngine;
 using Persistence;
 using Random = UnityEngine.Random;
@@ -94,9 +96,17 @@ public class Circle : BoardObject
         transform.localScale = original;
     }
 
+    public int GetPointValue()
+    {
+        if (!UpgradeManager.TryGetUpgrade("Circle Value +2", out var upgrade)) return startValue;
+        var def = upgrade.upgradeDefinition as CircleCompletionBonusUpgradeDefinition;
+
+        return def ? startValue + upgrade.currentLevel * def.bonusPerLevel : startValue;
+    }
+
     private void Complete()
     {
-        _particlesToSpawn += startValue;
+        _particlesToSpawn += GetPointValue();
         currentValue = startValue;
         targetRemovedSegments = 0f;
         SystemEventManager.Send(SystemEventManager.GameEvent.CircleComplete, this);

@@ -44,9 +44,9 @@ namespace Managers
         {
             int multiplier = CurrentObjective switch
             {
-                < 10 => 100,
-                < 50 => 1000,
-                _ => 2000
+                < 20 => 10,
+                < 30 => 50,
+                _ => 100
             };
 
             return CurrentObjective * multiplier;
