@@ -1,4 +1,3 @@
-using System;
 using Managers;
 using TMPro;
 using UnityEngine;
@@ -20,14 +19,6 @@ public class CurrencyCounter : MonoBehaviour
         Subscribe(GameEvent.CircleComplete, OnCircleComplete);
         Subscribe(GameEvent.CurrencySpent, OnCircleComplete);
         Subscribe(GameEvent.CurrencyAdded, OnCircleComplete);
-        Subscribe(GameEvent.BoardChanged, OnBoardChanged);
-        
-        OnBoardChanged(null);
-    }
-
-    private void OnBoardChanged(object obj)
-    {
-        _passiveIncomeAmount = PurchaseManager.GetPassiveIncomeAmount();
     }
 
     private void OnCircleComplete(object obj)
@@ -43,6 +34,7 @@ public class CurrencyCounter : MonoBehaviour
             UpdateCurrencyText(_currentCurrency);
         }
 
+        _passiveIncomeAmount = PurchaseManager.GetPassiveIncomeAmount();
         passiveText.text = $"+{_passiveIncomeAmount}/s";
     }
 
@@ -51,7 +43,6 @@ public class CurrencyCounter : MonoBehaviour
         Unsubscribe(GameEvent.CircleComplete, OnCircleComplete);
         Unsubscribe(GameEvent.CurrencySpent, OnCircleComplete);
         Unsubscribe(GameEvent.CurrencyAdded, OnCircleComplete);
-        Unsubscribe(GameEvent.BoardChanged, OnBoardChanged);
     }
 
     private void UpdateCurrencyText(long c)
