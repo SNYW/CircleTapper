@@ -22,9 +22,10 @@ namespace Managers
     
         private void Awake()
         {
-            
 #if !UNITY_EDITOR
             Application.targetFrameRate = 60;
+            Application.runInBackground = true;
+            Screen.sleepTimeout = SleepTimeout.NeverSleep;
 #endif
             
             DontDestroyOnLoad(transform.parent.gameObject);
