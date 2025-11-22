@@ -138,7 +138,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   anchorName: TotalCounterImage
   moveSpeed: 5
-  arcHeight: 1
+  arcHeight: 2.5
   animateTransform: {fileID: 318734409034256035}
 --- !u!114 &4776544966621621650
 MonoBehaviour:
