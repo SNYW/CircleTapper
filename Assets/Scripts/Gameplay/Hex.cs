@@ -137,10 +137,11 @@ public class Hex : BoardObject
             yield return new WaitForSeconds(0.01f);
 
             if (_particlesToSpawn <= 0) continue;
+            var value = _particlesToSpawn > 50 ? 10 : 1;
 
             var randPos = transform.position + new Vector3(Random.Range(-0.1f, 0.1f), Random.Range(-0.1f, 0.1f), 0);
-            Instantiate(particle, randPos, Quaternion.identity);
-            _particlesToSpawn--;
+            Instantiate(particle, randPos, Quaternion.identity).OnInit(value);
+            _particlesToSpawn-=value;
             if (parentCell != null)
                 SaveObjectState();
         }

@@ -11,9 +11,11 @@ public class CurrencyParticle : MonoBehaviour
     public float arcHeight;
     public Transform animateTransform;
 
-
-    private void OnEnable()
+    private int _value;
+    
+    public void OnInit(int value)
     {
+        _value = value;
         animateTransform.localPosition = Vector3.zero;
         StartCoroutine(MoveToUI());
     }
@@ -32,7 +34,7 @@ public class CurrencyParticle : MonoBehaviour
         transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
 
         var dist = Vector2.Distance(transform.position, targetPosition);
-        int arc = (int)Random.Range(-arcHeight, arcHeight);
+        float arc = Random.Range(-arcHeight, arcHeight);
         while (Vector2.Distance(transform.position, targetPosition) > 0.1f)
         {
             transform.position = Vector2.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
@@ -48,6 +50,6 @@ public class CurrencyParticle : MonoBehaviour
 
     private void OnDestroy()
     {
-        PurchaseManager.AddCurrency(1);
+        PurchaseManager.AddCurrency(_value);
     }
 }
