@@ -6,7 +6,7 @@ namespace ObjectPooling
     {
         public virtual void ReturnToPool()
         {
-           gameObject.SetActive(true);
+           gameObject.SetActive(false);
         }
     }
 }

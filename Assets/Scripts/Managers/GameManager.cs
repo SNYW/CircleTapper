@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using ObjectPooling;
 using Persistence;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -29,6 +30,7 @@ namespace Managers
 #endif
             
             DontDestroyOnLoad(transform.parent.gameObject);
+            ObjectPoolManager.InitPools();
             DOTween.Init();
             SystemEventManager.Init();
             PurchaseManager.Init();

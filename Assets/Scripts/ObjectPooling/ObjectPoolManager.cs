@@ -1,27 +1,31 @@
 using System.Collections.Generic;
 using System.Linq;
-using ObjectPooling;
 using UnityEngine;
 
-public static class ObjectPoolManager
+namespace ObjectPooling
 {
-    private static Dictionary<ObjectPool.ObjectPoolName, ObjectPool> _pools;
-
-    public static ObjectPool GetPool(ObjectPool.ObjectPoolName poolName)
+    public static class ObjectPoolManager
     {
-        return _pools.TryGetValue(poolName, out var pool) ? pool : null;
-    }
+        private static Dictionary<ObjectPool.ObjectPoolName, ObjectPool> _pools;
 
-    public static void InitPools()
-    {
-        var allPools = Resources.LoadAll("Data/Pools", typeof(ObjectPool)).Cast<ObjectPool>();
-
-        _pools = new Dictionary<ObjectPool.ObjectPoolName, ObjectPool>();
-        
-        foreach (var objectPool in allPools)
+        public static ObjectPool GetPool(ObjectPool.ObjectPoolName poolName)
         {
-          objectPool.InitPool();
-          _pools.Add(objectPool.poolName, objectPool);
+            return _pools.GetValueOrDefault(poolName);
+        }
+
+        public static void InitPools()
+        {
+            var allPools = Resources.LoadAll("Data/Pools", typeof(ObjectPool)).Cast<ObjectPool>();
+            var pooledObjectParent = new GameObject("Pooled Objects");
+            Object.DontDestroyOnLoad(pooledObjectParent.gameObject);
+
+            _pools = new Dictionary<ObjectPool.ObjectPoolName, ObjectPool>();
+        
+            foreach (var objectPool in allPools)
+            {
+                objectPool.InitPool(pooledObjectParent);
+                _pools.Add(objectPool.poolName, objectPool);
+            }
         }
     }
 }

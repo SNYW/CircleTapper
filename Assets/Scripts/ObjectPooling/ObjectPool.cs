@@ -31,9 +31,9 @@ namespace ObjectPooling
             return newPooledObject;
         }
 
-        public void InitPool()
+        public void InitPool(GameObject parent)
         {
-            _pooledObjectParent = GameObject.Find("Pooled Objects").transform;
+            _pooledObjectParent = parent.transform;
             
             if (_pool != null && _pool.Any())
             {
@@ -77,7 +77,8 @@ namespace ObjectPooling
 
         public enum ObjectPoolName
         {
-            SoundPlayer
+            SoundPlayer,
+            CurrencyParticle
         }
     }
 }

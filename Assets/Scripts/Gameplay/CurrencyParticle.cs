@@ -1,10 +1,11 @@
 using System;
 using System.Collections;
 using Managers;
+using ObjectPooling;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class CurrencyParticle : MonoBehaviour
+public class CurrencyParticle : PooledObject
 {
     public string anchorName;
     public float moveSpeed;
@@ -45,11 +46,12 @@ public class CurrencyParticle : MonoBehaviour
             
             yield return new WaitForEndOfFrame();
         }
-        Destroy(gameObject);
+        ReturnToPool();
     }
 
-    private void OnDestroy()
+    public override void ReturnToPool()
     {
         PurchaseManager.AddCurrency(_value);
+        base.ReturnToPool();
     }
 }

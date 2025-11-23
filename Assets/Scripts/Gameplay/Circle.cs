@@ -3,6 +3,7 @@ using System.Collections;
 using System.Globalization;
 using Gameplay;
 using Managers;
+using ObjectPooling;
 using UnityEngine;
 using Persistence;
 using Random = UnityEngine.Random;
@@ -13,7 +14,6 @@ public class Circle : BoardObject
     public int currentValue;
     public SpriteRenderer spriteRenderer;
 
-    [Header("Particle Spawn")] public CurrencyParticle particle;
     public float spawnCooldown;
     private int _particlesToSpawn;
 
@@ -60,7 +60,11 @@ public class Circle : BoardObject
             var value = _particlesToSpawn > 50 ? 10 : 1;
 
             var randPos = transform.position + new Vector3(Random.Range(-0.1f, 0.1f), Random.Range(-0.1f, 0.1f), 0);
-            Instantiate(particle, randPos, Quaternion.identity).OnInit(value);
+            var newParticle = ObjectPoolManager.GetPool(ObjectPool.ObjectPoolName.CurrencyParticle).GetPooledObject().GetComponent<CurrencyParticle>();
+            newParticle.transform.position = randPos;
+            newParticle.gameObject.SetActive(true);
+            newParticle.OnInit(value);
+            
             _particlesToSpawn -= value;
             if (parentCell != null)
                 SaveObjectState();
