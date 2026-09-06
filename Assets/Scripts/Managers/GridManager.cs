@@ -137,6 +137,40 @@ public static class GridManager
         return closestCell;
     }
     
+    /// <summary>Height of the grid in cells. Beams clamp their range to this.</summary>
+    public static int Height => InWorldGridManager != null ? InWorldGridManager.dimensions.y : 0;
+
+    /// <summary>
+    /// Direct lookup by grid position. The grid is already keyed by exactly this, so unlike
+    /// <see cref="GetGridCell"/> it does not walk every cell to find one.
+    /// </summary>
+    public static GridCell GetCellAt(Vector2Int gridPosition)
+    {
+        var grid = InWorldGridManager;
+        if (grid?.Grid == null) return null;
+
+        return grid.Grid.TryGetValue(gridPosition, out GridCell cell) ? cell : null;
+    }
+
+    /// <summary>
+    /// Fills <paramref name="into"/> with the cells directly above <paramref name="origin"/>,
+    /// nearest first, stopping at the top of the grid. Takes the list to fill so a beam firing
+    /// repeatedly does not allocate.
+    /// <para>Screen-up is negative Y — see <see cref="DirectionOffsets"/>.</para>
+    /// </summary>
+    public static void CollectColumnAbove(Vector2Int origin, int range, List<GridCell> into)
+    {
+        into.Clear();
+
+        for (int step = 1; step <= range; step++)
+        {
+            GridCell cell = GetCellAt(new Vector2Int(origin.x, origin.y - step));
+            if (cell == null) break;
+
+            into.Add(cell);
+        }
+    }
+
     public static GridCell GetGridCell(Vector2Int gridPosition, bool includeOccupied = false)
     {
         foreach (var cell in InWorldGridManager.Grid.Values)

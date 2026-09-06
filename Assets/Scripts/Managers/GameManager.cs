@@ -29,6 +29,7 @@ namespace Managers
         public List<Circle> circleLevels;
         public List<Square> squareLevels;
         public List<Hex> hexLevels;
+        public List<Triangle> triangleLevels;
 
         private const int GameplaySceneIndex = 1;
         private const float PassiveIncomeIntervalSeconds = 1f;
@@ -167,6 +168,7 @@ namespace Managers
                 BoardObjectType.Circle => LevelOrNull<Circle>(circleLevels, data.level),
                 BoardObjectType.Square => LevelOrNull<Square>(squareLevels, data.level),
                 BoardObjectType.Hex => LevelOrNull<Hex>(hexLevels, data.level),
+                BoardObjectType.Triangle => LevelOrNull<Triangle>(triangleLevels, data.level),
                 _ => null
             };
 

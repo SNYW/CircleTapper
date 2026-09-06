@@ -25,8 +25,21 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
 
         if (ServiceLocator.TryGet(out BoardObjectTickService ticks)) ticks.Register(this);
 
+        OnEnabled();
         SystemEventManager.Send(SystemEventManager.GameEvent.BoardChanged, this);
     }
+
+    /// <summary>
+    /// Enable/disable hooks for subclasses.
+    /// <para>
+    /// Declaring OnEnable or OnDisable in a subclass would HIDE this class's, because Unity
+    /// dispatches a message to the most-derived declaration only — Hex did exactly that and
+    /// silently stopped stopping its own loops. Override these instead.
+    /// </para>
+    /// </summary>
+    protected virtual void OnEnabled() { }
+
+    protected virtual void OnDisabled() { }
 
     /// <summary>
     /// Per-frame work, driven by <see cref="BoardObjectTickService"/> rather than an Update of
@@ -134,6 +147,7 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
     private void OnDisable()
     {
         StopLoops();
+        OnDisabled();
 
         // TryGet, because on shutdown the locator may already be cleared.
         if (ServiceLocator.TryGet(out BoardObjectTickService ticks)) ticks.Unregister(this);

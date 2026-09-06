@@ -113068,6 +113068,12 @@ MonoBehaviour:
   - {fileID: 1963523410248093157, guid: 752b10ce58c2249cda238840a773b0c2, type: 3}
   - {fileID: 1963523410248093157, guid: 66898c942a275436fbe8fb5f44b29eaf, type: 3}
   - {fileID: 1963523410248093157, guid: 66cacc5745b834417b4e03ef232ffd99, type: 3}
+  triangleLevels:
+  - {fileID: 2602972181128996473, guid: 4e3a5987b51534e3d821d3394e54ca81, type: 3}
+  - {fileID: 5153991122031724894, guid: da353f8bc3a534d43917ae68617c80fb, type: 3}
+  - {fileID: 3773531724541458635, guid: ff982659290b1470d8c65584c235a52f, type: 3}
+  - {fileID: 1702179736554852147, guid: c6d8fad0bec1e4e4a880e6662a0cd772, type: 3}
+  - {fileID: 5014887811225567345, guid: 2a3f2454167834cd29c03b0730a3d468, type: 3}
 --- !u!114 &1945645149
 MonoBehaviour:
   m_ObjectHideFlags: 0

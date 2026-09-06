@@ -13,7 +13,8 @@ public enum BoardObjectType
 {
     Circle,
     Square,
-    Hex
+    Hex,
+    Triangle
 }
 
 [Serializable]

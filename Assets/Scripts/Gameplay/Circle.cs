@@ -108,6 +108,11 @@ public class Circle : BoardObject
         _progress.Target = 0f;
 
         NotifyWatchingHexes();
+
+        // Triangles charge from completions anywhere, so they are told through a relay rather
+        // than by walking neighbours.
+        if (ServiceLocator.TryGet(out TriangleChargeService charge)) charge.NotifyCircleCompleted(this);
+
         FMODUnity.RuntimeManager.PlayOneShotAttached(CircleCompleteSFX, gameObject);
     }
 

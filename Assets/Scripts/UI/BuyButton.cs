@@ -17,6 +17,10 @@ using static SystemEventManager;
 /// </summary>
 public class BuyButton : MonoBehaviour
 {
+    [Tooltip("Flat price added before the per-object scaling. 0 keeps the original cost x count curve.")]
+    public int basePrice;
+
+    [Tooltip("Added to the price for each object already on the board.")]
     public int cost;
     public BoardObject objectToBuy;
     public TMP_Text costText;
@@ -31,7 +35,7 @@ public class BuyButton : MonoBehaviour
     private void Awake()
     {
         _button = GetComponent<Button>();
-        _currentCost = cost;
+        _currentCost = basePrice + cost;
         costText.text = _currentCost.ToString();
 
         // Expensive, and only changes when the board or the grid does.
@@ -93,7 +97,7 @@ public class BuyButton : MonoBehaviour
 
     private void Refresh()
     {
-        _currentCost = cost * CountBoardObjects();
+        _currentCost = basePrice + cost * CountBoardObjects();
         _hasFreeCell = GridManager.GetClosestCell(Vector2.zero) != null;
 
         costText.text = _currentCost.ToString();
