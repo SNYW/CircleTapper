@@ -20,12 +20,11 @@ public class CurrencyCounter : MonoBehaviour
     {
         _currency = ServiceLocator.Get<CurrencyService>();
         UpdateCurrencyText(_currency.Points);
-        Subscribe(GameEvent.CircleComplete, OnCircleComplete);
-        Subscribe(GameEvent.CurrencySpent, OnCircleComplete);
-        Subscribe(GameEvent.CurrencyAdded, OnCircleComplete);
+        Subscribe(GameEvent.CurrencySpent, OnCurrencyChanged);
+        Subscribe(GameEvent.CurrencyAdded, OnCurrencyChanged);
     }
 
-    private void OnCircleComplete(object obj)
+    private void OnCurrencyChanged(object obj)
     {
         _targetCurrency = _currency.Points;
     }
@@ -44,9 +43,8 @@ public class CurrencyCounter : MonoBehaviour
 
     private void OnDisable()
     {
-        Unsubscribe(GameEvent.CircleComplete, OnCircleComplete);
-        Unsubscribe(GameEvent.CurrencySpent, OnCircleComplete);
-        Unsubscribe(GameEvent.CurrencyAdded, OnCircleComplete);
+        Unsubscribe(GameEvent.CurrencySpent, OnCurrencyChanged);
+        Unsubscribe(GameEvent.CurrencyAdded, OnCurrencyChanged);
     }
 
     private void UpdateCurrencyText(long c)

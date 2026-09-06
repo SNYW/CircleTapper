@@ -1,6 +1,7 @@
 using Progression;
 using Core;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
@@ -105,8 +106,27 @@ public class Circle : BoardObject
         _emitter.Add(GetPointValue());
         currentValue = startValue;
         _progress.Target = 0f;
-        SystemEventManager.Send(SystemEventManager.GameEvent.CircleComplete, this);
+
+        NotifyWatchingHexes();
         FMODUnity.RuntimeManager.PlayOneShotAttached(CircleCompleteSFX, gameObject);
+    }
+
+    /// <summary>
+    /// Tells any adjacent hex directly. This used to be a global broadcast that every hex on the
+    /// board filtered for itself, so the cost scaled with the number of hexes; walking this
+    /// circle's own neighbours is at most eight lookups however big the board gets.
+    /// </summary>
+    private void NotifyWatchingHexes()
+    {
+        if (parentCell?.Neighbors == null) return;
+
+        foreach (KeyValuePair<GridManager.Direction, GridCell> neighbour in parentCell.Neighbors)
+        {
+            if (neighbour.Value.heldObject is Hex hex)
+            {
+                hex.OnWatchedCircleCompleted(this, neighbour.Key);
+            }
+        }
     }
 
     /// <summary>How much of the ring is gone, 0 when untouched and 1 when the circle is done.</summary>

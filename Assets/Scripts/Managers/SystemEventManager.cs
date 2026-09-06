@@ -5,7 +5,6 @@ public static class SystemEventManager
 {
        public enum GameEvent
        {
-              CircleComplete,
               CurrencyAdded,
               CurrencySpent,
               BoardObjectMoved,

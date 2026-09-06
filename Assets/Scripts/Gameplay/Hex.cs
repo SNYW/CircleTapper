@@ -20,6 +20,14 @@ public class Hex : BoardObject
     /// <summary>How often banked currency is paid out as particles.</summary>
     private const float SpawnInterval = 0.01f;
 
+    /// <summary>A hex banks double what the completing circle was worth.</summary>
+    private const int NeighbourValueMultiplier = 2;
+
+    private const float PopScale = 1.2f;
+
+    /// <summary>tapTargets as a set, so the adjacency check is a lookup rather than a scan.</summary>
+    private readonly HashSet<GridManager.Direction> _watchedDirections = new();
+
     private readonly CurrencyEmitter _emitter = new();
     private SegmentProgress _progress;
 
@@ -32,44 +40,39 @@ public class Hex : BoardObject
     private Vector3 targetScale = Vector3.one;
     private float scaleSpeed = 10f;
 
-    private void Awake()
+    /// <summary>
+    /// Called directly by an adjacent circle that has just completed, rather than through a
+    /// broadcast every hex on the board had to filter.
+    /// </summary>
+    /// <param name="circle">The circle that completed.</param>
+    /// <param name="directionFromCircle">Which way this hex lies from that circle.</param>
+    public void OnWatchedCircleCompleted(Circle circle, GridManager.Direction directionFromCircle)
     {
-        SystemEventManager.Subscribe(SystemEventManager.GameEvent.CircleComplete, OnCircleComplete);
-    }
+        if (parentCell == null) return;
+        if (!_watchedDirections.Contains(GridManager.Opposite(directionFromCircle))) return;
 
-    private void OnCircleComplete(object obj)
-    {
-        if (obj is not Circle c || parentCell == null) return;
+        _storedParticles += circle.GetPointValue() * NeighbourValueMultiplier;
+        neighbourValueText.text = _storedParticles.ToString();
 
-        foreach (var dir in tapTargets)
+        _remainingCooldown--;
+        _progress.Target = CooldownFraction;
+        SaveObjectState();
+
+        if (_remainingCooldown > 0) return;
+
+        if (_storedParticles > 0)
         {
-            if (!parentCell.Neighbors.TryGetValue(dir, out var cell)) continue;
-            if (cell != c.parentCell) continue;
+            _emitter.Add(_storedParticles);
+            _storedParticles = 0;
+            neighbourValueText.text = "0";
+            FMODUnity.RuntimeManager.PlayOneShotAttached(HexCompleteSFX, gameObject);
 
-            _storedParticles += c.GetPointValue()*2;
-            neighbourValueText.text = _storedParticles.ToString();
-
-            _remainingCooldown--;
-            _progress.Target = CooldownFraction;
-            SaveObjectState();
-
-            if (_remainingCooldown > 0 || parentCell == null) return;
-
-            if (_storedParticles > 0)
-            {
-                _emitter.Add(_storedParticles);
-                _storedParticles = 0;
-                neighbourValueText.text = "0";
-                FMODUnity.RuntimeManager.PlayOneShotAttached(HexCompleteSFX, gameObject);
-
-                foreach (var clickParticle in clickParticles)
-                    clickParticle.Play();
-            }
-
-            targetScale = Vector3.one * 1.2f;
-            _remainingCooldown = clickSpeed;
-            _progress.Target = 1f;
+            foreach (ParticleSystem clickParticle in clickParticles) clickParticle.Play();
         }
+
+        targetScale = Vector3.one * PopScale;
+        _remainingCooldown = clickSpeed;
+        _progress.Target = 1f;
     }
 
     public override void Init()
@@ -81,6 +84,9 @@ public class Hex : BoardObject
     {
         _remainingCooldown = remainingCooldown;
         _progress = new SegmentProgress(spriteRenderer, clickSpeed, CooldownFraction);
+
+        _watchedDirections.Clear();
+        foreach (GridManager.Direction direction in tapTargets) _watchedDirections.Add(direction);
 
         if (parentCell == null)
             GridManager.GetClosestCell(transform.position).SetChildObject(this);
@@ -165,8 +171,4 @@ public class Hex : BoardObject
 
     public override string GetMaterialValue() => _progress.ToDebugString();
 
-    private void OnDisable()
-    {
-        SystemEventManager.Unsubscribe(SystemEventManager.GameEvent.CircleComplete, OnCircleComplete);
-    }
 }

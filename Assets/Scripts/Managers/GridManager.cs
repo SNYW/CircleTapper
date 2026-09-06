@@ -31,6 +31,24 @@ public static class GridManager
         { Direction.DownRight, new Vector2Int(1, 1) }
     };
 
+    /// <summary>
+    /// The direction pointing back the other way. A hex's tapTargets are the directions it looks
+    /// in, so a circle finding a hex in direction d is only watched by it if that hex looks in
+    /// the opposite direction.
+    /// </summary>
+    public static Direction Opposite(Direction direction) => direction switch
+    {
+        Direction.Up => Direction.Down,
+        Direction.Down => Direction.Up,
+        Direction.Left => Direction.Right,
+        Direction.Right => Direction.Left,
+        Direction.UpLeft => Direction.DownRight,
+        Direction.UpRight => Direction.DownLeft,
+        Direction.DownLeft => Direction.UpRight,
+        Direction.DownRight => Direction.UpLeft,
+        _ => direction
+    };
+
     public static Dictionary<Vector2Int, GridCell> Init(Vector2 startPos, Vector2Int dimensions, GridCell gridCell)
     {
         Dispose();
