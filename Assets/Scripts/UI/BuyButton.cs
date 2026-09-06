@@ -1,72 +1,129 @@
-using Economy;
 using Core;
 using System;
-using System.Collections;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using Economy;
 using Managers;
+using Persistence;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static SystemEventManager;
 
+/// <summary>
+/// Buys a board object. Everything here used to be recomputed every frame — a scene-wide
+/// <c>FindObjectsByType</c> in LateUpdate and a full grid scan in Update, per button. Both answers
+/// only change when the board does, so both are event-driven now.
+/// </summary>
 public class BuyButton : MonoBehaviour
 {
-   public int cost;
-   public BoardObject objectToBuy;
-   public TMP_Text costText;
+    public int cost;
+    public BoardObject objectToBuy;
+    public TMP_Text costText;
 
-   private int _currentCost;
-   private Button _button;
+    public FMODUnity.EventReference BuyButtonSFX;
 
-   public FMODUnity.EventReference BuyButtonSFX;
-
+    private int _currentCost;
+    private bool _hasFreeCell;
+    private Button _button;
+    private bool _refreshQueued;
 
     private void Awake()
-   {
-      _currentCost = cost;
-      costText.text = cost.ToString();
-      _button = GetComponent<Button>();
-   }
+    {
+        _button = GetComponent<Button>();
+        _currentCost = cost;
+        costText.text = _currentCost.ToString();
 
+        // Expensive, and only changes when the board or the grid does.
+        Subscribe(GameEvent.BoardChanged, OnBoardChanged);
+        Subscribe(GameEvent.GridCellUnlocked, OnBoardChanged);
+        Subscribe(GameEvent.GameLoaded, OnBoardChanged);
 
-   private void LateUpdate()
-   {
-      _currentCost = cost * FindObjectsByType<BoardObject>(FindObjectsSortMode.None).Length;
-      costText.text = _currentCost.ToString();
-   }
+        // Cheap, but changes constantly — this is what makes the button light up when the player
+        // can finally afford it, which the board events alone would never catch.
+        Subscribe(GameEvent.CurrencyAdded, OnCurrencyChanged);
+        Subscribe(GameEvent.CurrencySpent, OnCurrencyChanged);
+    }
 
-   private void Update()
-   {
-      if (GameManager.DEBUGMODE)
-      {
-         _button.interactable = true;
-         return;
-      }
-      _button.interactable = GridManager.GetClosestCell(Vector2.zero) != null
-                             && ServiceLocator.Get<CurrencyService>().CanAfford(_currentCost);
-   }
+    private void Start() => ScheduleRefresh();
 
-   public void OnMouseDown()
-   {
-      if (GameManager.DEBUGMODE)
-      {
-         var newBoardObject = Instantiate(objectToBuy);
-         GridManager.GetClosestCell(Vector2.zero).SetChildObject(newBoardObject);
-         newBoardObject.Init();
-         _currentCost = cost * FindObjectsByType<BoardObject>(FindObjectsSortMode.None).Length;
-         costText.text = _currentCost.ToString();
-         SystemEventManager.Send(SystemEventManager.GameEvent.BoardChanged, newBoardObject);
-         return;
-      }
-      
-      var newCell = GridManager.GetClosestCell(Vector2.zero);
-      if (newCell == null || !ServiceLocator.Get<CurrencyService>().TrySpend(_currentCost)) return;
+    private void OnDestroy()
+    {
+        Unsubscribe(GameEvent.BoardChanged, OnBoardChanged);
+        Unsubscribe(GameEvent.GridCellUnlocked, OnBoardChanged);
+        Unsubscribe(GameEvent.GameLoaded, OnBoardChanged);
+        Unsubscribe(GameEvent.CurrencyAdded, OnCurrencyChanged);
+        Unsubscribe(GameEvent.CurrencySpent, OnCurrencyChanged);
+    }
 
-      var newObj = Instantiate(objectToBuy);
-      newCell.SetChildObject(newObj);
-      newObj.Init();
-      _currentCost = cost * FindObjectsByType<BoardObject>(FindObjectsSortMode.None).Length;
-      costText.text = _currentCost.ToString();
-      SystemEventManager.Send(SystemEventManager.GameEvent.BoardChanged, newObj);
-      EffectsManager.Instance.SpawnEffect(EffectsManager.EffectType.Spawn, newObj.transform.position);
-      FMODUnity.RuntimeManager.PlayOneShotAttached(BuyButtonSFX, gameObject);
+    private void OnBoardChanged(object payload) => ScheduleRefresh();
+
+    private void OnCurrencyChanged(object payload) => RefreshInteractable();
+
+    /// <summary>
+    /// Defers the expensive refresh by a frame, and coalesces a burst of board events into one.
+    /// <para>
+    /// The frame's delay matters: <c>BoardChanged</c> is sent from <c>OnDestroy</c>, and a
+    /// destroyed object is still counted by <c>FindObjectsByType</c> at that moment. Counting
+    /// immediately would leave the price permanently one object too high.
+    /// </para>
+    /// </summary>
+    private void ScheduleRefresh()
+    {
+        if (_refreshQueued) return;
+
+        _refreshQueued = true;
+        RefreshNextFrame(this.GetCancellationTokenOnDestroy()).Forget();
+    }
+
+    private async UniTaskVoid RefreshNextFrame(CancellationToken token)
+    {
+        try
+        {
+            await UniTask.NextFrame(token);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        _refreshQueued = false;
+        Refresh();
+    }
+
+    private void Refresh()
+    {
+        _currentCost = cost * CountBoardObjects();
+        _hasFreeCell = GridManager.GetClosestCell(Vector2.zero) != null;
+
+        costText.text = _currentCost.ToString();
+        RefreshInteractable();
+    }
+
+    private void RefreshInteractable()
+    {
+        bool canBuy = GameManager.DEBUGMODE
+                      || (_hasFreeCell && ServiceLocator.Get<CurrencyService>().CanAfford(_currentCost));
+
+        if (_button.interactable != canBuy) _button.interactable = canBuy;
+    }
+
+    private static int CountBoardObjects()
+        => ServiceLocator.Get<SaveService>().BoardObjects.Count;
+
+    public void OnMouseDown()
+    {
+        GridCell cell = GridManager.GetClosestCell(Vector2.zero);
+        if (cell == null) return;
+
+        if (!GameManager.DEBUGMODE && !ServiceLocator.Get<CurrencyService>().TrySpend(_currentCost)) return;
+
+        BoardObject bought = Instantiate(objectToBuy);
+        cell.SetChildObject(bought);
+        bought.Init();
+
+        Send(GameEvent.BoardChanged, bought);
+        EffectsManager.Instance.SpawnEffect(EffectsManager.EffectType.Spawn, bought.transform.position);
+        FMODUnity.RuntimeManager.PlayOneShotAttached(BuyButtonSFX, gameObject);
     }
 }
