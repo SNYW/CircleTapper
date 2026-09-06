@@ -1,3 +1,4 @@
+using Core;
 using System.Collections.Generic;
 using System.Linq;
 using Gameplay;
@@ -54,7 +55,7 @@ namespace Managers
             if (upgrades.TryGetValue(definition.upgradeName, out var upgrade))
             {
                 upgrade.currentLevel++;
-                SaveManager.Instance.SaveUpgrade(upgrade);
+                ServiceLocator.Get<SaveService>().SaveUpgrade(upgrade.ToSaveObject());
             }
             else
             {
@@ -65,7 +66,7 @@ namespace Managers
                 };
                 
                 upgrades.Add(definition.upgradeName, newUpgrade);
-                SaveManager.Instance.SaveUpgrade(newUpgrade);
+                ServiceLocator.Get<SaveService>().SaveUpgrade(newUpgrade.ToSaveObject());
             }
         }
 

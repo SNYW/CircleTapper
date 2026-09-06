@@ -1,3 +1,4 @@
+using Core;
 using System;
 using System.Collections.Generic;
 using DG.Tweening;
@@ -59,7 +60,7 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
     public virtual void OnMerge(BoardObject targetObj)
     {
         var newItem = Instantiate(onMergeSpawn, targetObj.transform.position, quaternion.identity);
-        SaveManager.Instance.RemoveObject(targetObj.parentCell.gridPosition);
+        ServiceLocator.Get<SaveService>().RemoveBoardObject(targetObj.parentCell.gridPosition);
         targetObj.parentCell.SetChildObject(newItem);
         newItem.Init();
         Destroy(targetObj.gameObject);

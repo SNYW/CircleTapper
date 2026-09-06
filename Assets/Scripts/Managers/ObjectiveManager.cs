@@ -1,3 +1,4 @@
+using Core;
 using System;
 using Persistence;
 using UI;
@@ -10,14 +11,9 @@ namespace Managers
     {
         public static int CurrentObjective;
         public static bool AllObjectivesComplete => UpgradeManager.AllUpgradesComplete();
-        public static void Init()
-        {
-            CurrentObjective = SaveManager.Instance.gameData.currentObjective;
-        }
-
         public static void OnGameLoad()
         {
-            CurrentObjective = Mathf.Max(1, SaveManager.Instance.gameData.currentObjective);
+            CurrentObjective = Mathf.Max(1, ServiceLocator.Get<SaveService>().Data.currentObjective);
             Object.FindFirstObjectByType<ObjectiveTrackerPanel>().Init();
         }
 

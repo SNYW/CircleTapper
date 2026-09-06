@@ -1,3 +1,4 @@
+using Core;
 using System;
 using System.Collections;
 using System.Globalization;
@@ -166,7 +167,8 @@ public class Circle : BoardObject
 
     protected override void SaveObjectState()
     {
-        if (parentCell != null) SaveManager.Instance.AddObject(parentCell.gridPosition, ToSaveData());
+        if (parentCell != null)
+            ServiceLocator.Get<SaveService>().SetBoardObject(parentCell.gridPosition, ToSaveData());
     }
 
     public override string GetValue() => currentValue.ToString();

@@ -1,3 +1,4 @@
+using Core;
 using System.Collections.Generic;
 using DG.Tweening;
 using Managers;
@@ -52,7 +53,7 @@ public class GridCell : MonoBehaviour
         heldObject.parentCell = this;
         heldObject.transform.position = transform.position;
 
-        SaveManager.Instance.AddObject(gridPosition, heldObject.ToSaveData());
+        ServiceLocator.Get<SaveService>().SetBoardObject(gridPosition, heldObject.ToSaveData());
         SystemEventManager.Send(SystemEventManager.GameEvent.BoardObjectMoved, boardObject);
     }
 
@@ -75,7 +76,7 @@ public class GridCell : MonoBehaviour
     {
         if (heldObject == null) return;
 
-        SaveManager.Instance.RemoveObject(gridPosition);
+        ServiceLocator.Get<SaveService>().RemoveBoardObject(gridPosition);
         heldObject.parentCell = null;
         heldObject = null;
     }

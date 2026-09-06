@@ -1,3 +1,4 @@
+using Core;
 using Gameplay;
 using Persistence;
 using UnityEngine;
@@ -18,7 +19,12 @@ namespace Managers
 
             if (!PurchaseManager.TryPurchaseUpgrade(this)) return;
            
-            SaveManager.Instance.UnlockCell(cellToUnlock);
+            if (ServiceLocator.Get<SaveService>().TryRecordUnlockedCell(cellToUnlock.gridPosition))
+            {
+                cellToUnlock.Unlock();
+                SystemEventManager.Send(SystemEventManager.GameEvent.GridCellUnlocked, cellToUnlock);
+            }
+
             UpgradeManager.LevelUpUpgrade(this);
             EffectsManager.Instance.SpawnEffect(EffectsManager.EffectType.Spawn, cellToUnlock.transform.position);
             FMODUnity.RuntimeManager.PlayOneShot("event:/UI_Button_UpgradeGrid"); //audio
@@ -32,7 +38,8 @@ namespace Managers
 
         public override int GetPurchasePrice()
         {
-            return Mathf.Clamp(SaveManager.Instance.gameData.unlockedCells.Count / unitAmount * costPerUnit, 1, 5);
+            return Mathf.Clamp(
+                ServiceLocator.Get<SaveService>().Data.unlockedCells.Count / unitAmount * costPerUnit, 1, 5);
         }
 
         public override string GetLevelInfo()

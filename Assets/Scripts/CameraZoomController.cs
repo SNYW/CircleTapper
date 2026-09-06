@@ -1,3 +1,4 @@
+using Core;
 using System;
 using DG.Tweening;
 using Persistence;
@@ -27,7 +28,7 @@ public class CameraZoomController : MonoBehaviour
 
     private float GetCamSize()
     {
-        var cellCount = SaveManager.Instance.gameData.unlockedCells.Count;
+        var cellCount = ServiceLocator.Get<SaveService>().Data.unlockedCells.Count;
         return  Mathf.Clamp(zoomMinMax.x + zoomPerCell * cellCount, zoomMinMax.x, zoomMinMax.y);
     }
 

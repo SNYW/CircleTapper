@@ -1,3 +1,4 @@
+using Core;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -136,7 +137,7 @@ public class Square : BoardObject
     protected override void SaveObjectState()
     {
         if (parentCell != null)
-            SaveManager.Instance.AddObject(parentCell.gridPosition, ToSaveData());
+            ServiceLocator.Get<SaveService>().SetBoardObject(parentCell.gridPosition, ToSaveData());
     }
 
     private void OnDisable()

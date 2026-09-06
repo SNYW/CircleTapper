@@ -116,7 +116,9 @@ public class GridVisualizerWithData : EditorWindow
     {
         try
         {
-            GameData gameData = FindAnyObjectByType<SaveManager>().GetSaveDataForUtils();
+            GameData gameData = new FileDataService(new JsonSerializer()).Exists("CTSave")
+                ? new FileDataService(new JsonSerializer()).Load("CTSave")
+                : new GameData();
 
             occupiedCells.Clear();
             foreach (var obj in gameData.boardObjects)
