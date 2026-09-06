@@ -132,9 +132,11 @@ public class Circle : BoardObject
     /// <summary>How much of the ring is gone, 0 when untouched and 1 when the circle is done.</summary>
     private float RemovedFraction => 1f - (float)currentValue / startValue;
 
-    private void Update()
+    public override void Tick(float deltaTime)
     {
-        _progress.Advance(Time.deltaTime);
+        if (_progress == null) return;
+
+        _progress.Advance(deltaTime);
 
         if (_progress.IsFull) Complete();
     }

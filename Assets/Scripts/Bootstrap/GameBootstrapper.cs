@@ -102,6 +102,7 @@ namespace Core
             ServiceLocator.Register(new UpgradeService(ServiceLocator.Get<SaveService>()));
             ServiceLocator.Register(new UpgradeCatalog());
             ServiceLocator.Register(new CurrencyParticleService());
+            ServiceLocator.Register(new BoardObjectTickService());
             ServiceLocator.Register(new ObjectiveService(
                 ServiceLocator.Get<SaveService>(),
                 ServiceLocator.Get<CurrencyService>()));

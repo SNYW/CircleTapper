@@ -109,7 +109,12 @@ public class Square : BoardObject
     /// <summary>Proportion of the cooldown still to run.</summary>
     private float CooldownFraction => (float)_remainingCooldown / clickSpeed;
 
-    private void Update() => _progress.Advance(Time.deltaTime);
+    public override void Tick(float deltaTime)
+    {
+        if (_progress == null) return;
+
+        _progress.Advance(deltaTime);
+    }
 
     public override BoardObjectSaveData ToSaveData()
     {

@@ -23,27 +23,29 @@ public class GridCell : MonoBehaviour
         debugger = GetComponentInChildren<GridCellDebugger>(true);
     }
 
-    private void Update()
+    /// <summary>
+    /// Driven by <see cref="InWorldGridManager"/> rather than an Update of its own. Every cell
+    /// having one meant ~126 callbacks a frame doing nothing but keeping hidden things hidden.
+    /// </summary>
+    public void RefreshDebugVisuals(bool debugActive)
     {
-        
-        debugParent.SetActive(GameManager.DEBUGMODE);
-        debugSprite.color = (heldObject != null && GameManager.DEBUGMODE) ? Color.red : Color.clear;
+        if (debugParent.activeSelf != debugActive) debugParent.SetActive(debugActive);
 
-        if (GameManager.DEBUGMODE && heldObject != null)
+        bool showsObject = debugActive && heldObject != null;
+        debugSprite.color = showsObject ? Color.red : Color.clear;
+        debugger.bo = showsObject ? heldObject : null;
+
+        // Only worth a line when the object has drifted off its cell, i.e. while it is dragged.
+        bool showsLine = showsObject && heldObject.transform.position != transform.position;
+        if (debugLine.enabled != showsLine) debugLine.enabled = showsLine;
+
+        if (showsLine)
         {
-            debugger.bo = heldObject;
-            if (heldObject.transform.position == transform.position) return;
-            
-            debugLine.enabled = true;
             debugLine.SetPosition(0, transform.position);
             debugLine.SetPosition(1, heldObject.transform.position);
-         
         }
-        else
-        {
-            debugLine.enabled = false;
-            debugger.bo = null;
-        }
+
+        debugger.Refresh();
     }
 
     public void SetChildObject(BoardObject boardObject)

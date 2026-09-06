@@ -22,8 +22,17 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
     private void OnEnable()
     {
         SetIndicators(false);
+
+        if (ServiceLocator.TryGet(out BoardObjectTickService ticks)) ticks.Register(this);
+
         SystemEventManager.Send(SystemEventManager.GameEvent.BoardChanged, this);
     }
+
+    /// <summary>
+    /// Per-frame work, driven by <see cref="BoardObjectTickService"/> rather than an Update of
+    /// this object's own.
+    /// </summary>
+    public virtual void Tick(float deltaTime) { }
 
     public virtual void Init() { }
 
@@ -125,6 +134,9 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
     private void OnDisable()
     {
         StopLoops();
+
+        // TryGet, because on shutdown the locator may already be cleared.
+        if (ServiceLocator.TryGet(out BoardObjectTickService ticks)) ticks.Unregister(this);
     }
 
     public abstract string GetValue(); 

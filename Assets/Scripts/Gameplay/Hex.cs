@@ -112,14 +112,16 @@ public class Hex : BoardObject
     /// <summary>Proportion of the cooldown still to run.</summary>
     private float CooldownFraction => (float)_remainingCooldown / clickSpeed;
 
-    private void Update()
+    public override void Tick(float deltaTime)
     {
-        _progress.Advance(Time.deltaTime);
+        if (_progress == null) return;
+
+        _progress.Advance(deltaTime);
 
         // Scale animation
         if (transform.localScale != targetScale)
         {
-            transform.localScale = Vector3.MoveTowards(transform.localScale, targetScale, scaleSpeed * Time.deltaTime);
+            transform.localScale = Vector3.MoveTowards(transform.localScale, targetScale, scaleSpeed * deltaTime);
 
             if (transform.localScale == targetScale && targetScale != Vector3.one)
                 targetScale = Vector3.one;
