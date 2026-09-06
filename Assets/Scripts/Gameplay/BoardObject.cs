@@ -71,7 +71,7 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
     private void OnDestroy()
     {
         StopAllCoroutines();
-        DOTween.KillAll(gameObject);
+        // Tweens are linked to their GameObject, so DOTween kills them on destroy by itself.
         SystemEventManager.Send(SystemEventManager.GameEvent.BoardChanged, this);
     }
 

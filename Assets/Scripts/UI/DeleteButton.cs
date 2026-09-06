@@ -29,7 +29,8 @@ public class DeleteButton : MonoBehaviour
     
     private void OnObjectDragged(object obj)
     {
-        _cg.DOFade(1, 0.3f);
+        _cg.DOKill();
+        _cg.DOFade(1, 0.3f).SetLink(gameObject);
     }
 
     private void OnDisable()
@@ -40,8 +41,8 @@ public class DeleteButton : MonoBehaviour
 
     private void OnObjectDropped(object obj)
     {
-        DOTween.KillAll(_cg);
-        _cg.DOFade(0, 0.3f);
+        _cg.DOKill();
+        _cg.DOFade(0, 0.3f).SetLink(gameObject);
     }
 
     public bool TryDeleteObject(BoardObject boardObject)

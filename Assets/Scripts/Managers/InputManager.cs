@@ -1,11 +1,8 @@
-using Gameplay;
-using Persistence;
 using UnityEngine;
 
 public class InputManager : MonoBehaviour
 {
     private BoardObject _draggedObject;
-    private AutoTapper _autoTapper => FindAnyObjectByType<AutoTapper>();
     private bool _isDragging;
     private Vector2 _startTouchPosition;
     private float _startTouchTime;
@@ -27,7 +24,6 @@ public class InputManager : MonoBehaviour
                 _startTouchPosition = worldPosition;
                 _startTouchTime = Time.time;
                 TrySetDraggedObject(worldPosition);
-                _autoTapper?.StartAutoTap();
                 break;
 
             case TouchPhase.Moved:
@@ -51,8 +47,6 @@ public class InputManager : MonoBehaviour
 
     private void HandleTouchMoved(Vector2 worldPosition)
     {
-        if(_autoTapper != null)
-            _autoTapper.transform.position = GridManager.GetClosestCell(worldPosition, true).transform.position;
         if (_draggedObject == null) return;
 
         float distance = Vector2.Distance(worldPosition, _startTouchPosition);
@@ -66,13 +60,10 @@ public class InputManager : MonoBehaviour
         if (!_isDragging) return;
         
         _draggedObject.OnDrag(worldPosition);
-        if(_autoTapper != null)
-            _autoTapper.StopAutoTap();
     }
 
     private void HandleTouchEnded(Vector2 worldPosition)
     {
-        if(_autoTapper != null) _autoTapper.StopAutoTap();
         float duration = Time.time - _startTouchTime;
         float distance = Vector2.Distance(worldPosition, _startTouchPosition);
 

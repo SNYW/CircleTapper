@@ -68,8 +68,15 @@ public class GridCell : MonoBehaviour
         locked = false;
         innerSprite.gameObject.SetActive(true);
         innerSprite.color = Color.white;
-        innerSprite.DOFade(0.2f, 0.3f);
-        if (playAnimation) innerSprite.transform.DOPunchScale(innerSprite.transform.localScale * 1.2f, 0.2f);
+        innerSprite.DOKill();
+        innerSprite.DOFade(0.2f, 0.3f).SetLink(gameObject);
+
+        if (!playAnimation) return;
+
+        innerSprite.transform.DOKill();
+        innerSprite.transform
+            .DOPunchScale(innerSprite.transform.localScale * 1.2f, 0.2f)
+            .SetLink(gameObject);
     }
 
     public void RemoveChildObject()

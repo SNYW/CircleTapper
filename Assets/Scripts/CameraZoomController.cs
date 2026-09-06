@@ -22,8 +22,11 @@ public class CameraZoomController : MonoBehaviour
 
     private void OnCellUnlocked(object obj)
     {
-        DOTween.KillAll(targetCam);
-        targetCam.DOOrthoSize(GetCamSize(), 0.2f).SetEase(Ease.InQuad);
+        // Kill only this camera's tween. DOTween.KillAll takes a bool, not a target, so the
+        // old call compiled via UnityEngine.Object's implicit bool and killed every tween in
+        // the game. See CLAUDE.md.
+        targetCam.DOKill();
+        targetCam.DOOrthoSize(GetCamSize(), 0.2f).SetEase(Ease.InQuad).SetLink(gameObject);
     }
 
     private float GetCamSize()
