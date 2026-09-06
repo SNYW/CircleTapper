@@ -101,6 +101,7 @@ namespace Core
             ServiceLocator.Register(new CurrencyService(ServiceLocator.Get<SaveService>()));
             ServiceLocator.Register(new UpgradeService(ServiceLocator.Get<SaveService>()));
             ServiceLocator.Register(new UpgradeCatalog());
+            ServiceLocator.Register(new CurrencyParticleService());
             ServiceLocator.Register(new ObjectiveService(
                 ServiceLocator.Get<SaveService>(),
                 ServiceLocator.Get<CurrencyService>()));

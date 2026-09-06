@@ -1,4 +1,4 @@
-using ObjectPooling;
+using Core;
 using UnityEngine;
 
 /// <summary>
@@ -33,24 +33,30 @@ public class CurrencyEmitter
     /// Spawns one particle if anything is owed. Returns false when there was nothing to pay out,
     /// which is the common case.
     /// </summary>
+    /// <summary>
+    /// Spawns one particle if anything is owed and the board has room for it. Returns false when
+    /// there is nothing to pay out, which is the common case.
+    /// <para>
+    /// At capacity nothing spawns and the backlog simply grows — which pushes the payout over
+    /// <see cref="BulkThreshold"/>, so it comes out as fewer, more valuable particles. The player
+    /// receives exactly the same currency either way.
+    /// </para>
+    /// </summary>
     public bool TryEmit(Vector3 origin)
     {
         if (Pending <= 0) return false;
 
+        var particles = ServiceLocator.Get<CurrencyParticleService>();
+        if (!particles.HasCapacity) return false;
+
         int value = Pending > BulkThreshold ? BulkValue : 1;
 
-        var particle = ObjectPoolManager
-            .GetPool(ObjectPool.ObjectPoolName.CurrencyParticle)
-            .GetPooledObject()
-            .GetComponent<CurrencyParticle>();
-
-        particle.transform.position = origin + new Vector3(
+        Vector3 scattered = origin + new Vector3(
             Random.Range(-ScatterRadius, ScatterRadius),
             Random.Range(-ScatterRadius, ScatterRadius),
             0f);
 
-        particle.gameObject.SetActive(true);
-        particle.OnInit(value);
+        if (!particles.TryLaunch(scattered, value)) return false;
 
         Pending -= value;
         return true;

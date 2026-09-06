@@ -15,14 +15,19 @@ namespace ObjectPooling
 
         private List<GameObject> _pool;
 
+        private int _scanCursor;
+
         public GameObject GetPooledObject()
         {
-            foreach (var go in _pool)
+            // Resume where the last search finished. Scanning from zero every time made spawning
+            // O(pool size), which bites hardest exactly when the pool has grown large.
+            int count = _pool.Count;
+            for (int i = 0; i < count; i++)
             {
-                if (!go.activeInHierarchy)
-                {
-                    return go;
-                }
+                if (_scanCursor >= count) _scanCursor = 0;
+
+                GameObject candidate = _pool[_scanCursor++];
+                if (!candidate.activeInHierarchy) return candidate;
             }
 
             var newPooledObject = Instantiate(pooledObject, Vector2.zero, Quaternion.identity, _pooledObjectParent);
