@@ -5,7 +5,30 @@ using UnityEngine;
 public static class GridManager
 {
     private const float CellSize = 0.5f;
-    private static InWorldGridManager InWorldGridManager => Object.FindFirstObjectByType<InWorldGridManager>();
+
+    private static InWorldGridManager _inWorldGridManager;
+
+    /// <summary>
+    /// The scene's grid, resolved once rather than searched for on every access. This used to be
+    /// an expression-bodied FindFirstObjectByType, so a single GetClosestCell cost three
+    /// scene-wide searches — and that runs per buy button, per frame.
+    /// <para>
+    /// Unity's == null is true for a destroyed object, so a scene change re-resolves by itself.
+    /// </para>
+    /// </summary>
+    private static InWorldGridManager InWorldGridManager
+    {
+        get
+        {
+            if (_inWorldGridManager == null) _inWorldGridManager = Object.FindFirstObjectByType<InWorldGridManager>();
+
+            return _inWorldGridManager;
+        }
+    }
+
+    /// <summary>Statics survive play sessions when domain reload is disabled.</summary>
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetOnEnterPlayMode() => _inWorldGridManager = null;
     
     public enum Direction
     {
@@ -95,9 +118,10 @@ public static class GridManager
         GridCell closestCell = null;
         float closestDistance = float.MaxValue;
 
-        if (InWorldGridManager == null || InWorldGridManager.Grid == null) return null;
+        var grid = InWorldGridManager;
+        if (grid == null || grid.Grid == null) return null;
 
-        foreach (var cell in InWorldGridManager.Grid.Values)
+        foreach (var cell in grid.Grid.Values)
         {
             if(!includeOccupied && cell.heldObject != null) continue;
             if(lockedOnly && !cell.locked) continue;
