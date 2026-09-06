@@ -1,3 +1,5 @@
+using Economy;
+using Core;
 using Managers;
 using TMPro;
 using UnityEngine;
@@ -10,7 +12,7 @@ namespace UI
 
         private void Update()
         {
-            pointsText.text = $"Upgrade Points: {PurchaseManager.GetCurrentUpgradePoints()}";
+            pointsText.text = $"Upgrade Points: {ServiceLocator.Get<CurrencyService>().UpgradePoints}";
         }
     }
 }

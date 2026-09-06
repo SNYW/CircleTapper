@@ -1,3 +1,5 @@
+using Economy;
+using Core;
 using Gameplay;
 using Managers;
 using TMPro;
@@ -34,11 +36,13 @@ namespace UI
 
         public void OnButtonDown()
         {
-            if (!PurchaseManager.CanPurchaseUpgrade(definition.GetPurchasePrice())) return;
+            if (!ServiceLocator.Get<CurrencyService>().CanAffordUpgrade(definition.GetPurchasePrice())) return;
             
             definition.OnLevelUp();
             costText.text = definition.GetPurchasePrice().ToString();
-            SystemEventManager.Send(SystemEventManager.GameEvent.UpgradePointSpent, PurchaseManager.GetCurrentUpgradePoints());
+            SystemEventManager.Send(
+                SystemEventManager.GameEvent.UpgradePointSpent,
+                ServiceLocator.Get<CurrencyService>().UpgradePoints);
         }
 
         private void OnDisable()

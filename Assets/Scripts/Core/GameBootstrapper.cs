@@ -1,3 +1,4 @@
+using Economy;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -95,6 +96,7 @@ namespace Core
         private void RegisterServices()
         {
             ServiceLocator.Register(new SaveService());
+            ServiceLocator.Register(new CurrencyService(ServiceLocator.Get<SaveService>()));
         }
 
         private async UniTaskVoid BootstrapAsync(CancellationToken cancellationToken)

@@ -1,3 +1,4 @@
+using Economy;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -33,6 +34,7 @@ namespace Managers
         private const float PassiveIncomeIntervalSeconds = 1f;
 
         private SaveService _save;
+        private CurrencyService _currency;
         private float _secondsSincePayout;
         private bool _sessionLoaded;
 
@@ -48,7 +50,6 @@ namespace Managers
             ObjectPoolManager.InitPools();
             DOTween.Init();
             SystemEventManager.Init();
-            PurchaseManager.Init();
             UpgradeManager.Init();
 
             UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoad;
@@ -58,8 +59,11 @@ namespace Managers
         {
             UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnSceneLoad;
 
-            SystemEventManager.Unsubscribe(SystemEventManager.GameEvent.CurrencyAdded, OnCurrencyChanged);
-            SystemEventManager.Unsubscribe(SystemEventManager.GameEvent.CurrencySpent, OnCurrencyChanged);
+            if (_currency != null)
+            {
+                _currency.PointsChanged -= OnPointsChanged;
+                _currency.UpgradePointsChanged -= OnUpgradePointsChanged;
+            }
 
             if (_save != null) _save.Loaded -= BuildSession;
         }
@@ -83,8 +87,9 @@ namespace Managers
             _save = ServiceLocator.Get<SaveService>();
             _save.CollectState = CollectStateForSave;
 
-            SystemEventManager.Subscribe(SystemEventManager.GameEvent.CurrencyAdded, OnCurrencyChanged);
-            SystemEventManager.Subscribe(SystemEventManager.GameEvent.CurrencySpent, OnCurrencyChanged);
+            _currency = ServiceLocator.Get<CurrencyService>();
+            _currency.PointsChanged += OnPointsChanged;
+            _currency.UpgradePointsChanged += OnUpgradePointsChanged;
 
             BuildSession();
 
@@ -97,7 +102,6 @@ namespace Managers
         {
             ClearBoard();
 
-            PurchaseManager.OnGameLoad(_save.Data);
             UpgradeManager.OnGameLoad(_save.Data);
 
             if (_save.IsNewGame) StartFreshBoard();
@@ -138,7 +142,6 @@ namespace Managers
 
         private void StartFreshBoard()
         {
-            PurchaseManager.ResetCurrency();
             ObjectiveManager.ResetObjectives();
             UpgradeManager.ResetUpgrades();
             GridManager.ResetCells();
@@ -199,13 +202,31 @@ namespace Managers
         /// </summary>
         private void CollectStateForSave(GameData data)
         {
-            data.currentPoints = PurchaseManager.GetCurrentCurrency();
-            data.currentUpgradePoints = PurchaseManager.GetCurrentUpgradePoints();
             data.currentObjective = ObjectiveManager.CurrentObjective;
             data.upgrades = UpgradeManager.GetUpgradeSaveData();
         }
 
-        private void OnCurrencyChanged(object payload) => _save?.MarkDirty();
+        /// <summary>
+        /// Bridges the currency service's own events onto the old event bus, for UI that has not
+        /// been converted yet. Delete once nothing subscribes to the currency GameEvents.
+        /// </summary>
+        private static void OnPointsChanged(long previous, long current)
+        {
+            SystemEventManager.Send(
+                current > previous
+                    ? SystemEventManager.GameEvent.CurrencyAdded
+                    : SystemEventManager.GameEvent.CurrencySpent,
+                current);
+        }
+
+        private static void OnUpgradePointsChanged(long previous, long current)
+        {
+            SystemEventManager.Send(
+                current > previous
+                    ? SystemEventManager.GameEvent.UpgradePointAdded
+                    : SystemEventManager.GameEvent.UpgradePointSpent,
+                current);
+        }
 
         private void Update()
         {
@@ -218,8 +239,8 @@ namespace Managers
             if (_secondsSincePayout < PassiveIncomeIntervalSeconds) return;
 
             _secondsSincePayout = 0f;
-            PurchaseManager.AddCurrency(PurchaseManager.GetPassiveIncomeAmount() + passiveBonus);
-            PurchaseManager.AddUpgradePoints(passiveUpgradeBonus);
+            _currency.AddPoints(GridManager.GetPassiveIncomeAmount() + passiveBonus);
+            _currency.AddUpgradePoints(passiveUpgradeBonus);
         }
 
         public void ToggleDebug() => DEBUGMODE = !DEBUGMODE;

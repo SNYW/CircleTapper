@@ -1,3 +1,5 @@
+using Economy;
+using Core;
 using System;
 using System.Collections;
 using Managers;
@@ -51,7 +53,7 @@ public class CurrencyParticle : PooledObject
 
     public override void ReturnToPool()
     {
-        PurchaseManager.AddCurrency(_value);
+        ServiceLocator.Get<CurrencyService>().AddPoints(_value);
         base.ReturnToPool();
     }
 }

@@ -1,3 +1,5 @@
+using Economy;
+using Core;
 using Managers;
 using UnityEngine;
 
@@ -10,7 +12,7 @@ namespace Gameplay
 
         public override void OnLevelUp()
         {
-            if (PurchaseManager.TryPurchaseUpgrade(this))
+            if (ServiceLocator.Get<CurrencyService>().TrySpendUpgradePoints(GetPurchasePrice()))
             {
                 UpgradeManager.LevelUpUpgrade(this);
                 FMODUnity.RuntimeManager.PlayOneShot("event:/UI_Button_UpgradeAutoTap"); //audio
@@ -19,7 +21,7 @@ namespace Gameplay
 
         public override bool CanPurchase()
         {
-            return !IsMaxed() && PurchaseManager.CanPurchaseUpgrade(GetPurchasePrice());
+            return !IsMaxed() && ServiceLocator.Get<CurrencyService>().CanAffordUpgrade(GetPurchasePrice());
         }
 
         public override bool IsMaxed()

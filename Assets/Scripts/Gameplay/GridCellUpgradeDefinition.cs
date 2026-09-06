@@ -1,3 +1,4 @@
+using Economy;
 using Core;
 using Gameplay;
 using Persistence;
@@ -17,7 +18,7 @@ namespace Managers
 
             if (cellToUnlock == null) return;
 
-            if (!PurchaseManager.TryPurchaseUpgrade(this)) return;
+            if (!ServiceLocator.Get<CurrencyService>().TrySpendUpgradePoints(GetPurchasePrice())) return;
            
             if (ServiceLocator.Get<SaveService>().TryRecordUnlockedCell(cellToUnlock.gridPosition))
             {
@@ -33,7 +34,7 @@ namespace Managers
         public override bool CanPurchase()
         {
             var hasCell = GridManager.GetClosestCell(Vector2.zero, false, true) != null;
-            return hasCell && PurchaseManager.CanPurchaseUpgrade(GetPurchasePrice());
+            return hasCell && ServiceLocator.Get<CurrencyService>().CanAffordUpgrade(GetPurchasePrice());
         }
 
         public override int GetPurchasePrice()

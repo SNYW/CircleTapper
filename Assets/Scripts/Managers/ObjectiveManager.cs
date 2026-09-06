@@ -1,3 +1,4 @@
+using Economy;
 using Core;
 using System;
 using Persistence;
@@ -19,15 +20,16 @@ namespace Managers
 
         public static bool CanClaimObjective()
         {
-            return PurchaseManager.GetCurrentCurrency() >= GetCurrentObjectiveCost();
+            return ServiceLocator.Get<CurrencyService>().Points >= GetCurrentObjectiveCost();
         }
         
         public static void ClaimObjective()
         {
-            if (AllObjectivesComplete || !CanClaimObjective() || !PurchaseManager.TryPurchaseItem(GetCurrentObjectiveCost(), false)) return;
-            
+            CurrencyService currency = ServiceLocator.Get<CurrencyService>();
+            if (AllObjectivesComplete || !CanClaimObjective() || !currency.TrySpend(GetCurrentObjectiveCost())) return;
+
             CurrentObjective++;
-            PurchaseManager.AddUpgradePoints(1);
+            currency.AddUpgradePoints(1);
         }
 
         public static void ResetObjectives()

@@ -1,3 +1,5 @@
+using Economy;
+using Core;
 using System;
 using System.Collections;
 using Managers;
@@ -38,7 +40,8 @@ public class BuyButton : MonoBehaviour
          _button.interactable = true;
          return;
       }
-      _button.interactable = PurchaseManager.CanPurchaseItem(_currentCost);
+      _button.interactable = GridManager.GetClosestCell(Vector2.zero) != null
+                             && ServiceLocator.Get<CurrencyService>().CanAfford(_currentCost);
    }
 
    public void OnMouseDown()
@@ -55,7 +58,7 @@ public class BuyButton : MonoBehaviour
       }
       
       var newCell = GridManager.GetClosestCell(Vector2.zero);
-      if (newCell == null || !PurchaseManager.TryPurchaseItem(_currentCost)) return;
+      if (newCell == null || !ServiceLocator.Get<CurrencyService>().TrySpend(_currentCost)) return;
 
       var newObj = Instantiate(objectToBuy);
       newCell.SetChildObject(newObj);

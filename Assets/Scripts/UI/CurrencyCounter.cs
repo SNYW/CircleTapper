@@ -1,3 +1,5 @@
+using Economy;
+using Core;
 using Managers;
 using TMPro;
 using UnityEngine;
@@ -12,10 +14,12 @@ public class CurrencyCounter : MonoBehaviour
     private long _currentCurrency;
     private long _targetCurrency;
     private long _passiveIncomeAmount;
+    private CurrencyService _currency;
     
     private void Start()
     {
-        UpdateCurrencyText(PurchaseManager.GetCurrentCurrency());
+        _currency = ServiceLocator.Get<CurrencyService>();
+        UpdateCurrencyText(_currency.Points);
         Subscribe(GameEvent.CircleComplete, OnCircleComplete);
         Subscribe(GameEvent.CurrencySpent, OnCircleComplete);
         Subscribe(GameEvent.CurrencyAdded, OnCircleComplete);
@@ -23,7 +27,7 @@ public class CurrencyCounter : MonoBehaviour
 
     private void OnCircleComplete(object obj)
     {
-        _targetCurrency = PurchaseManager.GetCurrentCurrency();
+        _targetCurrency = _currency.Points;
     }
 
     private void Update()
@@ -34,7 +38,7 @@ public class CurrencyCounter : MonoBehaviour
             UpdateCurrencyText(_currentCurrency);
         }
 
-        _passiveIncomeAmount = PurchaseManager.GetPassiveIncomeAmount();
+        _passiveIncomeAmount = GridManager.GetPassiveIncomeAmount();
         passiveText.text = $"+{_passiveIncomeAmount}/s";
     }
 

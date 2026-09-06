@@ -1,3 +1,5 @@
+using Economy;
+using Core;
 using System;
 using Managers;
 using TMPro;
@@ -24,8 +26,9 @@ namespace UI
         private void OnObjectiveProgressed()
         {
             allCompletePanel.SetActive(ObjectiveManager.AllObjectivesComplete);
-            objectiveText.text = $"Next Upgrade: {FormatNumber(PurchaseManager.GetCurrentCurrency())}/{FormatNumber(ObjectiveManager.GetCurrentObjectiveCost())}";
-            progressSlider.value = Mathf.Max((float)PurchaseManager.GetCurrentCurrency()/ObjectiveManager.GetCurrentObjectiveCost(), 0.04f);
+            long points = ServiceLocator.Get<CurrencyService>().Points;
+            objectiveText.text = $"Next Upgrade: {FormatNumber(points)}/{FormatNumber(ObjectiveManager.GetCurrentObjectiveCost())}";
+            progressSlider.value = Mathf.Max((float)points / ObjectiveManager.GetCurrentObjectiveCost(), 0.04f);
             claimButton.interactable = ObjectiveManager.CanClaimObjective();
         }
 

@@ -137,6 +137,12 @@ public static class GridManager
         return InWorldGridManager.Grid.Where(kvp => kvp.Value.heldObject != null).Select(kvp => kvp.Value.heldObject).ToList();
     }
 
+    /// <summary>Income per second implied by what is currently on the board.</summary>
+    public static int GetPassiveIncomeAmount()
+    {
+        return GetAllBoardItems().Sum(bo => bo.chainLevel + 1);
+    }
+
     public static int GetCellCount()
     {
         return InWorldGridManager?.Grid?.Count ?? 0;
