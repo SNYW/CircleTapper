@@ -1,16 +1,36 @@
-using Progression;
-using Economy;
 using Core;
-using System;
+using DG.Tweening;
+using Economy;
 using Managers;
+using Progression;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static SystemEventManager;
 
 namespace UI
 {
+    /// <summary>
+    /// Progress towards the next upgrade point, and the button that claims it.
+    /// <para>
+    /// Claiming is the only moment in the game where the player is handed something for a
+    /// deliberate choice, so it gets the loudest feedback the panel can give: the button asks to
+    /// be pressed while it is claimable, and answers when it is.
+    /// </para>
+    /// </summary>
     public class ObjectiveTrackerPanel : MonoBehaviour
     {
+        private const float SliderFillSeconds = 0.25f;
+        private const float MinimumFill = 0.04f;
+
+        private const float PulseScale = 1.08f;
+        private const float PulseSeconds = 0.6f;
+
+        private const float ClaimPunch = 0.35f;
+        private const float ClaimPunchSeconds = 0.4f;
+        private const float TextPunch = 0.25f;
+        private const float TextPunchSeconds = 0.35f;
+
         public TMP_Text objectiveText;
         public Slider progressSlider;
         public Button claimButton;
@@ -18,55 +38,141 @@ namespace UI
 
         public FMODUnity.EventReference claimButtonSFX;
 
-        public void Init()
+        private ObjectiveService _objectives;
+        private CurrencyService _currency;
+        private UpgradeCatalog _catalog;
+
+        private Vector3 _buttonRestScale;
+        private Vector3 _textRestScale;
+
+        private Tween _pulse;
+        private Tween _sliderFill;
+
+        private bool _wasClaimable;
+
+        private void Awake()
         {
-            claimButton.interactable = false;
-            OnObjectiveProgressed();
+            _buttonRestScale = claimButton.transform.localScale;
+            _textRestScale = objectiveText.transform.localScale;
         }
 
-        private void OnObjectiveProgressed()
+        private void Start()
         {
-            ObjectiveService objectives = ServiceLocator.Get<ObjectiveService>();
-            bool allComplete = ServiceLocator.Get<UpgradeCatalog>().AllComplete();
-            long points = ServiceLocator.Get<CurrencyService>().Points;
+            _objectives = ServiceLocator.Get<ObjectiveService>();
+            _currency = ServiceLocator.Get<CurrencyService>();
+            _catalog = ServiceLocator.Get<UpgradeCatalog>();
+
+            _objectives.CurrentChanged += OnObjectiveAdvanced;
+
+            Subscribe(GameEvent.CurrencyAdded, OnStateChanged);
+            Subscribe(GameEvent.CurrencySpent, OnStateChanged);
+            Subscribe(GameEvent.UpgradePointSpent, OnStateChanged);
+            Subscribe(GameEvent.GameLoaded, OnStateChanged);
+
+            progressSlider.value = CurrentFill();
+            Refresh();
+        }
+
+        private void OnDestroy()
+        {
+            if (_objectives != null) _objectives.CurrentChanged -= OnObjectiveAdvanced;
+
+            Unsubscribe(GameEvent.CurrencyAdded, OnStateChanged);
+            Unsubscribe(GameEvent.CurrencySpent, OnStateChanged);
+            Unsubscribe(GameEvent.UpgradePointSpent, OnStateChanged);
+            Unsubscribe(GameEvent.GameLoaded, OnStateChanged);
+
+            _pulse?.Kill();
+            _sliderFill?.Kill();
+        }
+
+        private void OnStateChanged(object payload) => Refresh();
+
+        private void Refresh()
+        {
+            bool allComplete = _catalog.AllComplete();
+            long points = _currency.Points;
 
             allCompletePanel.SetActive(allComplete);
-            objectiveText.text = $"Next Upgrade: {FormatNumber(points)}/{FormatNumber(objectives.CurrentCost)}";
-            progressSlider.value = Mathf.Max((float)points / objectives.CurrentCost, 0.04f);
-            claimButton.interactable = !allComplete && objectives.CanClaim;
+            objectiveText.text =
+                $"Next Upgrade: {FormatNumber(points)}/{FormatNumber(_objectives.CurrentCost)}";
+
+            _sliderFill?.Kill();
+            _sliderFill = progressSlider
+                .DOValue(CurrentFill(), SliderFillSeconds)
+                .SetEase(Ease.OutQuad)
+                .SetLink(gameObject);
+
+            bool claimable = !allComplete && _objectives.CanClaim;
+            claimButton.interactable = claimable;
+
+            if (claimable != _wasClaimable)
+            {
+                _wasClaimable = claimable;
+                SetPulsing(claimable);
+            }
         }
 
-        private void Update()
+        private float CurrentFill()
+            => Mathf.Max((float)_currency.Points / _objectives.CurrentCost, MinimumFill);
+
+        /// <summary>
+        /// The button asks to be pressed while there is something to claim, matching the pulse the
+        /// upgrade panel button already uses when upgrades are affordable.
+        /// </summary>
+        private void SetPulsing(bool pulsing)
         {
-           OnObjectiveProgressed();
+            _pulse?.Kill();
+            _pulse = null;
+            claimButton.transform.localScale = _buttonRestScale;
+
+            if (!pulsing) return;
+
+            _pulse = claimButton.transform
+                .DOScale(_buttonRestScale * PulseScale, PulseSeconds)
+                .SetEase(Ease.InOutSine)
+                .SetLoops(-1, LoopType.Yoyo)
+                .SetLink(gameObject);
+        }
+
+        /// <summary>The objective number moved on, so draw the eye to the new target.</summary>
+        private void OnObjectiveAdvanced(int current)
+        {
+            objectiveText.transform.DOKill();
+            objectiveText.transform.localScale = _textRestScale;
+            objectiveText.transform
+                .DOPunchScale(_textRestScale * TextPunch, TextPunchSeconds)
+                .SetLink(gameObject);
         }
 
         public void ClaimCurrentObjective()
         {
             // Once every upgrade is maxed there is nothing left to award, so stop taking points.
-            if (ServiceLocator.Get<UpgradeCatalog>().AllComplete()) return;
-            if (!ServiceLocator.Get<ObjectiveService>().TryClaim()) return;
+            if (_catalog.AllComplete()) return;
+            if (!_objectives.TryClaim()) return;
+
+            // Claiming spends the points, so the pulse has already stopped by the time this runs.
+            claimButton.transform.DOKill();
+            claimButton.transform.localScale = _buttonRestScale;
+            claimButton.transform
+                .DOPunchScale(_buttonRestScale * ClaimPunch, ClaimPunchSeconds)
+                .SetLink(gameObject);
 
             FMODUnity.RuntimeManager.PlayOneShotAttached(claimButtonSFX, gameObject);
         }
 
-        private static string FormatNumber(int number)
-        {
-            if (number >= 1_000_000)
-                return (number % 1_000_000 == 0) ? (number / 1_000_000) + "m" : (number / 1_000_000f).ToString("0.0") + "m";
-            if (number >= 1_000)
-                return (number % 1_000 == 0) ? (number / 1_000) + "k" : (number / 1_000f).ToString("0.0") + "k";
-    
-            return number.ToString();
-        }
-        
         private static string FormatNumber(long number)
         {
             if (number >= 1_000_000)
-                return (number % 1_000_000 == 0) ? (number / 1_000_000) + "m" : (number / 1_000_000f).ToString("0.0") + "m";
+                return number % 1_000_000 == 0
+                    ? number / 1_000_000 + "m"
+                    : (number / 1_000_000f).ToString("0.0") + "m";
+
             if (number >= 1_000)
-                return (number % 1_000 == 0) ? (number / 1_000) + "k" : (number / 1_000f).ToString("0.0") + "k";
-    
+                return number % 1_000 == 0
+                    ? number / 1_000 + "k"
+                    : (number / 1_000f).ToString("0.0") + "k";
+
             return number.ToString();
         }
     }
