@@ -84,7 +84,6 @@ namespace Managers
             await UniTask.WaitUntil(() => GameBootstrapper.IsReady, cancellationToken: cancellationToken);
 
             _save = ServiceLocator.Get<SaveService>();
-            _save.CollectState = CollectStateForSave;
 
             _currency = ServiceLocator.Get<CurrencyService>();
             _currency.PointsChanged += OnPointsChanged;
@@ -105,7 +104,6 @@ namespace Managers
             if (_save.IsNewGame) StartFreshBoard();
             else RestoreBoard();
 
-            ObjectiveManager.OnGameLoad();
             FindAnyObjectByType<CameraZoomController>().OnGameplayStart();
 
             _sessionLoaded = true;
@@ -140,7 +138,6 @@ namespace Managers
 
         private void StartFreshBoard()
         {
-            ObjectiveManager.ResetObjectives();
             GridManager.ResetCells();
 
             GridCell startingCell = GridManager.GetClosestCell(Vector2Int.zero, true, true);
@@ -191,15 +188,6 @@ namespace Managers
             {
                 Destroy(boardObject.gameObject);
             }
-        }
-
-        /// <summary>
-        /// Pulls state that still lives in static managers into the save, just before it writes.
-        /// Remove each line as its manager becomes a service that writes through directly.
-        /// </summary>
-        private void CollectStateForSave(GameData data)
-        {
-            data.currentObjective = ObjectiveManager.CurrentObjective;
         }
 
         /// <summary>

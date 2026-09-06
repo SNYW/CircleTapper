@@ -1,6 +1,6 @@
 {
     "name": "CircleTapper.Progression",
     "rootNamespace": "Progression",
-    "references": ["CircleTapper.Core", "CircleTapper.Persistence", "UniTask"],
+    "references": ["CircleTapper.Core", "CircleTapper.Persistence", "UniTask", "CircleTapper.Economy"],
     "autoReferenced": true
 }

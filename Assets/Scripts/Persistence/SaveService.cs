@@ -52,13 +52,6 @@ namespace Persistence
         /// <summary>A detached copy, safe to iterate while the save is being written to.</summary>
         public List<BoardObjectSaveData> SnapshotBoardObjects() => new(_boardObjects.Values);
 
-        /// <summary>
-        /// Invoked immediately before serializing, to pull state that still lives in the old
-        /// static managers into <see cref="GameData"/>. Delete this once currency, upgrades and
-        /// objectives are services that write straight through.
-        /// </summary>
-        public Action<GameData> CollectState;
-
         /// <summary>Raised once the save has been read and is safe to consume.</summary>
         public event Action Loaded;
 
@@ -200,8 +193,6 @@ namespace Persistence
 
             try
             {
-                CollectState?.Invoke(Data);
-
                 Data.saveVersion = CurrentSaveVersion;
                 Data.boardObjects = new List<BoardObjectSaveData>(_boardObjects.Values);
 
@@ -224,7 +215,6 @@ namespace Persistence
         public void DisposeService()
         {
             Flush();
-            CollectState = null;
             Loaded = null;
         }
 

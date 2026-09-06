@@ -234,17 +234,6 @@ namespace CircleTapper.Tests
         }
 
         [Test]
-        public void CollectState_RunsBeforeEachWrite()
-        {
-            Initialized();
-            _save.CollectState = data => data.currentObjective = 42;
-
-            _save.Flush();
-
-            Assert.AreEqual(42, _data.Primary.currentObjective);
-        }
-
-        [Test]
         public void DeletingTheSave_ClearsDiskAndMemory()
         {
             _data.Primary = FakeDataService.ValidSave(points: 50);

@@ -1,3 +1,4 @@
+using Progression;
 using Economy;
 using Core;
 using System;
@@ -25,11 +26,14 @@ namespace UI
 
         private void OnObjectiveProgressed()
         {
-            allCompletePanel.SetActive(ObjectiveManager.AllObjectivesComplete);
+            ObjectiveService objectives = ServiceLocator.Get<ObjectiveService>();
+            bool allComplete = ServiceLocator.Get<UpgradeCatalog>().AllComplete();
             long points = ServiceLocator.Get<CurrencyService>().Points;
-            objectiveText.text = $"Next Upgrade: {FormatNumber(points)}/{FormatNumber(ObjectiveManager.GetCurrentObjectiveCost())}";
-            progressSlider.value = Mathf.Max((float)points / ObjectiveManager.GetCurrentObjectiveCost(), 0.04f);
-            claimButton.interactable = ObjectiveManager.CanClaimObjective();
+
+            allCompletePanel.SetActive(allComplete);
+            objectiveText.text = $"Next Upgrade: {FormatNumber(points)}/{FormatNumber(objectives.CurrentCost)}";
+            progressSlider.value = Mathf.Max((float)points / objectives.CurrentCost, 0.04f);
+            claimButton.interactable = !allComplete && objectives.CanClaim;
         }
 
         private void Update()
@@ -39,10 +43,10 @@ namespace UI
 
         public void ClaimCurrentObjective()
         {
-            if (!ObjectiveManager.CanClaimObjective()) return;
-            
-            ObjectiveManager.ClaimObjective();
-            allCompletePanel.SetActive(ObjectiveManager.AllObjectivesComplete);
+            // Once every upgrade is maxed there is nothing left to award, so stop taking points.
+            if (ServiceLocator.Get<UpgradeCatalog>().AllComplete()) return;
+            if (!ServiceLocator.Get<ObjectiveService>().TryClaim()) return;
+
             FMODUnity.RuntimeManager.PlayOneShotAttached(claimButtonSFX, gameObject);
         }
 
