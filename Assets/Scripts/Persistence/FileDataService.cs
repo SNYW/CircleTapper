@@ -21,10 +21,15 @@ namespace Persistence
         private const string BackupExtension = "bak";
         private const string TempExtension = "tmp";
 
-        public FileDataService(ISerializer serializer)
+        /// <param name="dataPath">
+        /// Where save files live. Defaults to <see cref="Application.persistentDataPath"/>; tests
+        /// pass a temp directory, which is the only way to exercise the rotate-and-replace for
+        /// real rather than against a fake.
+        /// </param>
+        public FileDataService(ISerializer serializer, string dataPath = null)
         {
             _serializer = serializer;
-            _dataPath = Application.persistentDataPath;
+            _dataPath = string.IsNullOrEmpty(dataPath) ? Application.persistentDataPath : dataPath;
         }
 
         private string PathFor(string fileName) => Path.Combine(_dataPath, $"{fileName}.{Extension}");
