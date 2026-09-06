@@ -50,7 +50,6 @@ namespace Managers
             ObjectPoolManager.InitPools();
             DOTween.Init();
             SystemEventManager.Init();
-            UpgradeManager.Init();
 
             UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoad;
         }
@@ -102,7 +101,6 @@ namespace Managers
         {
             ClearBoard();
 
-            UpgradeManager.OnGameLoad(_save.Data);
 
             if (_save.IsNewGame) StartFreshBoard();
             else RestoreBoard();
@@ -143,7 +141,6 @@ namespace Managers
         private void StartFreshBoard()
         {
             ObjectiveManager.ResetObjectives();
-            UpgradeManager.ResetUpgrades();
             GridManager.ResetCells();
 
             GridCell startingCell = GridManager.GetClosestCell(Vector2Int.zero, true, true);
@@ -203,7 +200,6 @@ namespace Managers
         private void CollectStateForSave(GameData data)
         {
             data.currentObjective = ObjectiveManager.CurrentObjective;
-            data.upgrades = UpgradeManager.GetUpgradeSaveData();
         }
 
         /// <summary>

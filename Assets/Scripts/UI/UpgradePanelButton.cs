@@ -1,3 +1,4 @@
+using Core;
 using Managers;
 using UnityEngine;
 using System.Collections;
@@ -25,7 +26,7 @@ namespace UI
 
         private void OnUpgradePointSpend(object obj)
         {
-            if (UpgradeManager.CanPurchaseAnyUpgrades()) return;
+            if (ServiceLocator.Get<UpgradeCatalog>().CanPurchaseAny()) return;
 
             availableUpgradePanel.alpha = 0;
 
@@ -40,7 +41,7 @@ namespace UI
 
         private void OnUpgradePointAdded(object obj)
         {
-            if (!UpgradeManager.CanPurchaseAnyUpgrades() || availableUpgradePanel.alpha != 0) return;
+            if (!ServiceLocator.Get<UpgradeCatalog>().CanPurchaseAny() || availableUpgradePanel.alpha != 0) return;
 
             if (_scaleRoutine != null)
             {

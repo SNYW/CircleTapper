@@ -1,3 +1,5 @@
+using Progression;
+using Core;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -41,10 +43,13 @@ namespace Gameplay
 
         private float GetCooldown()
         {
-            var isUpgraded = UpgradeManager.TryGetUpgrade("Auto-Tap Speed", out var upgrade);
+            const string upgradeName = "Auto-Tap Speed";
 
-            var def = upgrade?.upgradeDefinition as AutoTapSpeedUpgradeDefinition;
-            return isUpgraded && def != null? Mathf.Clamp(baseTapSpeed - upgrade.currentLevel * def.speedPerLevel, minSpeed, baseTapSpeed) : baseTapSpeed;
+            if (!ServiceLocator.Get<UpgradeCatalog>()
+                    .TryGet(upgradeName, out AutoTapSpeedUpgradeDefinition def)) return baseTapSpeed;
+
+            int level = ServiceLocator.Get<UpgradeService>().GetLevel(upgradeName);
+            return Mathf.Clamp(baseTapSpeed - level * def.speedPerLevel, minSpeed, baseTapSpeed);
         }
 
         public void StartAutoTap()

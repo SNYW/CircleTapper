@@ -1,3 +1,4 @@
+using Progression;
 using Economy;
 using Core;
 using Managers;
@@ -14,7 +15,7 @@ namespace Gameplay
         {
             if (ServiceLocator.Get<CurrencyService>().TrySpendUpgradePoints(GetPurchasePrice()))
             {
-                UpgradeManager.LevelUpUpgrade(this);
+                ServiceLocator.Get<UpgradeService>().LevelUp(upgradeName);
                 FMODUnity.RuntimeManager.PlayOneShot("event:/UI_Button_UpgradeAutoTap"); //audio
             }
         }
@@ -26,12 +27,7 @@ namespace Gameplay
 
         public override bool IsMaxed()
         {
-            if (UpgradeManager.TryGetUpgrade(upgradeName, out var upgrade))
-            {
-                return upgrade.currentLevel >= maxLevel;
-            }
-
-            return false;
+            return ServiceLocator.Get<UpgradeService>().GetLevel(upgradeName) >= maxLevel;
         }
 
         public override int GetPurchasePrice()
@@ -41,10 +37,7 @@ namespace Gameplay
 
         public override string GetLevelInfo()
         {
-            var upgraded = UpgradeManager.TryGetUpgrade(upgradeName, out var upgrade);
-
-            var value = upgraded ? upgrade.currentLevel : 0;
-            return $"{value}/{maxLevel}";
+            return $"{ServiceLocator.Get<UpgradeService>().GetLevel(upgradeName)}/{maxLevel}";
         }
     }
 }

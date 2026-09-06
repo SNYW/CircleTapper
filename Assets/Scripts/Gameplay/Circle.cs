@@ -1,3 +1,4 @@
+using Progression;
 using Core;
 using System;
 using System.Collections;
@@ -105,10 +106,12 @@ public class Circle : BoardObject
 
     public int GetPointValue()
     {
-        if (!UpgradeManager.TryGetUpgrade("Circle Value +2", out var upgrade)) return startValue;
-        var def = upgrade.upgradeDefinition as CircleCompletionBonusUpgradeDefinition;
+        const string upgradeName = "Circle Value +2";
 
-        return def ? startValue + upgrade.currentLevel * def.bonusPerLevel : startValue;
+        if (!ServiceLocator.Get<UpgradeCatalog>()
+                .TryGet(upgradeName, out CircleCompletionBonusUpgradeDefinition def)) return startValue;
+
+        return startValue + ServiceLocator.Get<UpgradeService>().GetLevel(upgradeName) * def.bonusPerLevel;
     }
 
     private void Complete()

@@ -4,12 +4,19 @@
         "CircleTapper.Core",
         "CircleTapper.Persistence",
         "CircleTapper.Economy",
+        "CircleTapper.Progression",
         "UniTask",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],
-    "includePlatforms": ["Editor"],
-    "precompiledReferences": ["nunit.framework.dll"],
-    "defineConstraints": ["UNITY_INCLUDE_TESTS"],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
     "autoReferenced": false
 }

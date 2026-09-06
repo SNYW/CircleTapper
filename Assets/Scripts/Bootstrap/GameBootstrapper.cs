@@ -1,3 +1,5 @@
+using Progression;
+using Managers;
 using Economy;
 using System;
 using System.Collections.Generic;
@@ -97,6 +99,8 @@ namespace Core
         {
             ServiceLocator.Register(new SaveService());
             ServiceLocator.Register(new CurrencyService(ServiceLocator.Get<SaveService>()));
+            ServiceLocator.Register(new UpgradeService(ServiceLocator.Get<SaveService>()));
+            ServiceLocator.Register(new UpgradeCatalog());
         }
 
         private async UniTaskVoid BootstrapAsync(CancellationToken cancellationToken)

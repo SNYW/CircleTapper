@@ -11,7 +11,7 @@ namespace Managers
     public static class ObjectiveManager
     {
         public static int CurrentObjective;
-        public static bool AllObjectivesComplete => UpgradeManager.AllUpgradesComplete();
+        public static bool AllObjectivesComplete => ServiceLocator.Get<UpgradeCatalog>().AllComplete();
         public static void OnGameLoad()
         {
             CurrentObjective = Mathf.Max(1, ServiceLocator.Get<SaveService>().Data.currentObjective);

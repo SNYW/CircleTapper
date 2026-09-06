@@ -1,3 +1,4 @@
+using Progression;
 using Economy;
 using Core;
 using Gameplay;
@@ -26,7 +27,7 @@ namespace Managers
                 SystemEventManager.Send(SystemEventManager.GameEvent.GridCellUnlocked, cellToUnlock);
             }
 
-            UpgradeManager.LevelUpUpgrade(this);
+            ServiceLocator.Get<UpgradeService>().LevelUp(upgradeName);
             EffectsManager.Instance.SpawnEffect(EffectsManager.EffectType.Spawn, cellToUnlock.transform.position);
             FMODUnity.RuntimeManager.PlayOneShot("event:/UI_Button_UpgradeGrid"); //audio
         }
@@ -45,18 +46,12 @@ namespace Managers
 
         public override string GetLevelInfo()
         {
-            var upgraded = UpgradeManager.TryGetUpgrade(upgradeName, out var upgrade);
-
-            var value = upgraded ? upgrade.currentLevel : 0;
-            return $"{value}/{GridManager.GetCellCount()-1}";
+            return $"{ServiceLocator.Get<UpgradeService>().GetLevel(upgradeName)}/{GridManager.GetCellCount() - 1}";
         }
 
         public override bool IsMaxed()
         {
-            var upgraded = UpgradeManager.TryGetUpgrade(upgradeName, out var upgrade);
-
-            var value = upgraded ? upgrade.currentLevel : 0;
-            return value >= GridManager.GetCellCount()-1;
+            return ServiceLocator.Get<UpgradeService>().GetLevel(upgradeName) >= GridManager.GetCellCount() - 1;
         }
     }
 }
