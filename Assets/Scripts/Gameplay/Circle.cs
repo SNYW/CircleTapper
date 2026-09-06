@@ -1,7 +1,9 @@
 using Progression;
 using Core;
 using System;
-using System.Collections;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using Gameplay;
 using Managers;
 using UnityEngine;
@@ -10,6 +12,11 @@ using Random = UnityEngine.Random;
 
 public class Circle : BoardObject
 {
+    private const float TapBounceScale = 1.2f;
+    private const float CompleteBounceScale = 1.6f;
+    private const float BounceSeconds = 0.2f;
+    private static readonly Vector3 RestScale = Vector3.one * 0.5f;
+
     public int startValue;
     public int currentValue;
     public SpriteRenderer spriteRenderer;
@@ -32,16 +39,29 @@ public class Circle : BoardObject
         currentValue = initCurrentValue;
         _progress = new SegmentProgress(spriteRenderer, startValue, RemovedFraction);
 
-        StartCoroutine(SpawnCurrency());
+        EmitCurrencyLoop(RestartLoops()).Forget();
     }
 
-    private IEnumerator SpawnCurrency()
+    /// <summary>
+    /// Pays banked currency out a particle at a time. The interval runs whether or not anything
+    /// is owed, which is what the coroutine this replaced did.
+    /// </summary>
+    private async UniTaskVoid EmitCurrencyLoop(CancellationToken token)
     {
-        while (gameObject.activeSelf)
-        {
-            yield return new WaitForSeconds(spawnCooldown);
+        TimeSpan interval = TimeSpan.FromSeconds(spawnCooldown);
 
-            if (_emitter.TryEmit(transform.position)) SaveObjectState();
+        try
+        {
+            while (true)
+            {
+                await UniTask.Delay(interval, cancellationToken: token);
+
+                if (_emitter.TryEmit(transform.position)) SaveObjectState();
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // The circle was dropped, disabled or destroyed. Nothing to clean up.
         }
     }
 
@@ -51,7 +71,7 @@ public class Circle : BoardObject
         
         currentValue = Mathf.Clamp(currentValue - 1, 0, startValue);
         bool isComplete = currentValue <= 0;
-        StartCoroutine(BounceScale(isComplete ? 1.6f : 1.2f));
+        Bounce(isComplete ? CompleteBounceScale : TapBounceScale);
 
         _progress.Target = RemovedFraction;
         FMODUnity.RuntimeManager.PlayOneShotAttached(CircleTapSFX, gameObject);
@@ -59,21 +79,15 @@ public class Circle : BoardObject
         SaveObjectState();
     }
 
-    private IEnumerator BounceScale(float scaleMult)
+    /// <summary>Snaps up, then eases linearly back to rest — the same curve as the hand-rolled lerp.</summary>
+    private void Bounce(float scaleMultiplier)
     {
-        Vector3 original = Vector3.one * 0.5f;
-        Vector3 peak = transform.localScale * scaleMult;
-        float t = 0;
-        float duration = 0.2f;
-
-        while (t < duration)
-        {
-            t += Time.deltaTime;
-            transform.localScale = Vector3.Lerp(peak, original, t / duration);
-            yield return null;
-        }
-
-        transform.localScale = original;
+        transform.DOKill();
+        transform.localScale *= scaleMultiplier;
+        transform
+            .DOScale(RestScale, BounceSeconds)
+            .SetEase(Ease.Linear)
+            .SetLink(gameObject);
     }
 
     public int GetPointValue()
@@ -120,8 +134,6 @@ public class Circle : BoardObject
 
     public override void FromSaveData(BoardObjectSaveData saveData)
     {
-        StopAllCoroutines();
-
         var gridCell = GridManager.GetGridCell(new Vector2Int(saveData.xPosition, saveData.yPosition));
         if (gridCell == null)
         {

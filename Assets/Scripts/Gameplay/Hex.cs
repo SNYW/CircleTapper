@@ -1,6 +1,8 @@
 using Core;
-using System.Collections;
+using System;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using Persistence;
 using TMPro;
 using UnityEngine;
@@ -83,20 +85,21 @@ public class Hex : BoardObject
         if (parentCell == null)
             GridManager.GetClosestCell(transform.position).SetChildObject(this);
 
-        StartCoroutine(SpawnCurrency());
         neighbourValueText.text = _storedParticles.ToString();
+
+        EmitCurrencyLoop(RestartLoops()).Forget();
     }
 
     public override void BeginDrag(Vector2 startPos)
     {
-        StopAllCoroutines();
+        // Payout pauses while the hex is in the air, as stopping the coroutine used to.
+        StopLoops();
         base.BeginDrag(startPos);
     }
 
     public override void EndDrag(Vector2 eventData)
     {
-        StopAllCoroutines();
-        StartCoroutine(SpawnCurrency());
+        EmitCurrencyLoop(RestartLoops()).Forget();
         base.EndDrag(eventData);
     }
 
@@ -117,13 +120,22 @@ public class Hex : BoardObject
         }
     }
 
-    private IEnumerator SpawnCurrency()
+    private async UniTaskVoid EmitCurrencyLoop(CancellationToken token)
     {
-        while (gameObject.activeSelf)
-        {
-            yield return new WaitForSeconds(SpawnInterval);
+        TimeSpan interval = TimeSpan.FromSeconds(SpawnInterval);
 
-            if (_emitter.TryEmit(transform.position)) SaveObjectState();
+        try
+        {
+            while (true)
+            {
+                await UniTask.Delay(interval, cancellationToken: token);
+
+                if (_emitter.TryEmit(transform.position)) SaveObjectState();
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Picked up, disabled or destroyed.
         }
     }
 
@@ -142,7 +154,6 @@ public class Hex : BoardObject
 
     public override void FromSaveData(BoardObjectSaveData saveData)
     {
-        StopAllCoroutines();
         _remainingCooldown = saveData.value;
         _storedParticles = saveData.carryoverValue;
         GridManager.GetGridCell(new Vector2Int(saveData.xPosition, saveData.yPosition)).SetChildObject(this);

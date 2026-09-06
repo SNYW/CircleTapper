@@ -1,6 +1,8 @@
 using Core;
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Persistence;
 using Unity.Mathematics;
@@ -14,6 +16,8 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
     public List<GameObject> influenceIndicators;
 
     public FMODUnity.EventReference MergeObjectSFX;
+
+    private CancellationTokenSource _loopSource;
 
     private void OnEnable()
     {
@@ -68,9 +72,30 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
         FMODUnity.RuntimeManager.PlayOneShotAttached(MergeObjectSFX, gameObject);
     }
 
+    /// <summary>
+    /// Starts a fresh token for this object's repeating work, cancelling whatever was running.
+    /// Linked to the object's own destruction, so a loop can never outlive its board object.
+    /// </summary>
+    protected CancellationToken RestartLoops()
+    {
+        StopLoops();
+        _loopSource = CancellationTokenSource.CreateLinkedTokenSource(this.GetCancellationTokenOnDestroy());
+        return _loopSource.Token;
+    }
+
+    /// <summary>Cancels the object's repeating work. This is what pausing on drag does.</summary>
+    protected void StopLoops()
+    {
+        if (_loopSource == null) return;
+
+        _loopSource.Cancel();
+        _loopSource.Dispose();
+        _loopSource = null;
+    }
+
     private void OnDestroy()
     {
-        StopAllCoroutines();
+        StopLoops();
         // Tweens are linked to their GameObject, so DOTween kills them on destroy by itself.
         SystemEventManager.Send(SystemEventManager.GameEvent.BoardChanged, this);
     }
@@ -99,7 +124,7 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
 
     private void OnDisable()
     {
-        StopAllCoroutines();
+        StopLoops();
     }
 
     public abstract string GetValue(); 

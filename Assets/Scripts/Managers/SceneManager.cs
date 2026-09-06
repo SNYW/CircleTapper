@@ -16,7 +16,6 @@ public class SceneManager : MonoBehaviour
 
     public void LoadScene(int index)
     {
-        StopAllCoroutines();
         uiAnimator.SetTrigger(Load);
         UnityEngine.SceneManagement.SceneManager.LoadScene(index);
     }

@@ -1,15 +1,18 @@
 using Core;
+using DG.Tweening;
 using Managers;
 using UnityEngine;
-using System.Collections;
 
 namespace UI
 {
     public class UpgradePanelButton : MonoBehaviour
     {
+        private const float PulseScale = 1.25f;
+        private const float PulseSeconds = 2f;
+
         public CanvasGroup availableUpgradePanel;
         private Vector3 _startPanelScale;
-        private Coroutine _scaleRoutine;
+        private Tween _pulse;
 
         private void Awake()
         {
@@ -29,60 +32,35 @@ namespace UI
             if (ServiceLocator.Get<UpgradeCatalog>().CanPurchaseAny()) return;
 
             availableUpgradePanel.alpha = 0;
-
-            if (_scaleRoutine != null)
-            {
-                StopCoroutine(_scaleRoutine);
-                _scaleRoutine = null;
-            }
-
-            availableUpgradePanel.transform.localScale = _startPanelScale;
+            StopPulse();
         }
 
         private void OnUpgradePointAdded(object obj)
         {
             if (!ServiceLocator.Get<UpgradeCatalog>().CanPurchaseAny() || availableUpgradePanel.alpha != 0) return;
 
-            if (_scaleRoutine != null)
-            {
-                StopCoroutine(_scaleRoutine);
-                _scaleRoutine = null;
-            }
+            StopPulse();
 
-            availableUpgradePanel.transform.localScale = _startPanelScale;
             availableUpgradePanel.alpha = 1;
-            _scaleRoutine = StartCoroutine(ScaleYoyoRoutine(availableUpgradePanel.transform, _startPanelScale, _startPanelScale * 1.25f, 2f));
+
+            // Was ~40 lines of hand-rolled yoyo plus its own EaseInOutSine.
+            _pulse = availableUpgradePanel.transform
+                .DOScale(_startPanelScale * PulseScale, PulseSeconds)
+                .SetEase(Ease.InOutSine)
+                .SetLoops(-1, LoopType.Yoyo)
+                .SetLink(gameObject);
         }
 
-        private IEnumerator ScaleYoyoRoutine(Transform target, Vector3 from, Vector3 to, float duration)
+        private void StopPulse()
         {
-            while (true)
-            {
-                yield return LerpScale(target, from, to, duration, EaseInOutSine);
-                yield return LerpScale(target, to, from, duration, EaseInOutSine);
-            }
-        }
-
-        private IEnumerator LerpScale(Transform target, Vector3 start, Vector3 end, float duration, System.Func<float, float> ease)
-        {
-            float time = 0f;
-            while (time < duration)
-            {
-                float t = time / duration;
-                target.localScale = Vector3.LerpUnclamped(start, end, ease(t));
-                time += Time.deltaTime;
-                yield return null;
-            }
-            target.localScale = end;
-        }
-
-        private float EaseInOutSine(float t)
-        {
-            return -(Mathf.Cos(Mathf.PI * t) - 1) / 2f;
+            _pulse?.Kill();
+            _pulse = null;
+            availableUpgradePanel.transform.localScale = _startPanelScale;
         }
 
         private void OnDisable()
         {
+            StopPulse();
             SystemEventManager.Unsubscribe(SystemEventManager.GameEvent.UpgradePointAdded, OnUpgradePointAdded);
             SystemEventManager.Unsubscribe(SystemEventManager.GameEvent.UpgradePointSpent, OnUpgradePointSpend);
         }
