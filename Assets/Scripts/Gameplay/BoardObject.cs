@@ -82,19 +82,19 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
             indicator.gameObject.SetActive(active);
     }
 
-    public virtual BoardObjectSaveData ToSaveData()
-    {
-        throw new System.NotImplementedException();
-    }
+    public abstract BoardObjectSaveData ToSaveData();
 
-    public virtual void FromSaveData(BoardObjectSaveData saveData)
-    {
-        throw new System.NotImplementedException();
-    }
+    public abstract void FromSaveData(BoardObjectSaveData saveData);
 
-    protected virtual void SaveObjectState()
+    /// <summary>
+    /// Writes this object's state into the save. A no-op while the object is unparented — mid-drag
+    /// it belongs to no cell, so there is no position to key it by.
+    /// </summary>
+    protected void SaveObjectState()
     {
-        throw new System.NotImplementedException();
+        if (parentCell == null) return;
+
+        ServiceLocator.Get<SaveService>().SetBoardObject(parentCell.gridPosition, ToSaveData());
     }
 
     private void OnDisable()

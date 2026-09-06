@@ -1,9 +1,7 @@
 using Core;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using Persistence;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Square : BoardObject
@@ -12,14 +10,8 @@ public class Square : BoardObject
     public List<ParticleSystem> clickParticles;
     public SpriteRenderer spriteRenderer;
 
-    private MaterialPropertyBlock _propertyBlock;
-    private static readonly int RemovedSegments = Shader.PropertyToID("_RemovedSegments");
-    private static readonly int SegmentCount = Shader.PropertyToID("_SegmentCount");
-
     private int _remainingCooldown;
-    private float currentRemovedSegments;
-    private float targetRemovedSegments;
-    private float lerpSpeed = 10f;
+    private SegmentProgress _progress;
 
     public List<GridManager.Direction> tapTargets;
 
@@ -33,14 +25,7 @@ public class Square : BoardObject
     public void Init(int remainingCooldown)
     {
         _remainingCooldown = remainingCooldown;
-        _propertyBlock = new MaterialPropertyBlock();
-        spriteRenderer.GetPropertyBlock(_propertyBlock);
-
-        _propertyBlock.SetFloat(SegmentCount, clickSpeed);
-        currentRemovedSegments = (float)_remainingCooldown / clickSpeed;
-        targetRemovedSegments = currentRemovedSegments;
-        _propertyBlock.SetFloat(RemovedSegments, currentRemovedSegments);
-        spriteRenderer.SetPropertyBlock(_propertyBlock);
+        _progress = new SegmentProgress(spriteRenderer, clickSpeed, CooldownFraction);
         
         if (parentCell == null)
             GridManager.GetClosestCell(transform.position).SetChildObject(this);
@@ -68,7 +53,7 @@ public class Square : BoardObject
             yield return new WaitForSeconds(1f);
 
             _remainingCooldown--;
-            targetRemovedSegments = Mathf.Clamp01((float)_remainingCooldown / clickSpeed);
+            _progress.Target = Mathf.Clamp01(CooldownFraction);
             SaveObjectState();
 
             if (_remainingCooldown > 0) continue;
@@ -98,19 +83,14 @@ public class Square : BoardObject
             transform.localScale = Vector3.one;
 
             _remainingCooldown = clickSpeed;
-            targetRemovedSegments = 1f;
+            _progress.Target = 1f;
         }
     }
 
-    private void Update()
-    {
-        if (Mathf.Approximately(currentRemovedSegments, targetRemovedSegments)) return;
+    /// <summary>Proportion of the cooldown still to run.</summary>
+    private float CooldownFraction => (float)_remainingCooldown / clickSpeed;
 
-        currentRemovedSegments = Mathf.MoveTowards(currentRemovedSegments, targetRemovedSegments, Time.deltaTime * lerpSpeed);
-
-        _propertyBlock.SetFloat(RemovedSegments, currentRemovedSegments);
-        spriteRenderer.SetPropertyBlock(_propertyBlock);
-    }
+    private void Update() => _progress.Advance(Time.deltaTime);
 
     public override BoardObjectSaveData ToSaveData()
     {
@@ -134,12 +114,6 @@ public class Square : BoardObject
         Init(saveData.value);
     }
 
-    protected override void SaveObjectState()
-    {
-        if (parentCell != null)
-            ServiceLocator.Get<SaveService>().SetBoardObject(parentCell.gridPosition, ToSaveData());
-    }
-
     private void OnDisable()
     {
         StopAllCoroutines();
@@ -150,8 +124,5 @@ public class Square : BoardObject
         return _remainingCooldown.ToString();
     }
 
-    public override string GetMaterialValue()
-    {
-        return _propertyBlock.GetFloat(RemovedSegments).ToString(CultureInfo.InvariantCulture);
-    }
+    public override string GetMaterialValue() => _progress.ToDebugString();
 }

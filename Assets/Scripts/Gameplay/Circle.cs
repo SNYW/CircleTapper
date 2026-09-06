@@ -2,10 +2,8 @@ using Progression;
 using Core;
 using System;
 using System.Collections;
-using System.Globalization;
 using Gameplay;
 using Managers;
-using ObjectPooling;
 using UnityEngine;
 using Persistence;
 using Random = UnityEngine.Random;
@@ -17,15 +15,9 @@ public class Circle : BoardObject
     public SpriteRenderer spriteRenderer;
 
     public float spawnCooldown;
-    private int _particlesToSpawn;
 
-    private MaterialPropertyBlock _propertyBlock;
-    private static readonly int RemovedSegments = Shader.PropertyToID("_RemovedSegments");
-    private static readonly int SegmentCount = Shader.PropertyToID("_SegmentCount");
-
-    private float currentRemovedSegments;
-    private float targetRemovedSegments;
-    private float lerpSpeed = 10f;
+    private readonly CurrencyEmitter _emitter = new();
+    private SegmentProgress _progress;
 
     public FMODUnity.EventReference CircleCompleteSFX;
     public FMODUnity.EventReference CircleTapSFX;
@@ -38,15 +30,7 @@ public class Circle : BoardObject
     private void Init(int initCurrentValue)
     {
         currentValue = initCurrentValue;
-
-        _propertyBlock = new MaterialPropertyBlock();
-        spriteRenderer.GetPropertyBlock(_propertyBlock);
-
-        _propertyBlock.SetFloat(SegmentCount, startValue);
-        currentRemovedSegments = 1f - (float)currentValue / startValue;
-        targetRemovedSegments = currentRemovedSegments;
-        _propertyBlock.SetFloat(RemovedSegments, currentRemovedSegments);
-        spriteRenderer.SetPropertyBlock(_propertyBlock);
+        _progress = new SegmentProgress(spriteRenderer, startValue, RemovedFraction);
 
         StartCoroutine(SpawnCurrency());
     }
@@ -57,19 +41,7 @@ public class Circle : BoardObject
         {
             yield return new WaitForSeconds(spawnCooldown);
 
-            if (_particlesToSpawn <= 0) continue;
-            
-            var value = _particlesToSpawn > 50 ? 10 : 1;
-
-            var randPos = transform.position + new Vector3(Random.Range(-0.1f, 0.1f), Random.Range(-0.1f, 0.1f), 0);
-            var newParticle = ObjectPoolManager.GetPool(ObjectPool.ObjectPoolName.CurrencyParticle).GetPooledObject().GetComponent<CurrencyParticle>();
-            newParticle.transform.position = randPos;
-            newParticle.gameObject.SetActive(true);
-            newParticle.OnInit(value);
-            
-            _particlesToSpawn -= value;
-            if (parentCell != null)
-                SaveObjectState();
+            if (_emitter.TryEmit(transform.position)) SaveObjectState();
         }
     }
 
@@ -81,7 +53,7 @@ public class Circle : BoardObject
         bool isComplete = currentValue <= 0;
         StartCoroutine(BounceScale(isComplete ? 1.6f : 1.2f));
 
-        targetRemovedSegments = 1f - (float)currentValue / startValue;
+        _progress.Target = RemovedFraction;
         FMODUnity.RuntimeManager.PlayOneShotAttached(CircleTapSFX, gameObject);
 
         SaveObjectState();
@@ -116,26 +88,21 @@ public class Circle : BoardObject
 
     private void Complete()
     {
-        _particlesToSpawn += GetPointValue();
+        _emitter.Add(GetPointValue());
         currentValue = startValue;
-        targetRemovedSegments = 0f;
+        _progress.Target = 0f;
         SystemEventManager.Send(SystemEventManager.GameEvent.CircleComplete, this);
         FMODUnity.RuntimeManager.PlayOneShotAttached(CircleCompleteSFX, gameObject);
     }
 
+    /// <summary>How much of the ring is gone, 0 when untouched and 1 when the circle is done.</summary>
+    private float RemovedFraction => 1f - (float)currentValue / startValue;
+
     private void Update()
     {
-        if (Mathf.Approximately(currentRemovedSegments, targetRemovedSegments) && !Mathf.Approximately(currentRemovedSegments, 1f)) return;
+        _progress.Advance(Time.deltaTime);
 
-        currentRemovedSegments = Mathf.MoveTowards(currentRemovedSegments, targetRemovedSegments, Time.deltaTime * lerpSpeed);
-
-        _propertyBlock.SetFloat(RemovedSegments, currentRemovedSegments);
-        spriteRenderer.SetPropertyBlock(_propertyBlock);
-
-        if (Mathf.Approximately(currentRemovedSegments, 1f))
-        {
-            Complete();
-        }
+        if (_progress.IsFull) Complete();
     }
 
     public override BoardObjectSaveData ToSaveData()
@@ -145,7 +112,7 @@ public class Circle : BoardObject
             type = BoardObjectType.Circle.ToString(),
             value = currentValue,
             level = chainLevel,
-            carryoverValue = _particlesToSpawn,
+            carryoverValue = _emitter.Pending,
             xPosition = parentCell.gridPosition.x,
             yPosition = parentCell.gridPosition.y
         };
@@ -162,18 +129,13 @@ public class Circle : BoardObject
             return;
         }
         
-        _particlesToSpawn = saveData.carryoverValue;
+        _emitter.Clear();
+        _emitter.Add(saveData.carryoverValue);
         gridCell.SetChildObject(this);
         Init(saveData.value);
         SaveObjectState();
     }
 
-    protected override void SaveObjectState()
-    {
-        if (parentCell != null)
-            ServiceLocator.Get<SaveService>().SetBoardObject(parentCell.gridPosition, ToSaveData());
-    }
-
     public override string GetValue() => currentValue.ToString();
-    public override string GetMaterialValue() => _propertyBlock.GetFloat(RemovedSegments).ToString(CultureInfo.InvariantCulture);
+    public override string GetMaterialValue() => _progress.ToDebugString();
 }

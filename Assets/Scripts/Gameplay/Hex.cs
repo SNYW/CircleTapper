@@ -1,8 +1,6 @@
 using Core;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
-using ObjectPooling;
 using Persistence;
 using TMPro;
 using UnityEngine;
@@ -14,20 +12,17 @@ public class Hex : BoardObject
     public SpriteRenderer spriteRenderer;
     public TMP_Text neighbourValueText;
 
-    private MaterialPropertyBlock _propertyBlock;
-    private static readonly int RemovedSegments = Shader.PropertyToID("_RemovedSegments");
-    private static readonly int SegmentCount = Shader.PropertyToID("_SegmentCount");
-
     [Header("Particle Spawn")]
     public CurrencyParticle particle;
 
-    private int _particlesToSpawn;
+    /// <summary>How often banked currency is paid out as particles.</summary>
+    private const float SpawnInterval = 0.01f;
+
+    private readonly CurrencyEmitter _emitter = new();
+    private SegmentProgress _progress;
+
     private int _storedParticles;
     private int _remainingCooldown;
-
-    private float currentRemovedSegments;
-    private float targetRemovedSegments;
-    private float lerpSpeed = 10f;
 
     public List<GridManager.Direction> tapTargets;
     public FMODUnity.EventReference HexCompleteSFX;
@@ -53,14 +48,14 @@ public class Hex : BoardObject
             neighbourValueText.text = _storedParticles.ToString();
 
             _remainingCooldown--;
-            targetRemovedSegments = (float)_remainingCooldown / clickSpeed;
+            _progress.Target = CooldownFraction;
             SaveObjectState();
 
             if (_remainingCooldown > 0 || parentCell == null) return;
 
             if (_storedParticles > 0)
             {
-                _particlesToSpawn += _storedParticles;
+                _emitter.Add(_storedParticles);
                 _storedParticles = 0;
                 neighbourValueText.text = "0";
                 FMODUnity.RuntimeManager.PlayOneShotAttached(HexCompleteSFX, gameObject);
@@ -71,7 +66,7 @@ public class Hex : BoardObject
 
             targetScale = Vector3.one * 1.2f;
             _remainingCooldown = clickSpeed;
-            targetRemovedSegments = 1f;
+            _progress.Target = 1f;
         }
     }
 
@@ -83,14 +78,7 @@ public class Hex : BoardObject
     private void Init(int remainingCooldown)
     {
         _remainingCooldown = remainingCooldown;
-        _propertyBlock = new MaterialPropertyBlock();
-        spriteRenderer.GetPropertyBlock(_propertyBlock);
-
-        _propertyBlock.SetFloat(SegmentCount, clickSpeed);
-        currentRemovedSegments = (float)_remainingCooldown / clickSpeed;
-        targetRemovedSegments = currentRemovedSegments;
-        _propertyBlock.SetFloat(RemovedSegments, currentRemovedSegments);
-        spriteRenderer.SetPropertyBlock(_propertyBlock);
+        _progress = new SegmentProgress(spriteRenderer, clickSpeed, CooldownFraction);
 
         if (parentCell == null)
             GridManager.GetClosestCell(transform.position).SetChildObject(this);
@@ -112,15 +100,12 @@ public class Hex : BoardObject
         base.EndDrag(eventData);
     }
 
+    /// <summary>Proportion of the cooldown still to run.</summary>
+    private float CooldownFraction => (float)_remainingCooldown / clickSpeed;
+
     private void Update()
     {
-        // Shader value lerp
-        if (!Mathf.Approximately(currentRemovedSegments, targetRemovedSegments))
-        {
-            currentRemovedSegments = Mathf.MoveTowards(currentRemovedSegments, targetRemovedSegments, Time.deltaTime * lerpSpeed);
-            _propertyBlock.SetFloat(RemovedSegments, currentRemovedSegments);
-            spriteRenderer.SetPropertyBlock(_propertyBlock);
-        }
+        _progress.Advance(Time.deltaTime);
 
         // Scale animation
         if (transform.localScale != targetScale)
@@ -136,21 +121,9 @@ public class Hex : BoardObject
     {
         while (gameObject.activeSelf)
         {
-            yield return new WaitForSeconds(0.01f);
+            yield return new WaitForSeconds(SpawnInterval);
 
-            if (_particlesToSpawn <= 0) continue;
-            
-            var value = _particlesToSpawn > 50 ? 10 : 1;
-
-            var randPos = transform.position + new Vector3(Random.Range(-0.1f, 0.1f), Random.Range(-0.1f, 0.1f), 0);
-            var newParticle = ObjectPoolManager.GetPool(ObjectPool.ObjectPoolName.CurrencyParticle).GetPooledObject().GetComponent<CurrencyParticle>();
-            newParticle.transform.position = randPos;
-            newParticle.gameObject.SetActive(true);
-            newParticle.OnInit(value);
-            
-            _particlesToSpawn -= value;
-            if (parentCell != null)
-                SaveObjectState();
+            if (_emitter.TryEmit(transform.position)) SaveObjectState();
         }
     }
 
@@ -177,15 +150,9 @@ public class Hex : BoardObject
         SaveObjectState();
     }
 
-    protected override void SaveObjectState()
-    {
-        if (parentCell != null)
-            ServiceLocator.Get<SaveService>().SetBoardObject(parentCell.gridPosition, ToSaveData());
-    }
-
     public override string GetValue() => _remainingCooldown.ToString();
 
-    public override string GetMaterialValue() => _propertyBlock.GetFloat(RemovedSegments).ToString(CultureInfo.InvariantCulture);
+    public override string GetMaterialValue() => _progress.ToDebugString();
 
     private void OnDisable()
     {
