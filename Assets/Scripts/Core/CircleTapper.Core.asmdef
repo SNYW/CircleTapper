@@ -1,0 +1,6 @@
+{
+    "name": "CircleTapper.Core",
+    "rootNamespace": "Core",
+    "references": ["UniTask"],
+    "autoReferenced": true
+}

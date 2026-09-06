@@ -1,15 +1,8 @@
-using System;
+using Persistence;
 using Managers;
 
 namespace Gameplay
 {
-    [Serializable]
-    public class UpgradeSaveObject
-    {
-        public string upgradeName;
-        public int currentLevel;
-    }
-    
     public class Upgrade
     {
         public UpgradeDefinition upgradeDefinition;

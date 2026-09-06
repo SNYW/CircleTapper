@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading;
 using Core;
 using Cysharp.Threading.Tasks;
-using Gameplay;
 using UnityEngine;
 
 namespace Persistence

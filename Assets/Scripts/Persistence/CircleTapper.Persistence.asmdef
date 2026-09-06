@@ -1,0 +1,6 @@
+{
+    "name": "CircleTapper.Persistence",
+    "rootNamespace": "Persistence",
+    "references": ["CircleTapper.Core", "UniTask"],
+    "autoReferenced": true
+}

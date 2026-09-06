@@ -1,0 +1,6 @@
+{
+    "name": "CircleTapper.Economy",
+    "rootNamespace": "Economy",
+    "references": ["CircleTapper.Core", "CircleTapper.Persistence", "UniTask"],
+    "autoReferenced": true
+}
