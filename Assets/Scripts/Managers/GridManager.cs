@@ -173,7 +173,10 @@ public static class GridManager
 
     public static GridCell GetGridCell(Vector2Int gridPosition, bool includeOccupied = false)
     {
-        foreach (var cell in InWorldGridManager.Grid.Values)
+        var manager = InWorldGridManager;
+        if (manager?.Grid == null) return null;
+
+        foreach (var cell in manager.Grid.Values)
         {
             if(!includeOccupied && cell.heldObject != null) continue;
 
@@ -188,7 +191,10 @@ public static class GridManager
     
     public static void ResetCells()
     {
-        foreach (var kvp in InWorldGridManager.Grid)
+        var grid = InWorldGridManager;
+        if (grid?.Grid == null) return;
+
+        foreach (var kvp in grid.Grid)
         {
             kvp.Value.Lock();
         }
@@ -196,21 +202,37 @@ public static class GridManager
     
     public static void Dispose()
     {
-        var grid = InWorldGridManager.Grid;
-        grid ??= new Dictionary<Vector2Int, GridCell>();
-        while (InWorldGridManager.transform.childCount > 0)
+        var manager = InWorldGridManager;
+        if (manager == null) return;
+
+        while (manager.transform.childCount > 0)
         {
-            foreach(Transform child in InWorldGridManager.transform)
+            foreach (Transform child in manager.transform)
             {
                 Object.DestroyImmediate(child.gameObject);
             }
         }
-        grid.Clear();
+
+        manager.Grid?.Clear();
     }
 
+    /// <summary>
+    /// Empty rather than null when there is no grid. Board objects fire BoardChanged from
+    /// OnDestroy, which on shutdown happens after the grid is already gone.
+    /// </summary>
     public static List<BoardObject> GetAllBoardItems()
     {
-        return InWorldGridManager.Grid.Where(kvp => kvp.Value.heldObject != null).Select(kvp => kvp.Value.heldObject).ToList();
+        var items = new List<BoardObject>();
+
+        var grid = InWorldGridManager;
+        if (grid?.Grid == null) return items;
+
+        foreach (var kvp in grid.Grid)
+        {
+            if (kvp.Value.heldObject != null) items.Add(kvp.Value.heldObject);
+        }
+
+        return items;
     }
 
     /// <summary>Income per second implied by what is currently on the board.</summary>

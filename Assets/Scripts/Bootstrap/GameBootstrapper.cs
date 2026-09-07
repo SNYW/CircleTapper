@@ -155,6 +155,10 @@ namespace Core
             {
                 if (service is IApplicationLifecycle listener) listener.OnApplicationQuitting();
             }
+
+            // After the services have had their say — the save still needs to flush — but before
+            // Unity starts destroying objects, so nothing is handed an event it cannot survive.
+            SystemEventManager.Shutdown();
         }
 
         private void OnDestroy()

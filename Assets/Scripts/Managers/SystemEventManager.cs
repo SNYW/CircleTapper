@@ -18,8 +18,17 @@ public static class SystemEventManager
        }
        private static Dictionary<GameEvent, Action<object>> _eventListeners;
 
+       /// <summary>
+       /// Once the app is closing, nothing dispatched can be safely handled: Unity destroys
+       /// objects in an unspecified order, so a listener may already be gone, or may reach for a
+       /// grid, a text field or a service that is. Board objects fire BoardChanged from
+       /// OnDestroy, which is exactly this case.
+       /// </summary>
+       private static bool _isShuttingDown;
+
        public static void Init()
        {
+              _isShuttingDown = false;
               _eventListeners = new Dictionary<GameEvent, Action<object>>();
 
               foreach (GameEvent gameEvent in Enum.GetValues(typeof(GameEvent)))
@@ -52,8 +61,13 @@ public static class SystemEventManager
               }
        }
 
+       /// <summary>Stops dispatch for good. Called once the application is closing.</summary>
+       public static void Shutdown() => _isShuttingDown = true;
+
        public static void Send(GameEvent gameEvent, object payload)
        {
+              if (_isShuttingDown) return;
+
               if (_eventListeners != null && _eventListeners.TryGetValue(gameEvent, out var action))
               {
                      action?.Invoke(payload);
