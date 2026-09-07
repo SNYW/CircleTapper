@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 346a536466a0645a881907ade643dfe4, type: 3}
+  m_Name: ObjectiveSet
+  m_EditorClassIdentifier: CircleTapper.Progression::Progression.ObjectiveSet
+  steps:
+  - label: Tap a circle
+    goal: 1
+    target: 1
+    objectType: 0
+  - label: Buy a circle
+    goal: 2
+    target: 1
+    objectType: 0
+  - label: Merge two circles
+    goal: 3
+    target: 1
+    objectType: 0
+  - label: Next Upgrade
+    goal: 0
+    target: 100
+    objectType: 0
+  - label: Buy a square
+    goal: 2
+    target: 1
+    objectType: 1
+  - label: Merge two squares
+    goal: 3
+    target: 1
+    objectType: 1
+  - label: Next Upgrade
+    goal: 0
+    target: 500
+    objectType: 0
+  - label: Buy a hex
+    goal: 2
+    target: 1
+    objectType: 2
+  fallbackBaseCost: 1000
+  fallbackGrowth: 1.6

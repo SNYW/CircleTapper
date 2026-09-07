@@ -1,4 +1,7 @@
+using System;
+using System.Threading;
 using Core;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Economy;
 using Managers;
@@ -31,10 +34,16 @@ namespace UI
         private const float TextPunch = 0.25f;
         private const float TextPunchSeconds = 0.35f;
 
+        /// <summary>Long enough for the claim punch to read before the panel covers it.</summary>
+        private const float UpgradePanelDelaySeconds = 0.35f;
+
         public TMP_Text objectiveText;
         public Slider progressSlider;
         public Button claimButton;
         public GameObject allCompletePanel;
+
+        [Tooltip("Opened after claiming, so the point that was just earned has somewhere to go.")]
+        public GameObject upgradePanel;
 
         public FMODUnity.EventReference claimButtonSFX;
 
@@ -63,6 +72,7 @@ namespace UI
             _catalog = ServiceLocator.Get<UpgradeCatalog>();
 
             _objectives.CurrentChanged += OnObjectiveAdvanced;
+            _objectives.Progressed += OnProgressed;
 
             Subscribe(GameEvent.CurrencyAdded, OnStateChanged);
             Subscribe(GameEvent.CurrencySpent, OnStateChanged);
@@ -75,7 +85,11 @@ namespace UI
 
         private void OnDestroy()
         {
-            if (_objectives != null) _objectives.CurrentChanged -= OnObjectiveAdvanced;
+            if (_objectives != null)
+            {
+                _objectives.CurrentChanged -= OnObjectiveAdvanced;
+                _objectives.Progressed -= OnProgressed;
+            }
 
             Unsubscribe(GameEvent.CurrencyAdded, OnStateChanged);
             Unsubscribe(GameEvent.CurrencySpent, OnStateChanged);
@@ -88,14 +102,18 @@ namespace UI
 
         private void OnStateChanged(object payload) => Refresh();
 
+        private void OnProgressed() => Refresh();
+
         private void Refresh()
         {
             bool allComplete = _catalog.AllComplete();
-            long points = _currency.Points;
 
             allCompletePanel.SetActive(allComplete);
+
+            // The label comes from the objective itself, so a tutorial step reads "Merge two
+            // circles" while the open-ended ones still read "Next Upgrade".
             objectiveText.text =
-                $"Next Upgrade: {FormatNumber(points)}/{FormatNumber(_objectives.CurrentCost)}";
+                $"{_objectives.Label}: {FormatNumber(_objectives.Progress)}/{FormatNumber(_objectives.Target)}";
 
             _sliderFill?.Kill();
             _sliderFill = progressSlider
@@ -114,7 +132,7 @@ namespace UI
         }
 
         private float CurrentFill()
-            => Mathf.Max((float)_currency.Points / _objectives.CurrentCost, MinimumFill);
+            => Mathf.Max((float)_objectives.Progress / Mathf.Max(_objectives.Target, 1), MinimumFill);
 
         /// <summary>
         /// The button asks to be pressed while there is something to claim, matching the pulse the
@@ -159,6 +177,28 @@ namespace UI
                 .SetLink(gameObject);
 
             FMODUnity.RuntimeManager.PlayOneShotAttached(claimButtonSFX, gameObject);
+
+            OpenUpgradePanelShortly(this.GetCancellationTokenOnDestroy()).Forget();
+        }
+
+        /// <summary>
+        /// Claiming hands the player an upgrade point, so it shows them where to spend it. Delayed
+        /// by a beat so the button's punch is seen rather than immediately covered.
+        /// </summary>
+        private async UniTaskVoid OpenUpgradePanelShortly(CancellationToken token)
+        {
+            if (upgradePanel == null || upgradePanel.activeSelf) return;
+
+            try
+            {
+                await UniTask.Delay(TimeSpan.FromSeconds(UpgradePanelDelaySeconds), cancellationToken: token);
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+
+            if (upgradePanel != null) upgradePanel.SetActive(true);
         }
 
         private static string FormatNumber(long number)

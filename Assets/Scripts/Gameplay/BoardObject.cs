@@ -1,3 +1,4 @@
+using Progression;
 using Core;
 using System;
 using System.Collections.Generic;
@@ -209,6 +210,11 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
         Destroy(targetObj.gameObject);
         Destroy(gameObject);
 
+        if (ServiceLocator.TryGet(out ObjectiveService objectives))
+        {
+            objectives.Report(ObjectiveGoal.Merge, ObjectType);
+        }
+
         PlayMergeFeedback(newItem, mergePosition);
     }
 
@@ -302,6 +308,9 @@ public abstract class BoardObject : MonoBehaviour, ISaveable
         // TryGet, because on shutdown the locator may already be cleared.
         if (ServiceLocator.TryGet(out BoardObjectTickService ticks)) ticks.Unregister(this);
     }
+
+    /// <summary>What this is, for saving and for objectives that care which kind was used.</summary>
+    public abstract BoardObjectType ObjectType { get; }
 
     public abstract string GetValue(); 
     public abstract string GetMaterialValue();

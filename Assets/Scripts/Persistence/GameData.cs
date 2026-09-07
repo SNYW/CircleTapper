@@ -18,6 +18,9 @@ namespace Persistence
         public long currentPoints;
         public long currentUpgradePoints;
         public int currentObjective;
+
+        /// <summary>How far into the current objective the player is.</summary>
+        public int objectiveProgress;
         public List<BoardObjectSaveData> boardObjects = new();
         public List<Vector2Int> unlockedCells = new();
         public List<UpgradeSaveObject> upgrades = new();

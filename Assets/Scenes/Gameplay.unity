@@ -2588,6 +2588,7 @@ MonoBehaviour:
   progressSlider: {fileID: 613657789}
   claimButton: {fileID: 1601288335}
   allCompletePanel: {fileID: 681272634}
+  upgradePanel: {fileID: 1430816699}
   claimButtonSFX:
     Guid:
       Data1: -141619435

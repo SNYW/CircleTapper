@@ -150,7 +150,7 @@ public class Circle : BoardObject
     {
         return new BoardObjectSaveData
         {
-            type = BoardObjectType.Circle.ToString(),
+            type = ObjectType.ToString(),
             value = currentValue,
             level = chainLevel,
             carryoverValue = _emitter.Pending,
@@ -174,6 +174,8 @@ public class Circle : BoardObject
         Init(saveData.value);
         SaveObjectState();
     }
+
+    public override BoardObjectType ObjectType => BoardObjectType.Circle;
 
     public override string GetValue() => currentValue.ToString();
     public override string GetMaterialValue() => _progress.ToDebugString();

@@ -1,3 +1,4 @@
+using Progression;
 using Core;
 using System;
 using System.Threading;
@@ -42,6 +43,7 @@ public class BuyButton : MonoBehaviour
         Subscribe(GameEvent.BoardChanged, OnBoardChanged);
         Subscribe(GameEvent.GridCellUnlocked, OnBoardChanged);
         Subscribe(GameEvent.GameLoaded, OnBoardChanged);
+        Subscribe(GameEvent.UpgradePointAdded, OnBoardChanged);
 
         // Cheap, but changes constantly — this is what makes the button light up when the player
         // can finally afford it, which the board events alone would never catch.
@@ -56,6 +58,7 @@ public class BuyButton : MonoBehaviour
         Unsubscribe(GameEvent.BoardChanged, OnBoardChanged);
         Unsubscribe(GameEvent.GridCellUnlocked, OnBoardChanged);
         Unsubscribe(GameEvent.GameLoaded, OnBoardChanged);
+        Unsubscribe(GameEvent.UpgradePointAdded, OnBoardChanged);
         Unsubscribe(GameEvent.CurrencyAdded, OnCurrencyChanged);
         Unsubscribe(GameEvent.CurrencySpent, OnCurrencyChanged);
     }
@@ -97,11 +100,32 @@ public class BuyButton : MonoBehaviour
 
     private void Refresh()
     {
+        if (!RefreshUnlocked()) return;
+
         _currentCost = basePrice + cost * CountBoardObjects();
         _hasFreeCell = GridManager.GetClosestCell(Vector2.zero) != null;
 
         costText.text = _currentCost.ToString();
         RefreshInteractable();
+    }
+
+    /// <summary>
+    /// Hides the button entirely until its object is introduced, so the buy panel fills out as
+    /// the tutorial goes rather than presenting everything at once. Returns whether it is shown.
+    /// <para>
+    /// Deactivating is safe here: this component subscribes to a static bus in Awake, so its
+    /// handlers keep running and can switch it back on.
+    /// </para>
+    /// </summary>
+    private bool RefreshUnlocked()
+    {
+        if (objectToBuy == null) return true;
+        if (!ServiceLocator.TryGet(out ObjectiveService objectives)) return true;
+
+        bool unlocked = objectives.IsUnlocked(objectToBuy.ObjectType);
+        if (gameObject.activeSelf != unlocked) gameObject.SetActive(unlocked);
+
+        return unlocked;
     }
 
     private void RefreshInteractable()
@@ -125,6 +149,11 @@ public class BuyButton : MonoBehaviour
         BoardObject bought = Instantiate(objectToBuy);
         cell.SetChildObject(bought);
         bought.Init();
+
+        if (ServiceLocator.TryGet(out ObjectiveService objectives))
+        {
+            objectives.Report(ObjectiveGoal.Buy, bought.ObjectType);
+        }
 
         Send(GameEvent.BoardChanged, bought);
         EffectsManager.Instance.SpawnEffect(EffectsManager.EffectType.Spawn, bought.transform.position);

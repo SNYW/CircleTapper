@@ -1,3 +1,5 @@
+using Progression;
+using Core;
 using UnityEngine;
 
 public class InputManager : MonoBehaviour
@@ -77,6 +79,13 @@ public class InputManager : MonoBehaviour
             else if (distance < DragThreshold && duration < TapTimeThreshold)
             {
                 _draggedObject.OnTap();
+
+                // Deliberately here and not in Circle.OnTap: squares and triangle beams call
+                // that too, and they must not complete a "tap a circle" objective for the player.
+                if (_draggedObject is Circle && ServiceLocator.TryGet(out ObjectiveService objectives))
+                {
+                    objectives.Report(ObjectiveGoal.Tap);
+                }
             }
         }
 

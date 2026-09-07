@@ -20,7 +20,7 @@ namespace Persistence
         IApplicationLifecycle
     {
         /// <summary>Bump when the shape of <see cref="GameData"/> changes.</summary>
-        public const int CurrentSaveVersion = 1;
+        public const int CurrentSaveVersion = 2;
 
         private const string SaveFileName = "CTSave";
         private const float FlushIntervalSeconds = 5f;
@@ -234,6 +234,7 @@ namespace Persistence
             currentPoints = 0,
             currentUpgradePoints = 0,
             currentObjective = 1,
+            objectiveProgress = 0,
             boardObjects = new List<BoardObjectSaveData>(),
             unlockedCells = new List<Vector2Int>(),
             upgrades = new List<UpgradeSaveObject>()

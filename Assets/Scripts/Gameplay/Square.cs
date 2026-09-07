@@ -120,7 +120,7 @@ public class Square : BoardObject
     {
         return new BoardObjectSaveData
         {
-            type = BoardObjectType.Square.ToString(),
+            type = ObjectType.ToString(),
             value = _remainingCooldown,
             level = chainLevel,
             carryoverValue = _remainingCooldown,
@@ -135,6 +135,8 @@ public class Square : BoardObject
         GridManager.GetGridCell(new Vector2Int(saveData.xPosition, saveData.yPosition)).SetChildObject(this);
         Init(saveData.value);
     }
+
+    public override BoardObjectType ObjectType => BoardObjectType.Square;
 
     public override string GetValue()
     {

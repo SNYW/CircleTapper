@@ -153,7 +153,7 @@ public class Triangle : BoardObject
     {
         return new BoardObjectSaveData
         {
-            type = BoardObjectType.Triangle.ToString(),
+            type = ObjectType.ToString(),
             value = _remainingCharge,
             level = chainLevel,
             carryoverValue = 0,
@@ -170,6 +170,8 @@ public class Triangle : BoardObject
         Init(saveData.value);
         SaveObjectState();
     }
+
+    public override BoardObjectType ObjectType => BoardObjectType.Triangle;
 
     public override string GetValue() => _remainingCharge.ToString();
 

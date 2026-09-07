@@ -151,7 +151,7 @@ public class Hex : BoardObject
     {
         return new BoardObjectSaveData
         {
-            type = BoardObjectType.Hex.ToString(),
+            type = ObjectType.ToString(),
             value = _remainingCooldown,
             level = chainLevel,
             carryoverValue = _storedParticles,
@@ -168,6 +168,8 @@ public class Hex : BoardObject
         Init(saveData.value);
         SaveObjectState();
     }
+
+    public override BoardObjectType ObjectType => BoardObjectType.Hex;
 
     public override string GetValue() => _remainingCooldown.ToString();
 
